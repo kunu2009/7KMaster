@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
