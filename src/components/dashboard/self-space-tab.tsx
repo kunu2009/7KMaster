@@ -6,13 +6,18 @@ import type { SelfSpaceItem } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "../ui/button";
-import { PlusCircle, Camera } from "lucide-react";
+import { Camera } from "lucide-react";
+import { NewSelfSpaceDialog } from "./new-self-space-dialog";
 
 export function SelfSpaceTab() {
-  const [items] = useLocalStorage<SelfSpaceItem[]>(
+  const [items, setItems] = useLocalStorage<SelfSpaceItem[]>(
     "selfSpace",
     initialSelfSpace
   );
+
+  const addItem = (newItem: Omit<SelfSpaceItem, 'id'>) => {
+    setItems(prev => [...prev, { ...newItem, id: `${Date.now()}`}]);
+  };
 
   return (
     <Card>
@@ -24,10 +29,7 @@ export function SelfSpaceTab() {
               Cultivate your well-being and personal environment.
             </CardDescription>
           </div>
-           <Button size="sm" variant="outline">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Area
-          </Button>
+           <NewSelfSpaceDialog onAddItem={addItem} />
         </div>
       </CardHeader>
       <CardContent>

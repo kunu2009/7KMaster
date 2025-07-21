@@ -1,13 +1,10 @@
-"use client"
-
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle } from "lucide-react";
-import { Button } from "../ui/button";
+import { NewProjectDialog } from "./new-project-dialog";
 
 const statusColors: Record<ProjectStatus, string> = {
   "In Progress": "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -17,10 +14,18 @@ const statusColors: Record<ProjectStatus, string> = {
 };
 
 export function ProjectsTab() {
-  const [projects] = useLocalStorage<Project[]>(
+  const [projects, setProjects] = useLocalStorage<Project[]>(
     "projects",
     initialProjects
   );
+
+  const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
+    setProjects(prev => [...prev, {
+      ...newProject,
+      id: `${Date.now()}`,
+      lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
+    }]);
+  }
 
   return (
     <Card>
@@ -32,10 +37,7 @@ export function ProjectsTab() {
               Tracking progress on your suite of applications.
             </CardDescription>
           </div>
-          <Button size="sm" variant="outline">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Project
-          </Button>
+          <NewProjectDialog onAddProject={addProject} />
         </div>
       </CardHeader>
       <CardContent>

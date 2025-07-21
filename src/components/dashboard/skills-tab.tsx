@@ -9,17 +9,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from '../ui/button';
-import { PlusCircle } from 'lucide-react';
+import { NewSkillDialog } from './new-skill-dialog';
 
 export function SkillsTab() {
-  const [skills] = useLocalStorage<Skill[]>(
+  const [skills, setSkills] = useLocalStorage<Skill[]>(
     "skills",
     initialSkills
   );
   const [focusMode, setFocusMode] = useState(false);
 
   const displayedSkills = focusMode ? skills.slice(0, 3) : skills;
+
+  const addSkill = (newSkill: Omit<Skill, 'id'>) => {
+    setSkills(prev => [...prev, { ...newSkill, id: `${Date.now()}` }]);
+  }
 
   return (
     <Card>
@@ -40,10 +43,7 @@ export function SkillsTab() {
               />
               <Label htmlFor="focus-mode">Focus Mode</Label>
             </div>
-            <Button size="sm" variant="outline">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              New Skill
-            </Button>
+            <NewSkillDialog onAddSkill={addSkill} />
           </div>
         </div>
       </CardHeader>
