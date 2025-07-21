@@ -54,6 +54,13 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
       }));
   };
 
+  const handleEditTodo = (todoId: string, newText: string) => {
+    setEditedProject(prev => ({
+        ...prev,
+        todos: (prev.todos || []).map(t => t.id === todoId ? { ...t, text: newText } : t),
+    }));
+  };
+
   const handleAddLog = () => {
     if (newLogEntry.trim() !== '') {
       const log: WorkLogEntry = {
@@ -61,7 +68,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
         date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
         description: newLogEntry.trim(),
       };
-      setEditedProject(prev => ({ ...prev, workLog: [...(prev.workLog || []), log] }));
+      setEditedProject(prev => ({ ...prev, workLog: [...(prev.workLog || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), log] }));
       setNewLogEntry('');
     }
   };
@@ -116,9 +123,17 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                   onCheckedChange={() => handleToggleTodo(todo.id)}
                   disabled={!isEditing}
                 />
-                <label htmlFor={`todo-${todo.id}`} className={`flex-1 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
-                  {todo.text}
-                </label>
+                {isEditing ? (
+                  <Input 
+                    value={todo.text}
+                    onChange={(e) => handleEditTodo(todo.id, e.target.value)}
+                    className="flex-1 h-9"
+                  />
+                ) : (
+                  <label htmlFor={`todo-${todo.id}`} className={`flex-1 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+                    {todo.text}
+                  </label>
+                )}
                 {isEditing && (
                     <Button variant="ghost" size="icon" onClick={() => handleDeleteTodo(todo.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />

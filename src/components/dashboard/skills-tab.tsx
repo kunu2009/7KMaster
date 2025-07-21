@@ -9,6 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus } from "lucide-react";
 import { NewSkillDialog } from './new-skill-dialog';
 
 export function SkillsTab() {
@@ -23,6 +25,16 @@ export function SkillsTab() {
   const addSkill = (newSkill: Omit<Skill, 'id'>) => {
     setSkills(prev => [...prev, { ...newSkill, id: `${Date.now()}` }]);
   }
+
+  const updateProgress = (skillId: string, amount: number) => {
+    setSkills(prev => prev.map(skill => {
+        if (skill.id === skillId) {
+            const newProgress = Math.max(0, Math.min(skill.progress + amount, skill.maxProgress));
+            return { ...skill, progress: newProgress };
+        }
+        return skill;
+    }));
+  };
 
   return (
     <Card>
@@ -55,7 +67,7 @@ export function SkillsTab() {
                 <TableHead>Skill Area</TableHead>
                 <TableHead>Current Level</TableHead>
                 <TableHead>Weekly Goal</TableHead>
-                <TableHead className="w-[200px]">Progress</TableHead>
+                <TableHead className="w-[250px]">Progress</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -66,8 +78,14 @@ export function SkillsTab() {
                   <TableCell>{skill.weeklyGoal}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Progress value={(skill.progress / skill.maxProgress) * 100} className="w-[80%]" />
-                      <span className="text-sm text-muted-foreground">{skill.progress}/{skill.maxProgress}</span>
+                       <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateProgress(skill.id, -1)}>
+                            <Minus className="h-4 w-4" />
+                       </Button>
+                      <Progress value={(skill.progress / skill.maxProgress) * 100} className="w-full" />
+                       <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateProgress(skill.id, 1)}>
+                            <Plus className="h-4 w-4" />
+                       </Button>
+                      <span className="text-sm text-muted-foreground min-w-[40px] text-center">{skill.progress}/{skill.maxProgress}</span>
                     </div>
                   </TableCell>
                 </TableRow>
