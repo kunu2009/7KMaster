@@ -1,7 +1,19 @@
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type ProjectStatus = 'In Progress' | 'Not Started' | 'Concept' | 'Completed';
-export type Project = { id: string; name: string; status: ProjectStatus; lastWorked: string; nextAction: string };
+
+export type Todo = { id: string; text: string; completed: boolean };
+export type WorkLogEntry = { id: string; date: string; description: string };
+
+export type Project = {
+    id: string;
+    name: string;
+    status: ProjectStatus;
+    lastWorked: string;
+    nextAction: string;
+    todos: Todo[];
+    workLog: WorkLogEntry[];
+};
 
 export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number };
 

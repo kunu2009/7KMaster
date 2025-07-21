@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
-import type { Project, ProjectStatus } from "@/lib/types";
+import type { Project, ProjectStatus, Todo, WorkLogEntry } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "./new-project-dialog";
+import { ProjectDetail } from "./project-detail";
 
 const statusColors: Record<ProjectStatus, string> = {
   "In Progress": "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -20,13 +22,33 @@ export function ProjectsTab() {
     "projects",
     initialProjects
   );
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
     setProjects(prev => [...prev, {
       ...newProject,
       id: `${Date.now()}`,
       lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
+      todos: [],
+      workLog: [],
     }]);
+  }
+
+  const handleUpdateProject = (updatedProject: Project) => {
+    setProjects(prevProjects => prevProjects.map(p => p.id === updatedProject.id ? updatedProject : p));
+    setSelectedProject(updatedProject);
+  };
+
+  const handleSelectProject = (project: Project) => {
+    setSelectedProject(project);
+  }
+
+  const handleBackToList = () => {
+    setSelectedProject(null);
+  }
+
+  if (selectedProject) {
+    return <ProjectDetail project={selectedProject} onUpdateProject={handleUpdateProject} onBack={handleBackToList} />;
   }
 
   return (
@@ -36,7 +58,7 @@ export function ProjectsTab() {
           <div>
             <CardTitle>Projects (7K Ecosystem)</CardTitle>
             <CardDescription>
-              Tracking progress on your suite of applications.
+              Tracking progress on your suite of applications. Click a project to see details.
             </CardDescription>
           </div>
           <NewProjectDialog onAddProject={addProject} />
@@ -55,7 +77,7 @@ export function ProjectsTab() {
             </TableHeader>
             <TableBody>
               {projects.map((project) => (
-                <TableRow key={project.id}>
+                <TableRow key={project.id} onClick={() => handleSelectProject(project)} className="cursor-pointer">
                   <TableCell className="font-medium">{project.name}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={statusColors[project.status]}>
