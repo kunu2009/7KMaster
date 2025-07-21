@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Project, Todo, WorkLogEntry } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,12 +23,16 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   const [newTodo, setNewTodo] = useState('');
   const [newLogEntry, setNewLogEntry] = useState('');
 
+  useEffect(() => {
+    setEditedProject(project);
+  }, [project]);
+
   const handleSave = () => {
-    const updatedProject = {
+    const updatedProjectWithDate = {
         ...editedProject,
         lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
     };
-    onUpdateProject(updatedProject);
+    onUpdateProject(updatedProjectWithDate);
     setIsEditing(false);
   };
 
@@ -41,10 +45,11 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   };
 
   const handleToggleTodo = (todoId: string) => {
-    setEditedProject(prev => ({
-      ...prev,
-      todos: (prev.todos || []).map(t => t.id === todoId ? { ...t, completed: !t.completed } : t),
-    }));
+    const updatedTodos = (project.todos || []).map(t => 
+        t.id === todoId ? { ...t, completed: !t.completed } : t
+    );
+    const updatedProject = { ...project, todos: updatedTodos };
+    onUpdateProject(updatedProject);
   };
   
   const handleDeleteTodo = (todoId: string) => {
@@ -68,7 +73,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
         date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
         description: newLogEntry.trim(),
       };
-      setEditedProject(prev => ({ ...prev, workLog: [...(prev.workLog || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), log] }));
+      setEditedProject(prev => ({ ...prev, workLog: [log, ...(prev.workLog || [])] }));
       setNewLogEntry('');
     }
   };
@@ -125,7 +130,6 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
                   onCheckedChange={() => handleToggleTodo(todo.id)}
-                  disabled={!isEditing}
                 />
                 {isEditing ? (
                   <Input 
@@ -173,12 +177,12 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
             </div>
           )}
           <div className="space-y-2">
-            {(currentProject.workLog || []).map(log => (
+            {(currentProject.workLog || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(log => (
               <div key={log.id} className="p-2 border-l-2 pl-4">
                 <p className="font-semibold text-sm">{log.date}</p>
                 <p className="text-muted-foreground">{log.description}</p>
               </div>
-            )).reverse()}
+            ))}
           </div>
         </div>
       </CardContent>
