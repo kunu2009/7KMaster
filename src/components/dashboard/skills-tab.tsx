@@ -46,7 +46,7 @@ export function SkillsTab() {
               Track your learning goals and progress in different areas.
             </CardDescription>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 self-end sm:self-center">
              <div className="flex items-center space-x-2">
               <Switch 
                 id="focus-mode" 
@@ -65,16 +65,16 @@ export function SkillsTab() {
             <TableHeader>
               <TableRow>
                 <TableHead>Skill Area</TableHead>
-                <TableHead>Current Level</TableHead>
+                <TableHead className="hidden sm:table-cell">Current Level</TableHead>
                 <TableHead>Weekly Goal</TableHead>
-                <TableHead className="w-[250px]">Progress</TableHead>
+                <TableHead className="w-[200px] sm:w-[250px]">Progress</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {displayedSkills.map((skill) => (
                 <TableRow key={skill.id}>
                   <TableCell className="font-medium">{skill.area}</TableCell>
-                  <TableCell>{skill.level}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{skill.level}</TableCell>
                   <TableCell>{skill.weeklyGoal}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

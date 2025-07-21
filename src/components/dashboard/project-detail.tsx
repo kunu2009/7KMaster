@@ -78,17 +78,21 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <div className='flex items-center gap-4'>
-                 <Button variant="ghost" size="icon" onClick={onBack}>
+                 <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <div>
+                <div className="flex flex-col gap-1">
                     <CardTitle>{project.name}</CardTitle>
-                    <CardDescription>Status: <Badge variant="outline">{project.status}</Badge> | Last Worked: {project.lastWorked}</CardDescription>
+                    <CardDescription className='flex flex-wrap gap-x-2 gap-y-1 items-center'>
+                      <span>Status: <Badge variant="outline">{project.status}</Badge></span>
+                      <span className='hidden sm:inline'>|</span>
+                      <span>Last Worked: {project.lastWorked}</span>
+                    </CardDescription>
                 </div>
             </div>
-            <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)}>
+            <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full sm:w-auto">
                 {isEditing ? <Save className="mr-2" /> : <Edit className="mr-2" />}
                 {isEditing ? 'Save Changes' : 'Edit Mode'}
             </Button>
@@ -143,7 +147,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
             ))}
           </div>
           {isEditing && (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 value={newTodo}
                 onChange={(e) => setNewTodo(e.target.value)}

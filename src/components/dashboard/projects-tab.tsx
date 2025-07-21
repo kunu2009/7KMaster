@@ -54,7 +54,7 @@ export function ProjectsTab() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
             <CardTitle>Projects (7K Ecosystem)</CardTitle>
             <CardDescription>
@@ -71,7 +71,7 @@ export function ProjectsTab() {
               <TableRow>
                 <TableHead>Project</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Last Worked</TableHead>
+                <TableHead className="hidden md:table-cell">Last Worked</TableHead>
                 <TableHead>Next Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -80,11 +80,11 @@ export function ProjectsTab() {
                 <TableRow key={project.id} onClick={() => handleSelectProject(project)} className="cursor-pointer">
                   <TableCell className="font-medium">{project.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={statusColors[project.status]}>
+                    <Badge variant="outline" className={`${statusColors[project.status]} whitespace-nowrap`}>
                       {project.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{project.lastWorked}</TableCell>
+                  <TableCell className="hidden md:table-cell">{project.lastWorked}</TableCell>
                   <TableCell>{project.nextAction}</TableCell>
                 </TableRow>
               ))}

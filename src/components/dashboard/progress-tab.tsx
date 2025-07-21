@@ -110,7 +110,7 @@ export function ProgressTab() {
         </CardContent>
       </Card>
       
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="lg:col-span-2 grid gap-6 md:grid-cols-2">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Routine Streak</CardTitle>
@@ -133,13 +133,13 @@ export function ProgressTab() {
         </Card>
       </div>
 
-       <Card>
+       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Data &amp; Backups</CardTitle>
           <CardDescription>Manage your application data.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-            <div className="flex items-center justify-between rounded-lg border p-4">
+        <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="flex items-center justify-between rounded-lg border p-4 flex-wrap gap-4">
                 <div>
                     <h3 className="font-medium">Export Progress</h3>
                     <p className="text-sm text-muted-foreground">Download all your data as a JSON file.</p>
@@ -148,7 +148,7 @@ export function ProgressTab() {
                     <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
             </div>
-             <div className="flex items-center justify-between rounded-lg border p-4">
+             <div className="flex items-center justify-between rounded-lg border p-4 flex-wrap gap-4">
                 <div>
                     <h3 className="font-medium">Completed Task Archive</h3>
                     <p className="text-sm text-muted-foreground">View all your completed tasks.</p>
