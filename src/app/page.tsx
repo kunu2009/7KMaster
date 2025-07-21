@@ -4,9 +4,10 @@ import { SkillsTab } from "@/components/dashboard/skills-tab";
 import { SelfSpaceTab } from "@/components/dashboard/self-space-tab";
 import { ProgressTab } from "@/components/dashboard/progress-tab";
 import { ResearchTab } from "@/components/dashboard/research-tab";
+import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
-import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart, Bookmark } from "lucide-react";
+import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart, Bookmark, Bot } from "lucide-react";
 
 export default function Home() {
   return (
@@ -50,9 +51,12 @@ export default function Home() {
           <TabsContent value="progress">
             <ProgressTab />
           </TabsContent>
+          <TabsContent value="assistant">
+            <AssistantTab />
+          </TabsContent>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <TabsList className="grid h-auto w-full grid-cols-6 rounded-none bg-transparent p-0">
+        <TabsList className="grid h-auto w-full grid-cols-7 rounded-none bg-transparent p-0">
             <TabsTrigger value="today" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <ListTodo className="h-5 w-5" />
                 <span className="hidden sm:inline">Today</span>
@@ -76,6 +80,10 @@ export default function Home() {
             <TabsTrigger value="progress" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <LineChart className="h-5 w-5" />
                 <span className="hidden sm:inline">Progress</span>
+            </TabsTrigger>
+             <TabsTrigger value="assistant" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
+                <Bot className="h-5 w-5" />
+                <span className="hidden sm:inline">Assistant</span>
             </TabsTrigger>
         </TabsList>
       </footer>
