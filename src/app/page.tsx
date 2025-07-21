@@ -9,7 +9,7 @@ import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart } from "luci
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <Tabs defaultValue="today" className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
         <div className="flex items-center gap-2">
             <svg
@@ -30,32 +30,47 @@ export default function Home() {
           <ThemeToggle />
         </div>
       </header>
-      <main className="flex flex-1 flex-col gap-4 p-4 md:p-8">
-        <Tabs defaultValue="today" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto">
-            <TabsTrigger value="today"><ListTodo className="mr-2 h-4 w-4" />Today</TabsTrigger>
-            <TabsTrigger value="projects"><GanttChartSquare className="mr-2 h-4 w-4" />Projects</TabsTrigger>
-            <TabsTrigger value="skills"><BrainCircuit className="mr-2 h-4 w-4" />Skills</TabsTrigger>
-            <TabsTrigger value="self-space"><Smile className="mr-2 h-4 w-4" />Self & Space</TabsTrigger>
-            <TabsTrigger value="progress"><LineChart className="mr-2 h-4 w-4" />Progress</TabsTrigger>
-          </TabsList>
-          <TabsContent value="today" className="mt-4">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 mb-20">
+          <TabsContent value="today">
             <TodayTab />
           </TabsContent>
-          <TabsContent value="projects" className="mt-4">
+          <TabsContent value="projects">
             <ProjectsTab />
           </TabsContent>
-          <TabsContent value="skills" className="mt-4">
+          <TabsContent value="skills">
             <SkillsTab />
           </TabsContent>
-          <TabsContent value="self-space" className="mt-4">
+          <TabsContent value="self-space">
             <SelfSpaceTab />
           </TabsContent>
-          <TabsContent value="progress" className="mt-4">
+          <TabsContent value="progress">
             <ProgressTab />
           </TabsContent>
-        </Tabs>
       </main>
-    </div>
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <TabsList className="grid h-full w-full grid-cols-5 rounded-none bg-transparent p-2 sm:p-2 md:p-2">
+            <TabsTrigger value="today" className="flex-col h-14 text-xs gap-1">
+                <ListTodo className="h-5 w-5" />
+                <span>Today</span>
+            </TabsTrigger>
+            <TabsTrigger value="projects" className="flex-col h-14 text-xs gap-1">
+                <GanttChartSquare className="h-5 w-5" />
+                <span>Projects</span>
+            </TabsTrigger>
+            <TabsTrigger value="skills" className="flex-col h-14 text-xs gap-1">
+                <BrainCircuit className="h-5 w-5" />
+                <span>Skills</span>
+            </TabsTrigger>
+            <TabsTrigger value="self-space" className="flex-col h-14 text-xs gap-1">
+                <Smile className="h-5 w-5" />
+                <span>Self & Space</span>
+            </TabsTrigger>
+            <TabsTrigger value="progress" className="flex-col h-14 text-xs gap-1">
+                <LineChart className="h-5 w-5" />
+                <span>Progress</span>
+            </TabsTrigger>
+        </TabsList>
+      </footer>
+    </Tabs>
   );
 }
