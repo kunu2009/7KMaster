@@ -74,7 +74,7 @@ const generateProjectTodosTool = ai.defineTool(
               schema: z.object({ todos: z.array(TodoSchema) })
           }
       });
-      return llmResponse.output() || { todos: [] };
+      return llmResponse.output || { todos: [] };
   }
 );
 
@@ -150,7 +150,7 @@ const assistantFlow = ai.defineFlow(
   },
   async (input) => {
     const response = await assistantPrompt(input);
-    const toolRequest = response.toolRequest();
+    const toolRequest = response.toolRequest;
     let toolAction: AssistantToolAction | undefined = undefined;
 
     if (toolRequest) {
@@ -166,19 +166,19 @@ const assistantFlow = ai.defineFlow(
         const followUpResponse = await assistantPrompt({
             ...input,
             history: [
-                ...response.history(),
+                ...response.history,
                 response.request, // include the original request
                 response.response, // and the tool request response
             ],
         });
         return {
-            text: followUpResponse.text() || "I've processed that for you.",
+            text: followUpResponse.text || "I've processed that for you.",
             toolAction: toolAction,
         };
     }
 
     return {
-        text: response.text(),
+        text: response.text,
         toolAction: undefined,
     };
   }
