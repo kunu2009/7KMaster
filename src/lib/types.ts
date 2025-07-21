@@ -27,6 +27,7 @@ export type ResearchItem = {
     type: ResearchType;
     url: string;
     description: string;
+    attachment?: string;
 };
 
 

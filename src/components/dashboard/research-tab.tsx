@@ -7,8 +7,9 @@ import type { ResearchItem, ResearchType } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2, Paperclip, Edit } from "lucide-react";
 import { NewResearchItemDialog } from "./new-research-item-dialog";
+import { EditResearchItemDialog } from "./edit-research-item-dialog";
 
 const typeColors: Record<ResearchType, string> = {
   Tool: "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -27,6 +28,10 @@ export function ResearchTab() {
 
   const addItem = (newItem: Omit<ResearchItem, 'id'>) => {
     setItems(prev => [...prev, { ...newItem, id: `${Date.now()}` }]);
+  };
+  
+  const updateItem = (updatedItem: ResearchItem) => {
+    setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
   };
   
   const deleteItem = (itemId: string) => {
@@ -81,8 +86,14 @@ export function ResearchTab() {
                     </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="flex-grow space-y-2">
                 <p className="text-sm text-muted-foreground">{item.description}</p>
+                 {item.attachment && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                    <Paperclip className="h-4 w-4" />
+                    <span>{item.attachment}</span>
+                  </div>
+                )}
               </CardContent>
               <div className="p-4 pt-0 mt-auto flex justify-between items-center">
                 <a href={item.url} target="_blank" rel="noopener noreferrer">
@@ -90,9 +101,12 @@ export function ResearchTab() {
                     Visit <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
                 </a>
-                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => deleteItem(item.id)}>
-                    <Trash2 className="h-4 w-4" />
-                </Button>
+                 <div className="flex items-center gap-1">
+                    <EditResearchItemDialog item={item} onUpdateItem={updateItem} />
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => deleteItem(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
               </div>
             </Card>
           ))}
