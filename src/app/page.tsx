@@ -3,9 +3,10 @@ import { ProjectsTab } from "@/components/dashboard/projects-tab";
 import { SkillsTab } from "@/components/dashboard/skills-tab";
 import { SelfSpaceTab } from "@/components/dashboard/self-space-tab";
 import { ProgressTab } from "@/components/dashboard/progress-tab";
+import { ResearchTab } from "@/components/dashboard/research-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
-import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart } from "lucide-react";
+import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart, Bookmark } from "lucide-react";
 
 export default function Home() {
   return (
@@ -40,6 +41,9 @@ export default function Home() {
           <TabsContent value="skills">
             <SkillsTab />
           </TabsContent>
+           <TabsContent value="research">
+            <ResearchTab />
+          </TabsContent>
           <TabsContent value="self-space">
             <SelfSpaceTab />
           </TabsContent>
@@ -48,7 +52,7 @@ export default function Home() {
           </TabsContent>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <TabsList className="grid h-auto w-full grid-cols-5 rounded-none bg-transparent p-0">
+        <TabsList className="grid h-auto w-full grid-cols-6 rounded-none bg-transparent p-0">
             <TabsTrigger value="today" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <ListTodo className="h-5 w-5" />
                 <span className="hidden sm:inline">Today</span>
@@ -60,6 +64,10 @@ export default function Home() {
             <TabsTrigger value="skills" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <BrainCircuit className="h-5 w-5" />
                 <span className="hidden sm:inline">Skills</span>
+            </TabsTrigger>
+            <TabsTrigger value="research" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
+                <Bookmark className="h-5 w-5" />
+                <span className="hidden sm:inline">Research</span>
             </TabsTrigger>
             <TabsTrigger value="self-space" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <Smile className="h-5 w-5" />

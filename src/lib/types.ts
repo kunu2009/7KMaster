@@ -19,6 +19,17 @@ export type Skill = { id: string; area: string; level: string; weeklyGoal: strin
 
 export type SelfSpaceItem = { id: string; area: string; status: string; goal: string };
 
+export type ResearchType = 'Tool' | 'Website' | 'Article' | 'Video' | 'Course';
+
+export type ResearchItem = {
+    id: string;
+    name: string;
+    type: ResearchType;
+    url: string;
+    description: string;
+};
+
+
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode

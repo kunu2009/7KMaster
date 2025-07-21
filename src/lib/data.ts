@@ -1,4 +1,4 @@
-import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig } from './types';
+import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem } from './types';
 
 export const initialTodayTasks: TodayTask[] = [
   { id: '1', timeBlock: 'Morning Reset', task: 'Clean, journal, hydrate', done: true },
@@ -27,6 +27,12 @@ export const initialSelfSpace: SelfSpaceItem[] = [
   { id: '2', area: 'Routine', status: 'Getting Better', goal: '5 days streak' },
   { id: '3', area: 'Mental Health', status: 'Low focus', goal: 'Meditate 5 mins' },
   { id: '4', area: 'Sleep/Health', status: 'Irregular', goal: 'Sleep by 11 PM' },
+];
+
+export const initialResearchItems: ResearchItem[] = [
+    { id: '1', name: 'Genkit', type: 'Tool', url: 'https://firebase.google.com/docs/genkit', description: 'The GenAI stack for building AI-powered features and applications.' },
+    { id: '2', name: 'Shadcn UI', type: 'Website', url: 'https://ui.shadcn.com/', description: 'Beautifully designed components that you can copy and paste into your apps.' },
+    { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.' },
 ];
 
 export const progressChartData = [
