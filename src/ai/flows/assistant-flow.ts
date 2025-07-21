@@ -32,9 +32,9 @@ const GenerateTodosInputSchema = z.object({
 });
 
 const TodoSchema = z.object({
-    id: z.string(),
-    text: z.string(),
-    completed: z.boolean(),
+    id: z.string().describe("A unique ID for the todo item, generated as a random string."),
+    text: z.string().describe("The description of the task."),
+    completed: z.boolean().describe("Whether the task is completed. This should always be false initially."),
 });
 
 // Defining the Tools
@@ -46,8 +46,7 @@ const addProjectTool = ai.defineTool(
     outputSchema: z.object({ success: z.boolean() }),
   },
   async (input) => {
-    // In a real app, this would save to a database.
-    // Here we just signal success. The client will handle the actual data update.
+    // This just signals success. The client will handle the actual data update.
     console.log('AI wants to add project:', input);
     return { success: true };
   }
@@ -62,10 +61,16 @@ const generateProjectTodosTool = ai.defineTool(
   },
   async ({ projectName, numberOfTodos, projectContext }) => {
       const prompt = `
-        You are a project management assistant. Generate a list of ${numberOfTodos} actionable to-do items for the project "${projectName}".
-        ${projectContext ? `The user has provided this context: "${projectContext}"` : ''}
-        The tasks should be broken down into small, concrete steps.
-        Return the result as a JSON object with a "todos" array. Each todo should have an id (a random string), text, and completed (default to false).
+        You are a world-class project manager. A user needs help breaking down a project into tasks.
+        Generate a list of exactly ${numberOfTodos} actionable to-do items for the project named "${projectName}".
+
+        ${projectContext ? `The user has provided this context about the project: "${projectContext}"` : ''}
+        
+        The tasks should be concrete, actionable, and clear. For example, instead of "code the backend", a good task would be "Set up Express server with TypeScript".
+        Return the result as a JSON object with a "todos" array. Each todo must have:
+        - an "id" (a unique random string)
+        - a "text" (the task description)
+        - a "completed" field (which must be false).
       `;
       const llmResponse = await generate({
           model: 'googleai/gemini-2.0-flash',
@@ -107,25 +112,20 @@ const assistantPrompt = ai.definePrompt({
     output: { schema: AssistantOutputSchema },
     tools: [addProjectTool, generateProjectTodosTool],
     system: `You are the 7K Dashboard AI assistant.
-- Be conversational and helpful.
+- Be conversational, friendly, and helpful.
 - Your primary goal is to help the user manage their dashboard by using the available tools.
-- When you use a tool, provide a friendly text response confirming what you've done or what you're suggesting.
-- Before using a tool, you can ask clarifying questions if the user's request is ambiguous.
+- When you decide to use a tool, you MUST provide a friendly text response to the user confirming what you've done or what you're suggesting. For example, if you use 'addProject', say "I've added [Project Name] to your list for you!". If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]. You can add them to your project."
+- You can ask clarifying questions if the user's request is ambiguous before using a tool.
 - Use the provided project list for context on what the user is already working on.
-- When generating todos, formulate a clear response and pass the generated todos in the toolAction field.
+- When generating todos, you must formulate a clear response and pass the generated todos in the toolAction field.
 `,
     prompt: `
         {{#if history}}
             Here is the conversation history:
             {{#each history}}
-                {{#if @first}}
-                <--
-                {{/if}}
-                User: {{input}}
-                AI: {{output}}
-                {{#if @last}}
-                -->
-                {{/if}}
+                {{#if @first}}<--{{/if}}
+                {{#if (eq role 'user')}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
+                {{#if @last}}-->{{/if}}
             {{/each}}
         {{/if}}
 
@@ -149,30 +149,27 @@ const assistantFlow = ai.defineFlow(
     outputSchema: AssistantOutputSchema,
   },
   async (input) => {
-    const response = await assistantPrompt(input);
-    const toolRequest = response.toolRequest;
-    let toolAction: AssistantToolAction | undefined = undefined;
+    const promptRequest = {
+        ...input,
+        history: input.history || []
+    };
 
+    const response = await assistantPrompt(promptRequest);
+    const toolRequest = response.toolRequest;
+    
     if (toolRequest) {
         const toolResponse = await toolRequest.run();
 
-        // Prepare the action for the frontend
-        toolAction = {
+        const toolAction: AssistantToolAction = {
             toolName: toolRequest.toolName,
             args: toolRequest.input,
             result: toolResponse,
         };
-
-        const followUpResponse = await assistantPrompt({
-            ...input,
-            history: [
-                ...response.history,
-                response.request, // include the original request
-                response.response, // and the tool request response
-            ],
-        });
+        
+        // The prompt should have already generated a user-facing message.
+        // We just return it along with the tool action.
         return {
-            text: followUpResponse.text || "I've processed that for you.",
+            text: response.text,
             toolAction: toolAction,
         };
     }

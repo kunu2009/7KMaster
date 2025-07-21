@@ -10,8 +10,11 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Wand2, Loader } from "lucide-react";
 import { NewSkillDialog } from './new-skill-dialog';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { generateFocusSuggestions } from '@/ai/flows/generate-focus-suggestions-flow';
+import { useToast } from '@/hooks/use-toast';
 
 export function SkillsTab() {
   const [skills, setSkills] = useLocalStorage<Skill[]>(
@@ -19,8 +22,41 @@ export function SkillsTab() {
     initialSkills
   );
   const [focusMode, setFocusMode] = useState(false);
+  const [isGeneratingFocus, setIsGeneratingFocus] = useState(false);
+  const [focusSkillIds, setFocusSkillIds] = useState<string[]>([]);
+  const [focusReasoning, setFocusReasoning] = useState('');
+  const { toast } = useToast();
 
-  const displayedSkills = focusMode ? skills.slice(0, 3) : skills;
+  const handleFocusModeChange = async (checked: boolean) => {
+    setFocusMode(checked);
+    if (checked) {
+        setIsGeneratingFocus(true);
+        setFocusReasoning('');
+        try {
+            const result = await generateFocusSuggestions({
+                skills: skills.map(({ id, area, level, weeklyGoal }) => ({ id, area, level, weeklyGoal }))
+            });
+            setFocusSkillIds(result.focusSkillIds);
+            setFocusReasoning(result.reasoning);
+        } catch (error) {
+            console.error("Error generating focus suggestions:", error);
+            toast({
+                title: 'Error',
+                description: 'Could not generate AI focus suggestions. Showing top 3 skills.',
+                variant: 'destructive',
+            });
+            // Fallback to showing first 3 skills
+            setFocusSkillIds(skills.slice(0, 3).map(s => s.id));
+        } finally {
+            setIsGeneratingFocus(false);
+        }
+    } else {
+        setFocusSkillIds([]);
+        setFocusReasoning('');
+    }
+  };
+
+  const displayedSkills = focusMode ? skills.filter(s => focusSkillIds.includes(s.id)) : skills;
 
   const addSkill = (newSkill: Omit<Skill, 'id'>) => {
     setSkills(prev => [...prev, { ...newSkill, id: `${Date.now()}` }]);
@@ -51,15 +87,27 @@ export function SkillsTab() {
               <Switch 
                 id="focus-mode" 
                 checked={focusMode}
-                onCheckedChange={setFocusMode}
+                onCheckedChange={handleFocusModeChange}
               />
-              <Label htmlFor="focus-mode">Focus Mode</Label>
+              <Label htmlFor="focus-mode" className="flex items-center gap-1">
+                <Wand2 className="h-4 w-4" />
+                <span>AI Focus</span>
+              </Label>
             </div>
             <NewSkillDialog onAddSkill={addSkill} />
           </div>
         </div>
       </CardHeader>
       <CardContent>
+        {focusMode && (isGeneratingFocus || focusReasoning) && (
+            <Alert className="mb-6 bg-primary/5 border-primary/20">
+                {isGeneratingFocus ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Wand2 className="h-4 w-4" />}
+                <AlertTitle>{isGeneratingFocus ? "Generating Suggestions..." : "AI Focus Suggestions"}</AlertTitle>
+                <AlertDescription>
+                    {isGeneratingFocus ? "The AI is analyzing your skills to suggest what to focus on." : focusReasoning}
+                </AlertDescription>
+            </Alert>
+        )}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -93,6 +141,11 @@ export function SkillsTab() {
             </TableBody>
           </Table>
         </div>
+        {skills.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+                <p>No skills added yet. Click "New Skill" to start tracking your progress!</p>
+            </div>
+        )}
       </CardContent>
     </Card>
   );

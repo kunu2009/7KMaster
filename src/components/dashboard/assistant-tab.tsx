@@ -10,6 +10,7 @@ import { Bot, Loader, PlusCircle, Send, User } from 'lucide-react';
 import { runAssistant, type AssistantToolAction } from '@/ai/flows/assistant-flow';
 import { initialProjects } from '@/lib/data';
 import type { Project, Todo } from '@/lib/types';
+import type { Message as GenkitMessage } from 'genkit';
 
 
 interface Message {
@@ -64,8 +65,17 @@ export function AssistantTab() {
       }
       return prevProjects.map(p => {
         if (p.name.toLowerCase() === projectName.toLowerCase()) {
-          const newTodos = [...(p.todos || []), ...todos];
-          return { ...p, todos: newTodos };
+          // Filter out duplicate todos based on text
+          const existingTodoTexts = new Set((p.todos || []).map(t => t.text));
+          const newTodos = todos.filter((t: Todo) => !existingTodoTexts.has(t.text));
+          
+          if (newTodos.length < todos.length) {
+              toast({ title: "Duplicate tasks skipped", description: "Some suggested tasks already exist and were not added."});
+          }
+
+          if (newTodos.length === 0) return p;
+
+          return { ...p, todos: [...(p.todos || []), ...newTodos] };
         }
         return p;
       });
@@ -98,9 +108,16 @@ export function AssistantTab() {
 
     try {
         const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction }));
+
+        const history: GenkitMessage[] = messages.map(m => ({
+            role: m.role,
+            content: [{ text: m.content }]
+        }));
+
         const response = await runAssistant({
             message: input,
-            projects: simplifiedProjects
+            projects: simplifiedProjects,
+            history: history,
         });
         
         const assistantMessage: Message = {
@@ -139,11 +156,11 @@ export function AssistantTab() {
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     {message.toolAction && (
                         <div className="mt-3 border-t pt-3">
-                            <p className="text-xs font-semibold mb-2">Action Suggested:</p>
+                            <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
                              <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!)}>
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                {message.toolAction.toolName === 'addProject' && `Confirm Add Project`}
-                                {message.toolAction.toolName === 'generateProjectTodos' && `Confirm Add Todos`}
+                                {message.toolAction.toolName === 'addProject' && `Confirm: Add Project`}
+                                {message.toolAction.toolName === 'generateProjectTodos' && `Confirm: Add Todos`}
                             </Button>
                         </div>
                     )}
@@ -173,7 +190,7 @@ export function AssistantTab() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g., Generate 5 tasks for my '7K Life' project"
+            placeholder="e.g., Add a project called 'Learn Genkit'"
             disabled={isLoading}
           />
           <Button type="submit" disabled={isLoading || !input.trim()}>
