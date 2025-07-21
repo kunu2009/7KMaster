@@ -12,8 +12,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -70,14 +68,14 @@ export function TodayTab() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
             <div>
               <CardTitle>Today's Plan</CardTitle>
               <CardDescription>
                 A checklist for your daily reset, focus blocks, and reviews.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-end sm:self-auto">
                 {allTasksCompleted && <Badge color="green">All Done! 🎉</Badge>}
                 <Button onClick={handleGeneratePlan} disabled={isGenerating} size="sm" variant="outline">
                   {isGenerating ? (
@@ -85,37 +83,33 @@ export function TodayTab() {
                   ) : (
                     <RefreshCw className="mr-2 h-4 w-4" />
                   )}
-                  Refresh Plan
+                  <span className="hidden sm:inline">Refresh Plan</span>
+                  <span className="sm:hidden">Refresh</span>
                 </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[150px]">Time Block</TableHead>
-                <TableHead>Task</TableHead>
-                <TableHead className="w-[80px] text-center">Done ✔️</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tasks.map((task) => (
-                <TableRow key={task.id} className={task.done ? "text-muted-foreground" : ""}>
-                  <TableCell className="font-medium">{task.timeBlock}</TableCell>
-                  <TableCell>{task.task}</TableCell>
-                  <TableCell className="text-center">
-                    <Checkbox
-                      id={`task-${task.id}`}
-                      checked={task.done}
-                      onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
-                      aria-label={`Mark ${task.task} as done`}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableBody>
+                {tasks.map((task) => (
+                  <TableRow key={task.id} className={task.done ? "text-muted-foreground" : ""}>
+                    <TableCell className="font-medium w-1/3 sm:w-[150px] pr-2">{task.timeBlock}</TableCell>
+                    <TableCell>{task.task}</TableCell>
+                    <TableCell className="w-[50px] text-center pl-2">
+                      <Checkbox
+                        id={`task-${task.id}`}
+                        checked={task.done}
+                        onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
+                        aria-label={`Mark ${task.task} as done`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       <PomodoroTimer />
