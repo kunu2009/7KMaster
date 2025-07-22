@@ -13,6 +13,7 @@ import { z, generate } from 'genkit';
 import { ProjectStatus } from '@/lib/types';
 import { generateProjectTodos } from './generate-project-todos-flow';
 import type { GenerateTodosOutput } from './generate-project-todos-flow';
+import type { TodayTask, Skill } from '@/lib/types';
 
 
 // Schemas for AI Tools
@@ -74,7 +75,9 @@ export type AssistantToolAction = z.infer<typeof AssistantToolActionSchema>;
 const AssistantInputSchema = z.object({
   message: z.string(),
   history: z.array(z.any()).optional(),
-  projects: z.array(z.object({ name: z.string(), nextAction: z.string() })).optional().describe('A list of the user\'s current projects for context.'),
+  projects: z.array(z.object({ name: z.string(), nextAction: z.string(), status: z.string() })).optional().describe("A list of the user's current projects for context."),
+  skills: z.array(z.object({ area: z.string(), level: z.string(), weeklyGoal: z.string(), progress: z.number(), maxProgress: z.number() })).optional().describe("A list of the user's current skills."),
+  todayTasks: z.array(z.object({ task: z.string(), done: z.boolean() })).optional().describe("The user's plan for today."),
 });
 export type AssistantInput = z.infer<typeof AssistantInputSchema>;
 
@@ -91,15 +94,14 @@ const assistantPrompt = ai.definePrompt({
     input: { schema: z.any() }, // Allow any input for flexibility with template
     output: { schema: AssistantOutputSchema },
     tools: [addProjectTool, generateProjectTodosTool],
-    system: `You are the 7K Dashboard AI assistant.
-- Be conversational, friendly, and helpful.
-- Your primary goal is to help the user manage their dashboard by using the available tools.
-- **IMPORTANT**: When you decide to use a tool, you MUST also provide a friendly text response to the user confirming what you've done or what you're suggesting. Your response must always have a "text" field with a conversational message for the user. Do not output JSON or any other machine-readable format in the 'text' field.
-- If the user provides context about a specific project, focus your response and tool usage on that project.
-- If you use 'addProject', say something like "I've added [Project Name] to your list for you! You can confirm it below."
-- If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]. You can add them to your project." and present the generated todos in the toolAction.
-- You can ask clarifying questions if the user's request is ambiguous before using a tool.
-- Use the provided project list for context on what the user is already working on.
+    system: `You are the 7K Dashboard AI assistant. You are a helpful, friendly, and insightful productivity coach.
+- Your primary goal is to help the user manage their dashboard by using the available tools, or to help them reflect and plan by analyzing their data.
+- **IMPORTANT**: When you use a tool, you MUST also provide a friendly text response to the user confirming what you've done. Your response must always have a "text" field.
+- If the user asks for a summary or plan, synthesize information from their projects, skills, and tasks to provide a thoughtful and actionable response.
+- Be conversational. Do not output JSON or any other machine-readable format in the 'text' field.
+- If you use 'addProject', say something like "I've added [Project Name] to your list for you!"
+- If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]." and present the todos in the toolAction.
+- Use all the provided context (projects, skills, tasks) to answer questions comprehensively.
 `,
     prompt: `
         {{#if history}}
@@ -109,13 +111,33 @@ const assistantPrompt = ai.definePrompt({
             {{/each}}
         {{/if}}
 
-        Here are the user's current projects:
+        Here is the full context of the user's dashboard:
+        
+        **Projects:**
         {{#if projects}}
             {{#each projects}}
-            - {{name}} (Next Action: {{nextAction}})
+            - {{name}} (Status: {{status}}, Next Action: {{nextAction}})
             {{/each}}
         {{else}}
             The user has no projects yet.
+        {{/if}}
+
+        **Skills:**
+        {{#if skills}}
+            {{#each skills}}
+            - {{area}} (Level: {{level}}, Goal: "{{weeklyGoal}}", Progress: {{progress}}/{{maxProgress}})
+            {{/each}}
+        {{else}}
+            The user has no skills yet.
+        {{/if}}
+
+        **Today's Tasks:**
+        {{#if todayTasks}}
+             {{#each todayTasks}}
+            - [{{#if done}}x{{else}} {{/if}}] {{task}}
+            {{/each}}
+        {{else}}
+            The user has no tasks for today.
         {{/if}}
 
         User's new message: {{{message}}}

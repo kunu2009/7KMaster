@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Bot, Loader, PlusCircle, Send, User, FolderKanban } from 'lucide-react';
+import { Bot, Loader, PlusCircle, Send, User, FolderKanban, Sparkles, Zap, Brain } from 'lucide-react';
 import { runAssistant, type AssistantToolAction, type AssistantOutput } from '@/ai/flows/assistant-flow';
-import { initialProjects } from '@/lib/data';
-import type { Project, Todo } from '@/lib/types';
+import { initialProjects, initialSkills, initialTodayTasks } from '@/lib/data';
+import type { Project, Todo, Skill, TodayTask } from '@/lib/types';
 import type { Message as GenkitMessage } from 'genkit';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,6 +36,9 @@ export function AssistantTab() {
   const { toast } = useToast();
   
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [skills, setSkills] = useLocalStorage<Skill[]>("skills", initialSkills);
+  const [todayTasks, setTodayTasks] = useLocalStorage<TodayTask[]>("todayTasks", initialTodayTasks);
+
   const [pendingTodoAction, setPendingTodoAction] = useState<PendingTodoAction | null>(null);
   const [selectedProjectContext, setSelectedProjectContext] = useState<string>('');
   
@@ -56,6 +59,7 @@ export function AssistantTab() {
         lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
         todos: [],
         workLog: [],
+        attachments: [],
       }]);
       toast({ title: "Project Added!", description: `"${args.name}" has been added to your projects.` });
   }, [setProjects, toast]);
@@ -123,23 +127,20 @@ export function AssistantTab() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const processRequest = async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return;
 
-    let finalInput = input;
-    if (selectedProjectContext) {
-        finalInput = `For project "${selectedProjectContext}", ${input}`;
-    }
-
-    const userMessage: Message = { role: 'user', content: input }; // Show original input to user
+    const userMessage: Message = { role: 'user', content: messageText };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
     setPendingTodoAction(null);
 
     try {
-        const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction }));
+        const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction, status: p.status }));
+        const simplifiedSkills = skills.map(s => ({ area: s.area, level: s.level, weeklyGoal: s.weeklyGoal, progress: s.progress, maxProgress: s.maxProgress }));
+        const simplifiedTasks = todayTasks.map(t => ({ task: t.task, done: t.done }));
+
 
         const history: GenkitMessage[] = messages.map(m => ({
             role: m.role,
@@ -147,8 +148,10 @@ export function AssistantTab() {
         }));
 
         const response : AssistantOutput = await runAssistant({
-            message: finalInput, // Send input with context to AI
+            message: messageText,
             projects: simplifiedProjects,
+            skills: simplifiedSkills,
+            todayTasks: simplifiedTasks,
             history: history,
         });
         
@@ -157,7 +160,7 @@ export function AssistantTab() {
             content: response.text,
             toolAction: response.toolAction ?? undefined
         };
-        const newMessageId = messages.length + 1; // ID for the new assistant message
+        const newMessageId = messages.length + 2; // ID for the new assistant message
         setMessages(prev => [...prev, assistantMessage]);
 
         if (response.toolAction) {
@@ -173,6 +176,19 @@ export function AssistantTab() {
         setIsLoading(false);
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    let finalInput = input;
+    if (selectedProjectContext) {
+        finalInput = `For project "${selectedProjectContext}", ${input}`;
+    }
+    processRequest(finalInput);
+  };
+
+  const handleSmartPrompt = (prompt: string) => {
+    processRequest(prompt);
+  }
 
   const ProjectSelector = ({ onConfirm }: { onConfirm: (projectName: string) => void }) => {
     const [selectedProject, setSelectedProject] = useState('');
@@ -204,7 +220,7 @@ export function AssistantTab() {
     <Card className="flex flex-col h-[calc(100vh-12rem)]">
         <CardHeader>
             <CardTitle>AI Assistant</CardTitle>
-            <CardDescription>Ask me to add projects, generate ideas, and more.</CardDescription>
+            <CardDescription>Your smart dashboard companion. Ask me anything about your progress.</CardDescription>
         </CardHeader>
       <CardContent className="flex-1 overflow-y-auto pr-4">
         <div className="space-y-6">
@@ -251,9 +267,23 @@ export function AssistantTab() {
         </div>
       </CardContent>
       <div className="p-4 border-t space-y-4">
+        <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">Smart Prompts</Label>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading}>
+                    <Sparkles className="mr-2 h-4 w-4" /> Summarize Week
+                </Button>
+                 <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Based on my projects and skills, suggest a plan for the next 3 days.")} disabled={isLoading}>
+                    <Zap className="mr-2 h-4 w-4" /> Plan Next 3 Days
+                </Button>
+                 <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Generate a high-level vision statement based on my current projects and skills.")} disabled={isLoading}>
+                    <Brain className="mr-2 h-4 w-4" /> Generate Vision
+                </Button>
+            </div>
+        </div>
         <div>
             <Label htmlFor="project-context" className="text-xs text-muted-foreground">Project Context (Optional)</Label>
-            <Select onValueChange={setSelectedProjectContext} value={selectedProjectContext}>
+            <Select onValueChange={setSelectedProjectContext} value={selectedProjectContext} disabled={isLoading}>
                 <SelectTrigger id="project-context" className="w-full">
                     <SelectValue placeholder="Select a project for context..." />
                 </SelectTrigger>
