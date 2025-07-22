@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Bot, Loader, PlusCircle, Send, User } from 'lucide-react';
-import { runAssistant, type AssistantToolAction } from '@/ai/flows/assistant-flow';
+import { runAssistant, type AssistantToolAction, type AssistantOutput } from '@/ai/flows/assistant-flow';
 import { initialProjects } from '@/lib/data';
 import type { Project, Todo } from '@/lib/types';
 import type { Message as GenkitMessage } from 'genkit';
@@ -67,7 +67,7 @@ export function AssistantTab() {
         if (p.name.toLowerCase() === projectName.toLowerCase()) {
           // Filter out duplicate todos based on text
           const existingTodoTexts = new Set((p.todos || []).map(t => t.text));
-          const newTodos = todos.filter((t: Todo) => !existingTodoTexts.has(t.text));
+          const newTodos = todos.filter((t: Todo) => t.text && !existingTodoTexts.has(t.text));
           
           if (newTodos.length < todos.length) {
               toast({ title: "Duplicate tasks skipped", description: "Some suggested tasks already exist and were not added."});
@@ -119,7 +119,7 @@ export function AssistantTab() {
             content: [{ text: m.content }]
         }));
 
-        const response = await runAssistant({
+        const response : AssistantOutput = await runAssistant({
             message: input,
             projects: simplifiedProjects,
             history: history,

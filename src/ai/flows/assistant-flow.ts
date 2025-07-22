@@ -33,7 +33,7 @@ const GenerateTodosInputSchema = z.object({
 
 const TodoSchema = z.object({
     id: z.string().describe("A unique ID for the todo item, generated as a random string."),
-    text: z.string().describe("The description of the task."),
+    text: z.string().describe("The description of the task. This is the content of the to-do item."),
     completed: z.boolean().describe("Whether the task is completed. This should always be false initially."),
 });
 
@@ -69,7 +69,7 @@ const generateProjectTodosTool = ai.defineTool(
         The tasks should be concrete, actionable, and clear. For example, instead of "code the backend", a good task would be "Set up Express server with TypeScript".
         Return the result as a JSON object with a "todos" array. Each todo must have:
         - an "id" (a unique random string)
-        - a "text" (the task description)
+        - a "text" (the task description, this is crucial and cannot be empty)
         - a "completed" field (which must be false).
       `;
       const llmResponse = await generate({
