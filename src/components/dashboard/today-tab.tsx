@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -18,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, Loader } from "lucide-react";
+import { RefreshCw, Loader, Clock } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialTodayTasks, initialProjects, initialSkills } from "@/lib/data";
 import type { TodayTask, Project, Skill } from "@/lib/types";
@@ -62,24 +63,25 @@ export function TodayTab() {
     }
   };
 
-  const { completedTasks, totalTasks, progress, allTasksCompleted, groupedTasks } = useMemo(() => {
+  const { completedTasks, totalTasks, progress, allTasksCompleted, tasksByTimeBlock } = useMemo(() => {
     const total = tasks.length;
     const completed = tasks.filter(task => task.done).length;
-    const groups = tasks.reduce((acc, task) => {
-      const { timeBlock } = task;
-      if (!acc[timeBlock]) {
-        acc[timeBlock] = [];
-      }
-      acc[timeBlock].push(task);
-      return acc;
-    }, {} as Record<string, TodayTask[]>);
+    
+    // The AI is now expected to generate a chronological, time-blocked schedule.
+    // We can just render them in the order we receive them.
+    const uniqueTimeBlocks = [...new Set(tasks.map(t => t.timeBlock))];
+
+    const grouped = uniqueTimeBlocks.map(timeBlock => ({
+        timeBlock,
+        tasks: tasks.filter(t => t.timeBlock === timeBlock),
+    }));
 
     return {
         completedTasks: completed,
         totalTasks: total,
         progress: total > 0 ? (completed / total) * 100 : 0,
         allTasksCompleted: total > 0 && completed === total,
-        groupedTasks: Object.entries(groups)
+        tasksByTimeBlock: grouped,
     }
   }, [tasks]);
 
@@ -91,7 +93,7 @@ export function TodayTab() {
             <div>
               <CardTitle>Today's Plan</CardTitle>
               <CardDescription>
-                A checklist for your daily reset, focus blocks, and reviews.
+                Your AI-generated, time-blocked schedule for the day.
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 self-end sm:self-auto">
@@ -102,7 +104,7 @@ export function TodayTab() {
                   ) : (
                     <RefreshCw className="mr-2 h-4 w-4" />
                   )}
-                  <span className="hidden sm:inline">Refresh Plan</span>
+                  <span className="hidden sm:inline">New Plan</span>
                   <span className="sm:hidden">Refresh</span>
                 </Button>
             </div>
@@ -116,15 +118,18 @@ export function TodayTab() {
            </div>
         </CardHeader>
         <CardContent>
-          <Accordion type="multiple" defaultValue={groupedTasks.map(([timeBlock]) => timeBlock)} className="w-full">
-            {groupedTasks.map(([timeBlock, tasksInGroup]) => (
+          <Accordion type="multiple" defaultValue={tasksByTimeBlock.map(g => g.timeBlock)} className="w-full">
+            {tasksByTimeBlock.map(({ timeBlock, tasks: tasksInBlock }) => (
                 <AccordionItem value={timeBlock} key={timeBlock}>
                     <AccordionTrigger className="font-semibold text-base hover:no-underline">
-                        {timeBlock}
+                       <div className="flex items-center gap-3">
+                         <Clock className="h-5 w-5 text-primary" />
+                         <span className="font-mono text-lg">{timeBlock}</span>
+                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <div className="space-y-4 pl-1">
-                            {tasksInGroup.map(task => (
+                        <div className="space-y-4 pl-4 border-l-2 ml-4">
+                            {tasksInBlock.map(task => (
                                 <div key={task.id} className="flex items-center gap-4">
                                     <Checkbox
                                         id={`task-${task.id}`}
@@ -145,6 +150,12 @@ export function TodayTab() {
                 </AccordionItem>
             ))}
           </Accordion>
+           {tasks.length === 0 && !isGenerating && (
+                <div className="text-center py-10 text-muted-foreground">
+                    <p>No tasks for today.</p>
+                    <p>Click "New Plan" to generate a schedule.</p>
+                </div>
+            )}
         </CardContent>
       </Card>
       <PomodoroTimer />
