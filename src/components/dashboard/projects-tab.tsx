@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
-import type { Project, ProjectStatus, Todo, WorkLogEntry } from "@/lib/types";
+import type { Project, ProjectStatus } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "./new-project-dialog";
 import { ProjectDetail } from "./project-detail";
+import { useToast } from "@/hooks/use-toast";
 
 const statusColors: Record<ProjectStatus, string> = {
   "In Progress": "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -23,6 +24,7 @@ export function ProjectsTab() {
     initialProjects
   );
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { toast } = useToast();
 
   const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
     setProjects(prev => [...prev, {
@@ -38,6 +40,15 @@ export function ProjectsTab() {
     setProjects(prevProjects => prevProjects.map(p => p.id === updatedProject.id ? updatedProject : p));
     setSelectedProject(updatedProject);
   };
+  
+  const handleDeleteProject = (projectId: string) => {
+    setProjects(prev => prev.filter(p => p.id !== projectId));
+    setSelectedProject(null);
+    toast({
+        title: "Project Deleted",
+        description: "The project has been successfully removed.",
+    });
+  }
 
   const handleSelectProject = (project: Project) => {
     setSelectedProject(project);
@@ -48,7 +59,12 @@ export function ProjectsTab() {
   }
 
   if (selectedProject) {
-    return <ProjectDetail project={selectedProject} onUpdateProject={handleUpdateProject} onBack={handleBackToList} />;
+    return <ProjectDetail 
+              project={selectedProject} 
+              onUpdateProject={handleUpdateProject} 
+              onDeleteProject={handleDeleteProject}
+              onBack={handleBackToList} 
+            />;
   }
 
   return (

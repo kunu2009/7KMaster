@@ -123,9 +123,7 @@ const assistantPrompt = ai.definePrompt({
         {{#if history}}
             Here is the conversation history:
             {{#each history}}
-                {{#if @first}}<--{{/if}}
-                {{#if isUser}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
-                {{#if @last}}-->{{/if}}
+                {{role}}: {{content}}
             {{/each}}
         {{/if}}
 
@@ -151,8 +149,8 @@ const assistantFlow = ai.defineFlow(
   async (input) => {
     // Pre-process history for Handlebars
     const processedHistory = (input.history || []).map(m => ({
-        ...m,
-        isUser: m.role === 'user'
+        role: m.role === 'user' ? 'User' : 'AI',
+        content: m.content[0]?.text || ''
     }));
 
     const promptRequest = {
@@ -172,8 +170,6 @@ const assistantFlow = ai.defineFlow(
             result: toolResponse,
         };
         
-        // The prompt should have already generated a user-facing message.
-        // We just return it along with the tool action.
         return {
             text: response.text,
             toolAction: toolAction,

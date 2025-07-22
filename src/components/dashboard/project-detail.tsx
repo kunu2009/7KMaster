@@ -29,10 +29,11 @@ import {
 interface ProjectDetailProps {
   project: Project;
   onUpdateProject: (project: Project) => void;
+  onDeleteProject: (projectId: string) => void;
   onBack: () => void;
 }
 
-export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetailProps) {
+export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBack }: ProjectDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProject, setEditedProject] = useState<Project>(project);
   const [newTodo, setNewTodo] = useState('');
@@ -53,6 +54,11 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
     onUpdateProject(updatedProjectWithDate);
     setIsEditing(false);
   };
+  
+  const handleDelete = () => {
+    onDeleteProject(project.id);
+    // onBack will be called by the parent component after deletion
+  }
 
   const handleAddTodo = () => {
     if (newTodo.trim() !== '') {
@@ -149,12 +155,12 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
     <Card>
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-            <div className='flex items-center gap-4'>
+            <div className='flex items-center gap-2 sm:gap-4'>
                  <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div className="flex flex-col gap-1">
-                    <CardTitle>{project.name}</CardTitle>
+                    <CardTitle className="text-xl sm:text-2xl">{project.name}</CardTitle>
                     <CardDescription className='flex flex-wrap gap-x-2 gap-y-1 items-center'>
                       <span>Status: <Badge variant="outline">{project.status}</Badge></span>
                       <span className='hidden sm:inline'>|</span>
@@ -162,9 +168,9 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                     </CardDescription>
                 </div>
             </div>
-             <div className='flex gap-2 w-full sm:w-auto'>
+             <div className='flex gap-2 w-full sm:w-auto shrink-0'>
                 <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full sm:w-auto">
-                    {isEditing ? <Save className="mr-2" /> : <Edit className="mr-2" />}
+                    {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Edit className="mr-2 h-4 w-4" />}
                     {isEditing ? 'Save' : 'Edit'}
                 </Button>
                  {isEditing && (
@@ -179,7 +185,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
         {isEditing && (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                 <h3 className="font-semibold text-lg">Edit Project Details</h3>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-4">
                     <div>
                         <Label htmlFor="next-action">Next Action</Label>
                         <Input
@@ -188,22 +194,41 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                             onChange={(e) => setEditedProject({ ...editedProject, nextAction: e.target.value })}
                         />
                     </div>
+                     <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                         <Button variant="destructive" size="sm">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete Project
+                         </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the <strong>{project.name}</strong> project and all of its data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDelete}>Delete Project</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </div>
         )}
 
         {/* TODO List */}
         <div className="space-y-4">
-            <div className='flex justify-between items-center'>
+            <div className='flex justify-between items-center flex-wrap gap-2'>
                 <h3 className="font-semibold text-lg">To-Do List</h3>
                 <Button variant="outline" size="sm" onClick={handleGenerateTodos} disabled={isGeneratingTodos}>
-                    {isGeneratingTodos ? <Loader className="mr-2 animate-spin" /> : <Wand2 className="mr-2" />}
+                    {isGeneratingTodos ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                     AI Generate Tasks
                 </Button>
             </div>
           <div className="space-y-2">
             {(currentProject.todos || []).map(todo => (
-              <div key={todo.id} className="flex items-center gap-2">
+              <div key={todo.id} className="flex items-center gap-3">
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
@@ -216,14 +241,14 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                     className="flex-1 h-9"
                   />
                 ) : (
-                  <label htmlFor={`todo-${todo.id}`} className={`flex-1 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+                  <label htmlFor={`todo-${todo.id}`} className={`flex-1 text-sm ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
                     {todo.text}
                   </label>
                 )}
                 {isEditing && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                         <Button variant="ghost" size="icon">
+                         <Button variant="ghost" size="icon" className="shrink-0">
                             <Trash2 className="h-4 w-4 text-destructive" />
                          </Button>
                       </AlertDialogTrigger>
@@ -252,7 +277,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                 placeholder="Add a new to-do item..."
                 onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
               />
-              <Button onClick={handleAddTodo}><PlusCircle className="mr-2" /> Add</Button>
+              <Button onClick={handleAddTodo}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
             </div>
           )}
         </div>
@@ -268,16 +293,19 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                     placeholder="Log what you did today..."
                     rows={3}
                 />
-                <Button onClick={handleAddLog} className='self-end'><PlusCircle className="mr-2" /> Log Entry</Button>
+                <Button onClick={handleAddLog} className='self-end'><PlusCircle className="mr-2 h-4 w-4" /> Log Entry</Button>
             </div>
           )}
-          <div className="space-y-2">
+          <div className="space-y-4">
             {(currentProject.workLog || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(log => (
-              <div key={log.id} className="p-2 border-l-2 pl-4">
+              <div key={log.id} className="p-3 border-l-2 pl-4 rounded-r-md bg-muted/20">
                 <p className="font-semibold text-sm">{log.date}</p>
-                <p className="text-muted-foreground">{log.description}</p>
+                <p className="text-muted-foreground text-sm">{log.description}</p>
               </div>
             ))}
+             {(currentProject.workLog || []).length === 0 && !isEditing && (
+                 <p className="text-sm text-muted-foreground text-center py-4">No work has been logged yet.</p>
+            )}
           </div>
         </div>
       </CardContent>
