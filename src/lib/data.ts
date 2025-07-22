@@ -38,6 +38,9 @@ export const initialResearchItems: ResearchItem[] = [
     { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.' },
 ];
 
+export const initialJournalEntry = "";
+export const initialFocusThing = "";
+
 export const progressChartData = [
     { name: 'Week 1', '7K Life': 5, 'Stan AI': 2, '7K Studio': 0 },
     { name: 'Week 2', '7K Life': 7, 'Stan AI': 3, '7K Studio': 1 },

@@ -20,10 +20,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2, Wand2, Play } from "lucide-react";
+import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2, Wand2, Play, Target, BookOpen } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialTodayTasks, initialProjects, initialSkills } from "@/lib/data";
+import { initialTodayTasks, initialProjects, initialSkills, initialJournalEntry, initialFocusThing } from "@/lib/data";
 import type { TodayTask, Project, Skill } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
 import { generateBlockTasks } from "@/ai/flows/generate-block-tasks-flow";
@@ -38,6 +39,8 @@ export function TodayTab() {
   );
   const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
+  const [journalEntry, setJournalEntry] = useLocalStorage<string>("journalEntry", initialJournalEntry);
+  const [focusThing, setFocusThing] = useLocalStorage<string>("focusThing", initialFocusThing);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newTask, setNewTask] = useState('');
@@ -194,7 +197,17 @@ export function TodayTab() {
               <Progress value={progress} />
            </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="focus-thing" className="flex items-center gap-2 text-muted-foreground">
+                        <Target className="h-4 w-4" />
+                        One Thing to Focus On Today
+                    </Label>
+                    <Input id="focus-thing" placeholder="e.g., Ship the new feature" value={focusThing} onChange={(e) => setFocusThing(e.target.value)} />
+                </div>
+            </div>
+
           <Accordion type="multiple" defaultValue={tasksByTimeBlock.map(g => g.timeBlock)} className="w-full">
             {tasksByTimeBlock.map(({ timeBlock, tasks: tasksInBlock, title }) => (
                 <AccordionItem value={timeBlock} key={timeBlock}>
@@ -284,6 +297,13 @@ export function TodayTab() {
                     <p>Click "New Plan" to generate a schedule.</p>
                 </div>
             )}
+            <div className="space-y-2 pt-4">
+                <Label htmlFor="journal-entry" className="flex items-center gap-2 text-muted-foreground">
+                    <BookOpen className="h-4 w-4" />
+                    Mini Journal (1-Line Reflection)
+                </Label>
+                <Input id="journal-entry" placeholder="Today I learned..." value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)} />
+            </div>
         </CardContent>
         <CardFooter>
             <PomodoroTimer focusedTask={focusedTask ? focusedTask.task : null} />
