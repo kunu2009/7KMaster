@@ -2,17 +2,18 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { Project, Todo, WorkLogEntry } from '@/lib/types';
+import type { Project, Todo, WorkLogEntry, Attachment } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader } from 'lucide-react';
+import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { generateProjectTodos } from '@/ai/flows/generate-project-todos-flow';
 import { useToast } from '@/hooks/use-toast';
+import { AddAttachmentDialog } from './add-attachment-dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,6 +69,25 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
       onUpdateProject(updatedProject);
       setNewTodo('');
     }
+  };
+
+  const handleAddAttachment = (attachment: Omit<Attachment, 'id'>) => {
+    const newAttachment = { ...attachment, id: `${Date.now()}` };
+    const updatedProject = {
+      ...editedProject,
+      attachments: [...(editedProject.attachments || []), newAttachment],
+    };
+    setEditedProject(updatedProject);
+    onUpdateProject(updatedProject);
+  };
+  
+  const handleDeleteAttachment = (attachmentId: string) => {
+    const updatedProject = {
+      ...editedProject,
+      attachments: (editedProject.attachments || []).filter(a => a.id !== attachmentId),
+    };
+    setEditedProject(updatedProject);
+    onUpdateProject(updatedProject);
   };
   
   const handleGenerateTodos = async () => {
@@ -283,6 +303,35 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
           )}
         </div>
         
+        {/* Attachments */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center flex-wrap gap-2">
+            <h3 className="font-semibold text-lg">Attachments</h3>
+            {isEditing && <AddAttachmentDialog onAddAttachment={handleAddAttachment} />}
+          </div>
+          <div className="space-y-2">
+            {(currentProject.attachments || []).map(attachment => (
+              <div key={attachment.id} className="flex items-center gap-3 p-2 rounded-md border bg-muted/20">
+                <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium text-primary hover:underline">
+                  {attachment.name}
+                </a>
+                <a href={attachment.url} target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4"/></Button>
+                </a>
+                {isEditing && (
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteAttachment(attachment.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            {(currentProject.attachments || []).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">No attachments yet.</p>
+            )}
+          </div>
+        </div>
+
         {/* Work Log */}
         <div className="space-y-6">
           <h3 className="font-semibold text-lg">Work Log</h3>

@@ -34,6 +34,7 @@ export function ProjectsTab() {
       lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
       todos: [],
       workLog: [],
+      attachments: [],
     }]);
   }
 

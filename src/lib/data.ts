@@ -12,10 +12,10 @@ export const initialTodayTasks: TodayTask[] = [
 ];
 
 export const initialProjects: Project[] = [
-  { id: '1', name: '7K Life', status: 'In Progress', lastWorked: 'July 20', nextAction: 'Add rewards system', todos: [{id: 't1', text: 'Design database schema', completed: true}, {id: 't2', text: 'Implement auth flow', completed: false}], workLog: [{id: 'w1', date: 'July 20', description: 'Finished DB schema design.'}] },
-  { id: '2', name: '7K Studio', status: 'Not Started', lastWorked: '–', nextAction: 'Sketch video UI', todos: [], workLog: [] },
-  { id: '3', name: 'Stan AI', status: 'Concept', lastWorked: 'July 19', nextAction: 'Integrate Gemini API', todos: [], workLog: [] },
-  { id: '4', name: '7K Game', status: 'Not Started', lastWorked: '–', nextAction: 'Choose engine (Godot?)', todos: [], workLog: [] },
+  { id: '1', name: '7K Life', status: 'In Progress', lastWorked: 'July 20', nextAction: 'Add rewards system', todos: [{id: 't1', text: 'Design database schema', completed: true}, {id: 't2', text: 'Implement auth flow', completed: false}], workLog: [{id: 'w1', date: 'July 20', description: 'Finished DB schema design.'}], attachments: [] },
+  { id: '2', name: '7K Studio', status: 'Not Started', lastWorked: '–', nextAction: 'Sketch video UI', todos: [], workLog: [], attachments: [] },
+  { id: '3', name: 'Stan AI', status: 'Concept', lastWorked: 'July 19', nextAction: 'Integrate Gemini API', todos: [], workLog: [], attachments: [] },
+  { id: '4', name: '7K Game', status: 'Not Started', lastWorked: '–', nextAction: 'Choose engine (Godot?)', todos: [], workLog: [], attachments: [] },
 ];
 
 export const initialSkills: Skill[] = [

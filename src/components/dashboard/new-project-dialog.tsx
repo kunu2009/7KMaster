@@ -24,7 +24,7 @@ import { PlusCircle } from "lucide-react";
 import type { Project, ProjectStatus } from "@/lib/types";
 
 interface NewProjectDialogProps {
-    onAddProject: (project: Omit<Project, 'id' | 'lastWorked'>) => void;
+    onAddProject: (project: Omit<Project, 'id' | 'lastWorked' | 'attachments'>) => void;
 }
 
 export function NewProjectDialog({ onAddProject }: NewProjectDialogProps) {
@@ -35,7 +35,7 @@ export function NewProjectDialog({ onAddProject }: NewProjectDialogProps) {
 
   const handleSubmit = () => {
       if(name && nextAction) {
-        onAddProject({ name, status, nextAction });
+        onAddProject({ name, status, nextAction, todos: [], workLog: [] });
         setOpen(false);
         // Reset fields
         setName('');

@@ -9,6 +9,7 @@ export enum ProjectStatus {
 
 export type Todo = { id: string; text: string; completed: boolean };
 export type WorkLogEntry = { id: string; date: string; description: string };
+export type Attachment = { id: string; name: string; url: string; };
 
 export type Project = {
     id: string;
@@ -18,6 +19,7 @@ export type Project = {
     nextAction: string;
     todos: Todo[];
     workLog: WorkLogEntry[];
+    attachments: Attachment[];
 };
 
 export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number };
