@@ -111,7 +111,7 @@ export function AssistantTab() {
         handleAddProject(action.args);
         break;
       case 'generateProjectTodos':
-        if(action.result) {
+        if(action.result?.todos) {
             setPendingTodoAction({ messageId, args: action.args, result: action.result });
         } else {
             toast({ title: "Error", description: "The AI tool did not return any todos.", variant: "destructive" });
@@ -223,7 +223,7 @@ export function AssistantTab() {
                     {message.toolAction && message.toolAction.toolName === 'addProject' && (
                         <div className="mt-3 border-t pt-3">
                             <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
-                            <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index + 1)} className="bg-background/80 hover:bg-background">
+                            <Button size="sm" variant="outline" onClick={() => handleAddProject(message.toolAction?.args)} className="bg-background/80 hover:bg-background">
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Confirm: Add Project
                             </Button>
@@ -258,7 +258,6 @@ export function AssistantTab() {
                     <SelectValue placeholder="Select a project for context..." />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="">None</SelectItem>
                      <ScrollArea className="h-40">
                         {projects.map(p => (
                             <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
@@ -283,3 +282,5 @@ export function AssistantTab() {
     </Card>
   );
 }
+
+    
