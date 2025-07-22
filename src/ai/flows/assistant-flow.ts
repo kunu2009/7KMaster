@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview The main AI assistant flow for the 7K Dashboard.
@@ -9,18 +10,14 @@
  */
 import { ai } from '@/ai/genkit';
 import { z, generate } from 'genkit';
-import type { Project, ProjectStatus } from '@/lib/types';
+import type { Project } from '@/lib/types';
+import { ProjectStatus } from '@/lib/types';
 
 
 // Schemas for AI Tools
 const AddProjectInputSchema = z.object({
   name: z.string().describe('The name of the project.'),
-  status: z.nativeEnum(Object.values({
-    Concept: 'Concept',
-    NotStarted: 'Not Started',
-    InProgress: 'In Progress',
-    Completed: 'Completed',
-  }).reduce((acc, curr) => ({...acc, [curr]: curr}), {}) as { [key in ProjectStatus]: key })
+  status: z.nativeEnum(ProjectStatus)
   .describe('The current status of the project.'),
   nextAction: z.string().describe("The very next concrete action to move the project forward."),
 });

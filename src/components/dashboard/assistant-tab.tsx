@@ -13,6 +13,7 @@ import { initialProjects } from '@/lib/data';
 import type { Project, Todo } from '@/lib/types';
 import type { Message as GenkitMessage } from 'genkit';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 interface Message {
@@ -149,7 +150,12 @@ export function AssistantTab() {
             content: response.text,
             toolAction: response.toolAction ?? undefined
         };
+        const newMessageId = messages.length + 1; // ID for the new assistant message
         setMessages(prev => [...prev, assistantMessage]);
+
+        if (response.toolAction) {
+          handleToolAction(response.toolAction, newMessageId);
+        }
 
     } catch (error) {
         console.error("Error running assistant:", error);
@@ -171,9 +177,11 @@ export function AssistantTab() {
                     <SelectValue placeholder="Choose project..." />
                 </SelectTrigger>
                 <SelectContent>
+                  <ScrollArea className="h-40">
                     {projects.map(p => (
                         <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
                     ))}
+                  </ScrollArea>
                 </SelectContent>
             </Select>
             <Button size="sm" variant="outline" onClick={() => onConfirm(selectedProject)} className="w-full bg-background/80 hover:bg-background">
@@ -202,26 +210,15 @@ export function AssistantTab() {
                 )}
                 <div className={`rounded-lg p-3 max-w-sm ${message.role === 'user' ? 'bg-muted' : 'bg-accent text-accent-foreground'}`}>
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    {pendingTodoAction?.messageId === index ? (
+                    {pendingTodoAction?.messageId === index + 1 && (
                         <ProjectSelector onConfirm={handleConfirmAddTodos} />
-                    ) : (
-                        message.toolAction && message.toolAction.toolName === 'addProject' && (
-                            <div className="mt-3 border-t pt-3">
-                                <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
-                                <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index)} className="bg-background/80 hover:bg-background">
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    Confirm: Add Project
-                                </Button>
-                            </div>
-                        )
                     )}
-
-                    {message.toolAction && message.toolAction.toolName === 'generateProjectTodos' && !pendingTodoAction && (
-                         <div className="mt-3 border-t pt-3">
+                    {message.toolAction && message.toolAction.toolName === 'addProject' && (
+                        <div className="mt-3 border-t pt-3">
                             <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
-                             <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index)} className="bg-background/80 hover:bg-background">
+                            <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index + 1)} className="bg-background/80 hover:bg-background">
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                Review & Add Todos
+                                Confirm: Add Project
                             </Button>
                         </div>
                     )}

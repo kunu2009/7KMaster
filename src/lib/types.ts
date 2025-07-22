@@ -1,6 +1,11 @@
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
-export type ProjectStatus = 'In Progress' | 'Not Started' | 'Concept' | 'Completed';
+export enum ProjectStatus {
+    InProgress = 'In Progress',
+    NotStarted = 'Not Started',
+    Concept = 'Concept',
+    Completed = 'Completed'
+};
 
 export type Todo = { id: string; text: string; completed: boolean };
 export type WorkLogEntry = { id: string; date: string; description: string };
