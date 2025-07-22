@@ -2,3 +2,4 @@
 import './flows/generate-daily-plan-flow';
 import './flows/assistant-flow';
 import './flows/generate-focus-suggestions-flow';
+import './flows/generate-project-todos-flow';

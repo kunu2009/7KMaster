@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -8,8 +9,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Edit, Save, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { generateProjectTodos } from '@/ai/flows/generate-project-todos-flow';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 interface ProjectDetailProps {
   project: Project;
@@ -22,6 +37,9 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   const [editedProject, setEditedProject] = useState<Project>(project);
   const [newTodo, setNewTodo] = useState('');
   const [newLogEntry, setNewLogEntry] = useState('');
+  const [isGeneratingTodos, setIsGeneratingTodos] = useState(false);
+  const { toast } = useToast();
+
 
   useEffect(() => {
     setEditedProject(project);
@@ -39,10 +57,49 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   const handleAddTodo = () => {
     if (newTodo.trim() !== '') {
       const todo: Todo = { id: `${Date.now()}`, text: newTodo.trim(), completed: false };
-      setEditedProject(prev => ({ ...prev, todos: [...(prev.todos || []), todo] }));
+      const updatedProject = { ...editedProject, todos: [...(editedProject.todos || []), todo] };
+      setEditedProject(updatedProject)
+      onUpdateProject(updatedProject);
       setNewTodo('');
     }
   };
+  
+  const handleGenerateTodos = async () => {
+    setIsGeneratingTodos(true);
+    try {
+        const result = await generateProjectTodos({
+            projectName: project.name,
+            projectContext: project.nextAction,
+            numberOfTodos: 5,
+        });
+
+        if (result && result.todos) {
+            const existingTodoTexts = new Set((project.todos || []).map(t => t.text));
+            const newTodos = result.todos.filter(t => !existingTodoTexts.has(t.text));
+
+            if (newTodos.length < result.todos.length) {
+                toast({ title: "Duplicate tasks skipped", description: "Some suggested tasks already existed."});
+            }
+
+            if (newTodos.length > 0) {
+                 const updatedProject = {
+                    ...project,
+                    todos: [...(project.todos || []), ...newTodos],
+                };
+                onUpdateProject(updatedProject);
+                 toast({ title: "AI Todos Added!", description: `${newTodos.length} new tasks were added to your project.` });
+            } else {
+                 toast({ title: "No new tasks", description: "The AI didn't generate any new unique tasks."});
+            }
+        }
+    } catch (e) {
+        console.error("Failed to generate todos:", e);
+        toast({ title: "Error", description: "Could not generate AI tasks. Please try again.", variant: 'destructive' });
+    } finally {
+        setIsGeneratingTodos(false);
+    }
+  };
+
 
   const handleToggleTodo = (todoId: string) => {
     const updatedTodos = (project.todos || []).map(t => 
@@ -53,17 +110,20 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   };
   
   const handleDeleteTodo = (todoId: string) => {
-      setEditedProject(prev => ({
-          ...prev,
-          todos: (prev.todos || []).filter(t => t.id !== todoId),
-      }));
+      const updatedProject = {
+          ...project,
+          todos: (project.todos || []).filter(t => t.id !== todoId),
+      };
+      onUpdateProject(updatedProject);
   };
 
   const handleEditTodo = (todoId: string, newText: string) => {
-    setEditedProject(prev => ({
-        ...prev,
-        todos: (prev.todos || []).map(t => t.id === todoId ? { ...t, text: newText } : t),
-    }));
+    const updatedProject = {
+        ...project,
+        todos: (project.todos || []).map(t => t.id === todoId ? { ...t, text: newText } : t),
+    }
+    onUpdateProject(updatedProject);
+    setEditedProject(updatedProject);
   };
 
   const handleAddLog = () => {
@@ -73,12 +133,14 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
         date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
         description: newLogEntry.trim(),
       };
-      setEditedProject(prev => ({ ...prev, workLog: [log, ...(prev.workLog || [])] }));
+      const updatedProject = { ...editedProject, workLog: [log, ...(editedProject.workLog || [])] };
+      setEditedProject(updatedProject);
+      onUpdateProject(updatedProject);
       setNewLogEntry('');
     }
   };
   
-  const currentProject = isEditing ? editedProject : project;
+  const currentProject = project;
 
   return (
     <Card>
@@ -97,10 +159,17 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                     </CardDescription>
                 </div>
             </div>
-            <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full sm:w-auto">
-                {isEditing ? <Save className="mr-2" /> : <Edit className="mr-2" />}
-                {isEditing ? 'Save Changes' : 'Edit Mode'}
-            </Button>
+             <div className='flex gap-2 w-full sm:w-auto'>
+                <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full sm:w-auto">
+                    {isEditing ? <Save className="mr-2" /> : <Edit className="mr-2" />}
+                    {isEditing ? 'Save' : 'Edit'}
+                </Button>
+                 {isEditing && (
+                    <Button variant="outline" onClick={() => setIsEditing(false)} className="w-full sm:w-auto">
+                        Cancel
+                    </Button>
+                 )}
+            </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -122,7 +191,13 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
 
         {/* TODO List */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">To-Do List</h3>
+            <div className='flex justify-between items-center'>
+                <h3 className="font-semibold text-lg">To-Do List</h3>
+                <Button variant="outline" size="sm" onClick={handleGenerateTodos} disabled={isGeneratingTodos}>
+                    {isGeneratingTodos ? <Loader className="mr-2 animate-spin" /> : <Wand2 className="mr-2" />}
+                    AI Generate Tasks
+                </Button>
+            </div>
           <div className="space-y-2">
             {(currentProject.todos || []).map(todo => (
               <div key={todo.id} className="flex items-center gap-2">
@@ -143,9 +218,25 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                   </label>
                 )}
                 {isEditing && (
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTodo(todo.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                         <Button variant="ghost" size="icon">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                         </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete this to-do item.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDeleteTodo(todo.id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                 )}
               </div>
             ))}
@@ -156,6 +247,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
                 value={newTodo}
                 onChange={(e) => setNewTodo(e.target.value)}
                 placeholder="Add a new to-do item..."
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
               />
               <Button onClick={handleAddTodo}><PlusCircle className="mr-2" /> Add</Button>
             </div>
