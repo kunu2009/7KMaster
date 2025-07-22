@@ -1,11 +1,14 @@
+
 import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem } from './types';
 
 export const initialTodayTasks: TodayTask[] = [
-  { id: '1', timeBlock: 'Morning Reset', task: 'Clean, journal, hydrate', done: true },
-  { id: '2', timeBlock: 'Focus Block 1', task: 'Skill: React/TypeScript', done: false },
-  { id: '3', timeBlock: 'Focus Block 2', task: 'Project: 7K Life', done: false },
-  { id: '4', timeBlock: 'Practice Zone', task: 'Activity: Chess puzzles', done: false },
-  { id: '5', timeBlock: 'Night Review', task: 'Log what I did today', done: false },
+  { id: '1', timeBlock: '08:00 - 08:30', task: 'Morning Routine: Journal and hydrate', done: false },
+  { id: '2', timeBlock: '09:00 - 11:00', task: 'Focus Block: Skill - React/TypeScript', done: false },
+  { id: '3', timeBlock: '11:00 - 12:00', task: 'Focus Block: Project - 7K Life feature', done: false },
+  { id: '4', timeBlock: '12:00 - 13:00', task: 'Break: Lunch and walk', done: false },
+  { id: '5', timeBlock: '13:00 - 14:00', task: 'Practice: Chess Puzzles', done: false },
+  { id: '6', timeBlock: '14:00 - 15:00', task: 'Admin: Reply to emails', done: false },
+  { id: '7', timeBlock: '17:00 - 17:30', task: 'Review: Log today\'s work and plan tomorrow', done: false },
 ];
 
 export const initialProjects: Project[] = [

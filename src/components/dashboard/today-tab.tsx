@@ -67,8 +67,6 @@ export function TodayTab() {
     const total = tasks.length;
     const completed = tasks.filter(task => task.done).length;
     
-    // The AI is now expected to generate a chronological, time-blocked schedule.
-    // We can just render them in the order we receive them.
     const uniqueTimeBlocks = [...new Set(tasks.map(t => t.timeBlock))];
 
     const grouped = uniqueTimeBlocks.map(timeBlock => ({
@@ -122,9 +120,12 @@ export function TodayTab() {
             {tasksByTimeBlock.map(({ timeBlock, tasks: tasksInBlock }) => (
                 <AccordionItem value={timeBlock} key={timeBlock}>
                     <AccordionTrigger className="font-semibold text-base hover:no-underline">
-                       <div className="flex items-center gap-3">
-                         <Clock className="h-5 w-5 text-primary" />
-                         <span className="font-mono text-lg">{timeBlock}</span>
+                       <div className="flex items-center justify-between w-full">
+                         <div className="flex items-center gap-3">
+                            <Clock className="h-5 w-5 text-primary" />
+                            <span className="text-lg">{tasksInBlock[0].task.split(':')[0]}</span>
+                         </div>
+                         <Badge variant="outline" className="font-mono text-sm mr-2">{timeBlock}</Badge>
                        </div>
                     </AccordionTrigger>
                     <AccordionContent>
