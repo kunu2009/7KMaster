@@ -11,6 +11,8 @@
 import { ai } from '@/ai/genkit';
 import { z, generate } from 'genkit';
 import { ProjectStatus } from '@/lib/types';
+import { generateProjectTodos } from './generate-project-todos-flow';
+import type { GenerateTodosOutput } from './generate-project-todos-flow';
 
 
 // Schemas for AI Tools
@@ -55,27 +57,9 @@ const generateProjectTodosTool = ai.defineTool(
     inputSchema: GenerateTodosInputSchema,
     outputSchema: z.object({ todos: z.array(TodoSchema) }),
   },
-  async ({ projectName, numberOfTodos, projectContext }) => {
-      const prompt = `
-        You are a world-class project manager. A user needs help breaking down a project into tasks.
-        Generate a list of exactly ${numberOfTodos} actionable to-do items for the project named "${projectName}".
-
-        ${projectContext ? `The user has provided this context about the project: "${projectContext}"` : ''}
-        
-        The tasks should be concrete, actionable, and clear. For example, instead of "code the backend", a good task would be "Set up Express server with TypeScript".
-        Return the result as a JSON object with a "todos" array. Each todo must have:
-        - an "id" (a unique random string)
-        - a "text" (the task description, this is crucial and cannot be empty)
-        - a "completed" field (which must be false).
-      `;
-      const llmResponse = await generate({
-          model: 'googleai/gemini-2.0-flash',
-          prompt: prompt,
-          output: {
-              schema: z.object({ todos: z.array(TodoSchema) })
-          }
-      });
-      return llmResponse.output || { todos: [] };
+  async (input): Promise<GenerateTodosOutput> => {
+      // This tool now acts as a wrapper around the dedicated flow.
+      return await generateProjectTodos(input);
   }
 );
 
@@ -177,9 +161,15 @@ const assistantFlow = ai.defineFlow(
         };
     }
 
+    // This handles the case where the AI responds without a tool, ensuring the output format is consistent.
+    if (response.output) {
+        return response.output;
+    }
+
+    // Fallback if the output is not in the expected format
     return {
-        text: response.output?.text || "Sorry, I'm not sure how to respond to that.",
-        toolAction: response.output?.toolAction,
+        text: response.text || "Sorry, I'm not sure how to respond to that.",
+        toolAction: null,
     };
   }
 );

@@ -9,25 +9,25 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z, generate } from 'genkit';
+import { z } from 'genkit';
 
 const GenerateTodosInputSchema = z.object({
   projectName: z.string().describe('The name of the project to generate todos for.'),
   numberOfTodos: z.number().int().positive().describe('The number of todos to generate.'),
   projectContext: z.string().optional().describe('Any additional context about the project, like its goal or next action.'),
 });
-type GenerateTodosInput = z.infer<typeof GenerateTodosInputSchema>;
+export type GenerateTodosInput = z.infer<typeof GenerateTodosInputSchema>;
 
 const TodoSchema = z.object({
     id: z.string().describe("A unique ID for the todo item, generated as a random string."),
-    text: z.string().describe("The description of the task."),
+    text: z.string().describe("The description of the task. This field is crucial and cannot be blank or just whitespace."),
     completed: z.boolean().describe("Whether the task is completed. This should always be false initially."),
 });
 
 const GenerateTodosOutputSchema = z.object({
   todos: z.array(TodoSchema),
 });
-type GenerateTodosOutput = z.infer<typeof GenerateTodosOutputSchema>;
+export type GenerateTodosOutput = z.infer<typeof GenerateTodosOutputSchema>;
 
 
 export async function generateProjectTodos(input: GenerateTodosInput): Promise<GenerateTodosOutput> {
@@ -50,7 +50,7 @@ const prompt = ai.definePrompt({
         The tasks should be concrete, actionable, and clear. For example, instead of "code the backend", a good task would be "Set up Express server with TypeScript".
         Return the result as a JSON object with a "todos" array. Each todo must have:
         - an "id" (a unique random string)
-        - a "text" (the task description)
+        - a "text" (the task description, this cannot be empty)
         - a "completed" field (which must be false).
     `,
 });
@@ -61,12 +61,8 @@ const generateProjectTodosFlow = ai.defineFlow(
     inputSchema: GenerateTodosInputSchema,
     outputSchema: GenerateTodosOutputSchema,
   },
-  async ({ projectName, numberOfTodos, projectContext }) => {
-    const llmResponse = await prompt({
-        projectName,
-        numberOfTodos,
-        projectContext,
-    });
-    return llmResponse.output || { todos: [] };
+  async (input) => {
+    const { output } = await prompt(input);
+    return output || { todos: [] };
   }
 );

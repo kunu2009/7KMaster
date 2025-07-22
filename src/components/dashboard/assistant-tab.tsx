@@ -282,5 +282,3 @@ export function AssistantTab() {
     </Card>
   );
 }
-
-    

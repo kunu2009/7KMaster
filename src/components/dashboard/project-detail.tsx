@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import { runAssistant } from '@/ai/flows/assistant-flow';
+import { generateProjectTodos } from '@/ai/flows/generate-project-todos-flow';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -73,17 +73,17 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
   const handleGenerateTodos = async () => {
     setIsGeneratingTodos(true);
     try {
-        const response = await runAssistant({
-            message: `Generate 5 todos for my project called "${project.name}". The overall goal is "${project.nextAction}".`,
+        const response = await generateProjectTodos({
+            projectName: project.name,
+            projectContext: project.nextAction,
+            numberOfTodos: 5,
         });
 
-        const action = response.toolAction;
-        if (action?.toolName === 'generateProjectTodos' && action.result?.todos) {
-            const result = action.result;
+        if (response?.todos) {
             const existingTodoTexts = new Set((project.todos || []).map(t => t.text));
-            const newTodos = result.todos.filter((t: Todo) => !existingTodoTexts.has(t.text));
+            const newTodos = response.todos.filter((t: Todo) => t.text && !existingTodoTexts.has(t.text));
 
-            if (newTodos.length < result.todos.length) {
+            if (newTodos.length < response.todos.length) {
                 toast({ title: "Duplicate tasks skipped", description: "Some suggested tasks already existed."});
             }
 
@@ -93,6 +93,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
                     todos: [...(project.todos || []), ...newTodos],
                 };
                 onUpdateProject(updatedProject);
+                setEditedProject(updatedProject);
                  toast({ title: "AI Todos Added!", description: `${newTodos.length} new tasks were added to your project.` });
             } else {
                  toast({ title: "No new tasks", description: "The AI didn't generate any new unique tasks."});
