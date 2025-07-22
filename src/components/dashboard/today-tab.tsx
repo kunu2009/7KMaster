@@ -8,7 +8,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Accordion,
@@ -163,7 +162,8 @@ export function TodayTab() {
 
 
   return (
-      <Card>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <Card className="lg:col-span-2">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
             <div>
@@ -305,9 +305,10 @@ export function TodayTab() {
                 <Input id="journal-entry" placeholder="Today I learned..." value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)} />
             </div>
         </CardContent>
-        <CardFooter>
-            <PomodoroTimer focusedTask={focusedTask ? focusedTask.task : null} />
-        </CardFooter>
       </Card>
+      <div className="lg:col-span-1">
+        <PomodoroTimer focusedTask={focusedTask ? focusedTask.task : null} />
+      </div>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -68,7 +69,7 @@ export function PomodoroTimer({ focusedTask }: PomodoroTimerProps) {
   }, []);
 
   return (
-    <Card className="text-center mt-6">
+    <Card className="text-center h-full flex flex-col justify-center">
       <CardHeader>
         <CardTitle className="flex items-center justify-center gap-2">
             <Timer className="h-6 w-6" />
