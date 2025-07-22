@@ -104,11 +104,12 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
 
 
   const handleToggleTodo = (todoId: string) => {
-    const updatedTodos = (project.todos || []).map(t => 
+    const updatedTodos = (editedProject.todos || []).map(t => 
         t.id === todoId ? { ...t, completed: !t.completed } : t
     );
-    const updatedProject = { ...project, todos: updatedTodos };
-    onUpdateProject(updatedProject);
+    const updatedProject = { ...editedProject, todos: updatedTodos };
+    setEditedProject(updatedProject); // Keep edited state in sync
+    onUpdateProject(updatedProject); // Persist change immediately
   };
   
   const handleDeleteTodo = (todoId: string) => {
@@ -142,7 +143,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
     }
   };
   
-  const currentProject = project;
+  const currentProject = isEditing ? editedProject : project;
 
   return (
     <Card>
@@ -257,7 +258,7 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
         </div>
         
         {/* Work Log */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h3 className="font-semibold text-lg">Work Log</h3>
            {isEditing && (
             <div className="flex flex-col gap-2">

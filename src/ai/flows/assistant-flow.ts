@@ -108,7 +108,7 @@ export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 // The main assistant prompt and flow
 const assistantPrompt = ai.definePrompt({
     name: 'assistantPrompt',
-    input: { schema: AssistantInputSchema },
+    input: { schema: z.any() }, // Allow any input for flexibility with template
     output: { schema: AssistantOutputSchema },
     tools: [addProjectTool, generateProjectTodosTool],
     system: `You are the 7K Dashboard AI assistant.
@@ -124,7 +124,7 @@ const assistantPrompt = ai.definePrompt({
             Here is the conversation history:
             {{#each history}}
                 {{#if @first}}<--{{/if}}
-                {{#if (this.role === 'user')}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
+                {{#if isUser}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
                 {{#if @last}}-->{{/if}}
             {{/each}}
         {{/if}}
@@ -149,9 +149,15 @@ const assistantFlow = ai.defineFlow(
     outputSchema: AssistantOutputSchema,
   },
   async (input) => {
+    // Pre-process history for Handlebars
+    const processedHistory = (input.history || []).map(m => ({
+        ...m,
+        isUser: m.role === 'user'
+    }));
+
     const promptRequest = {
         ...input,
-        history: input.history || []
+        history: processedHistory
     };
 
     const response = await assistantPrompt(promptRequest);
