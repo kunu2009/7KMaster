@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Accordion,
@@ -20,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2, Wand2 } from "lucide-react";
+import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2, Wand2, Play } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialTodayTasks, initialProjects, initialSkills } from "@/lib/data";
 import type { TodayTask, Project, Skill } from "@/lib/types";
@@ -42,6 +43,7 @@ export function TodayTab() {
   const [newTask, setNewTask] = useState('');
   const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
   const { toast } = useToast();
+  const [focusedTask, setFocusedTask] = useState<TodayTask | null>(null);
 
 
   const handleCheckedChange = (taskId: string, checked: boolean) => {
@@ -158,7 +160,6 @@ export function TodayTab() {
 
 
   return (
-    <>
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
@@ -209,7 +210,7 @@ export function TodayTab() {
                     <AccordionContent>
                         <div className="space-y-4 pl-4 border-l-2 ml-4">
                             {tasksInBlock.map(task => (
-                                <div key={task.id} className="flex items-center gap-3">
+                                <div key={task.id} className={`flex items-center gap-3 p-2 rounded-md ${focusedTask?.id === task.id ? 'bg-primary/10' : ''}`}>
                                     <Checkbox
                                         id={`task-${task.id}`}
                                         checked={task.done}
@@ -231,9 +232,13 @@ export function TodayTab() {
                                             {task.task}
                                         </label>
                                     )}
-                                    {isEditing && (
+                                    {isEditing ? (
                                         <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(task.id)}>
                                             <Trash2 className="h-4 w-4 text-destructive" />
+                                        </Button>
+                                    ) : (
+                                        <Button variant="ghost" size="icon" onClick={() => setFocusedTask(task)} disabled={task.done}>
+                                            <Play className="h-4 w-4 text-primary" />
                                         </Button>
                                     )}
                                 </div>
@@ -280,8 +285,9 @@ export function TodayTab() {
                 </div>
             )}
         </CardContent>
+        <CardFooter>
+            <PomodoroTimer focusedTask={focusedTask ? focusedTask.task : null} />
+        </CardFooter>
       </Card>
-      <PomodoroTimer />
-    </>
   );
 }
