@@ -186,7 +186,7 @@ export function AssistantTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let finalInput = input;
-    if (selectedProjectContext) {
+    if (selectedProjectContext && selectedProjectContext !== 'none') {
         finalInput = `For project "${selectedProjectContext}", ${input}`;
     }
     processRequest(finalInput);
@@ -308,13 +308,13 @@ export function AssistantTab() {
                       <FolderKanban className="h-4 w-4" />
                       Project Context (Optional)
                     </Label>
-                    <Select onValueChange={(value) => { setSelectedProjectContext(value); if(value) {setIsActionsOpen(true)}}} value={selectedProjectContext} disabled={isLoading}>
+                    <Select onValueChange={(value) => { setSelectedProjectContext(value === 'none' ? '' : value); if(value) {setIsActionsOpen(true)}}} value={selectedProjectContext || 'none'} disabled={isLoading}>
                         <SelectTrigger id="project-context" className="w-full">
                             <SelectValue placeholder="Select a project for context..." />
                         </SelectTrigger>
                         <SelectContent>
                             <ScrollArea className="h-40">
-                                <SelectItem value="">None</SelectItem>
+                                <SelectItem value="none">None</SelectItem>
                                 {projects.map(p => (
                                     <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
                                 ))}
