@@ -124,7 +124,7 @@ const assistantPrompt = ai.definePrompt({
             Here is the conversation history:
             {{#each history}}
                 {{#if @first}}<--{{/if}}
-                {{#if (eq role 'user')}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
+                {{#if (this.role === 'user')}}User{{else}}AI{{/if}}: {{#each content}}{{#if text}}{{text}}{{/if}}{{/each}}
                 {{#if @last}}-->{{/if}}
             {{/each}}
         {{/if}}
