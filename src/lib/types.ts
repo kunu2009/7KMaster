@@ -37,6 +37,14 @@ export type ResearchItem = {
     attachment?: string;
 };
 
+export type Note = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  modifiedAt: string;
+};
+
 
 export type ChartConfig = {
   [k in string]: {

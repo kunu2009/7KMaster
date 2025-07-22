@@ -4,10 +4,11 @@ import { SkillsTab } from "@/components/dashboard/skills-tab";
 import { SelfSpaceTab } from "@/components/dashboard/self-space-tab";
 import { ProgressTab } from "@/components/dashboard/progress-tab";
 import { ResearchTab } from "@/components/dashboard/research-tab";
+import { NotesTab } from "@/components/dashboard/notes-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
-import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart, Bookmark, Bot } from "lucide-react";
+import { ListTodo, GanttChartSquare, BrainCircuit, Smile, LineChart, Bookmark, Bot, FileText } from "lucide-react";
 
 export default function Home() {
   return (
@@ -45,6 +46,9 @@ export default function Home() {
            <TabsContent value="research">
             <ResearchTab />
           </TabsContent>
+          <TabsContent value="notes">
+            <NotesTab />
+          </TabsContent>
           <TabsContent value="self-space">
             <SelfSpaceTab />
           </TabsContent>
@@ -56,7 +60,7 @@ export default function Home() {
           </TabsContent>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <TabsList className="grid h-auto w-full grid-cols-7 rounded-none bg-transparent p-0">
+        <TabsList className="grid h-auto w-full grid-cols-8 rounded-none bg-transparent p-0">
             <TabsTrigger value="today" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <ListTodo className="h-5 w-5" />
                 <span className="hidden sm:inline">Today</span>
@@ -72,6 +76,10 @@ export default function Home() {
             <TabsTrigger value="research" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <Bookmark className="h-5 w-5" />
                 <span className="hidden sm:inline">Research</span>
+            </TabsTrigger>
+            <TabsTrigger value="notes" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
+                <FileText className="h-5 w-5" />
+                <span className="hidden sm:inline">Notes</span>
             </TabsTrigger>
             <TabsTrigger value="self-space" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
                 <Smile className="h-5 w-5" />

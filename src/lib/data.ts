@@ -1,5 +1,5 @@
 
-import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem } from './types';
+import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem, Note } from './types';
 
 export const initialTodayTasks: TodayTask[] = [
   { id: '1', timeBlock: '08:00 - 08:30', task: 'Morning Routine: Journal and hydrate', done: false },
@@ -37,6 +37,8 @@ export const initialResearchItems: ResearchItem[] = [
     { id: '2', name: 'Shadcn UI', type: 'Website', url: 'https://ui.shadcn.com/', description: 'Beautifully designed components that you can copy and paste into your apps.' },
     { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.' },
 ];
+
+export const initialNotes: Note[] = [];
 
 export const initialJournalEntry = "";
 export const initialFocusThing = "";
