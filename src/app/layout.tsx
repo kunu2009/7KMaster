@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: "7K Master Dashboard",
   description: "A dashboard to track your 7K master plan.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -25,6 +26,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        <meta name="theme-color" content="#18181b" />
       </head>
       <body className={`${inter.variable} font-body antialiased`}>
         <ThemeProvider
