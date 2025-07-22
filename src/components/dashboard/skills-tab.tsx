@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -9,12 +10,24 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Wand2, Loader } from "lucide-react";
+import { Minus, Plus, Wand2, Loader, Edit, Trash2 } from "lucide-react";
 import { NewSkillDialog } from './new-skill-dialog';
+import { EditSkillDialog } from './edit-skill-dialog';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { generateFocusSuggestions } from '@/ai/flows/generate-focus-suggestions-flow';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export function SkillsTab() {
   const [skills, setSkills] = useLocalStorage<Skill[]>(
@@ -60,6 +73,14 @@ export function SkillsTab() {
 
   const addSkill = (newSkill: Omit<Skill, 'id'>) => {
     setSkills(prev => [...prev, { ...newSkill, id: `${Date.now()}` }]);
+  }
+
+  const updateSkill = (updatedSkill: Skill) => {
+    setSkills(prev => prev.map(s => s.id === updatedSkill.id ? updatedSkill : s));
+  };
+  
+  const deleteSkill = (skillId: string) => {
+    setSkills(prev => prev.filter(s => s.id !== skillId));
   }
 
   const updateProgress = (skillId: string, amount: number) => {
@@ -125,13 +146,37 @@ export function SkillsTab() {
                         <p className="text-right text-sm text-muted-foreground">{skill.progress} / {skill.maxProgress}</p>
                      </div>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, -1)} disabled={skill.progress <= 0}>
-                        <Minus className="h-4 w-4" />
-                   </Button>
-                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, 1)} disabled={skill.progress >= skill.maxProgress}>
-                        <Plus className="h-4 w-4" />
-                   </Button>
+                <CardFooter className="flex justify-between items-center">
+                  <div className='flex gap-1'>
+                     <EditSkillDialog skill={skill} onUpdateSkill={updateSkill} />
+                      <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                  <Trash2 className="h-4 w-4" />
+                              </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                              <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                      This will permanently delete the "{skill.area}" skill. This action cannot be undone.
+                                  </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteSkill(skill.id)}>Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                          </AlertDialogContent>
+                      </AlertDialog>
+                  </div>
+                   <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, -1)} disabled={skill.progress <= 0}>
+                          <Minus className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, 1)} disabled={skill.progress >= skill.maxProgress}>
+                          <Plus className="h-4 w-4" />
+                      </Button>
+                   </div>
                 </CardFooter>
             </Card>
           ))}

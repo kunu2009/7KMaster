@@ -1,15 +1,16 @@
+
 "use client";
 
 import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectDialog } from "./new-project-dialog";
 import { ProjectDetail } from "./project-detail";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "../ui/button";
 
 const statusColors: Record<ProjectStatus, string> = {
   "In Progress": "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -81,31 +82,27 @@ export function ProjectsTab() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Project</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Last Worked</TableHead>
-                <TableHead>Next Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {projects.map((project) => (
-                <TableRow key={project.id} onClick={() => handleSelectProject(project)} className="cursor-pointer">
-                  <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <Card key={project.id} className="flex flex-col">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{project.name}</CardTitle>
                     <Badge variant="outline" className={`${statusColors[project.status]} whitespace-nowrap`}>
-                      {project.status}
+                        {project.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{project.lastWorked}</TableCell>
-                  <TableCell>{project.nextAction}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                </div>
+                 <CardDescription>Last worked: {project.lastWorked}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                 <p className="text-sm font-medium">Next Action:</p>
+                 <p className="text-sm text-muted-foreground">{project.nextAction}</p>
+              </CardContent>
+              <CardFooter>
+                 <Button onClick={() => handleSelectProject(project)} className="w-full" variant="outline">View Details</Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       </CardContent>
     </Card>
