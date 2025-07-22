@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Bot, Loader, PlusCircle, Send, User } from 'lucide-react';
+import { Bot, Loader, PlusCircle, Send, User, FolderKanban } from 'lucide-react';
 import { runAssistant, type AssistantToolAction, type AssistantOutput } from '@/ai/flows/assistant-flow';
 import { initialProjects } from '@/lib/data';
 import type { Project, Todo } from '@/lib/types';
 import type { Message as GenkitMessage } from 'genkit';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '../ui/label';
 
 
 interface Message {
@@ -36,6 +37,7 @@ export function AssistantTab() {
   
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [pendingTodoAction, setPendingTodoAction] = useState<PendingTodoAction | null>(null);
+  const [selectedProjectContext, setSelectedProjectContext] = useState<string>('');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +127,12 @@ export function AssistantTab() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    let finalInput = input;
+    if (selectedProjectContext) {
+        finalInput = `For project "${selectedProjectContext}", ${input}`;
+    }
+
+    const userMessage: Message = { role: 'user', content: input }; // Show original input to user
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
@@ -140,7 +147,7 @@ export function AssistantTab() {
         }));
 
         const response : AssistantOutput = await runAssistant({
-            message: input,
+            message: finalInput, // Send input with context to AI
             projects: simplifiedProjects,
             history: history,
         });
@@ -243,7 +250,23 @@ export function AssistantTab() {
           <div ref={messagesEndRef} />
         </div>
       </CardContent>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t space-y-4">
+        <div>
+            <Label htmlFor="project-context" className="text-xs text-muted-foreground">Project Context (Optional)</Label>
+            <Select onValueChange={setSelectedProjectContext} value={selectedProjectContext}>
+                <SelectTrigger id="project-context" className="w-full">
+                    <SelectValue placeholder="Select a project for context..." />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                     <ScrollArea className="h-40">
+                        {projects.map(p => (
+                            <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                        ))}
+                    </ScrollArea>
+                </SelectContent>
+            </Select>
+        </div>
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <Input
             value={input}

@@ -10,7 +10,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z, generate } from 'genkit';
-import type { Project } from '@/lib/types';
 import { ProjectStatus } from '@/lib/types';
 
 
@@ -112,6 +111,7 @@ const assistantPrompt = ai.definePrompt({
 - Be conversational, friendly, and helpful.
 - Your primary goal is to help the user manage their dashboard by using the available tools.
 - **IMPORTANT**: When you decide to use a tool, you MUST also provide a friendly text response to the user confirming what you've done or what you're suggesting. Your response must always have a "text" field with a conversational message for the user. Do not output JSON or any other machine-readable format in the 'text' field.
+- If the user provides context about a specific project, focus your response and tool usage on that project.
 - If you use 'addProject', say something like "I've added [Project Name] to your list for you! You can confirm it below."
 - If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]. You can add them to your project." and present the generated todos in the toolAction.
 - You can ask clarifying questions if the user's request is ambiguous before using a tool.
