@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Bot, Loader, PlusCircle, Send, User, FolderKanban, Sparkles, Zap, Brain } from 'lucide-react';
+import { Bot, Loader, PlusCircle, Send, User, Sparkles, Zap, Brain, ChevronsUpDown, FolderKanban } from 'lucide-react';
 import { runAssistant, type AssistantToolAction, type AssistantOutput } from '@/ai/flows/assistant-flow';
 import { initialProjects, initialSkills, initialTodayTasks } from '@/lib/data';
 import type { Project, Todo, Skill, TodayTask } from '@/lib/types';
@@ -15,6 +15,11 @@ import type { Message as GenkitMessage } from 'genkit';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '../ui/label';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 
 interface Message {
@@ -33,6 +38,7 @@ export function AssistantTab() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const { toast } = useToast();
   
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
@@ -188,6 +194,7 @@ export function AssistantTab() {
 
   const handleSmartPrompt = (prompt: string) => {
     processRequest(prompt);
+    setIsActionsOpen(false);
   }
 
   const ProjectSelector = ({ onConfirm }: { onConfirm: (projectName: string) => void }) => {
@@ -224,6 +231,13 @@ export function AssistantTab() {
         </CardHeader>
       <CardContent className="flex-1 overflow-y-auto pr-4">
         <div className="space-y-6">
+          {messages.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                <Bot className="h-16 w-16 mb-4" />
+                <h3 className="text-lg font-semibold">Welcome to your AI Assistant</h3>
+                <p className="text-sm">Ask me to add a project, generate tasks, or summarize your progress!</p>
+            </div>
+          )}
           {messages.map((message, index) => (
             <div key={index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role === 'assistant' && (
@@ -266,37 +280,51 @@ export function AssistantTab() {
           <div ref={messagesEndRef} />
         </div>
       </CardContent>
-      <div className="p-4 border-t space-y-4">
-        <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">Smart Prompts</Label>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
-                <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading}>
-                    <Sparkles className="mr-2 h-4 w-4" /> Summarize Week
+      <div className="p-4 border-t space-y-2">
+        <Collapsible open={isActionsOpen} onOpenChange={setIsActionsOpen}>
+            <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full justify-center gap-2 text-muted-foreground">
+                    <ChevronsUpDown className="h-4 w-4" />
+                    Smart Actions
                 </Button>
-                 <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Based on my projects and skills, suggest a plan for the next 3 days.")} disabled={isLoading}>
-                    <Zap className="mr-2 h-4 w-4" /> Plan Next 3 Days
-                </Button>
-                 <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Generate a high-level vision statement based on my current projects and skills.")} disabled={isLoading}>
-                    <Brain className="mr-2 h-4 w-4" /> Generate Vision
-                </Button>
-            </div>
-        </div>
-        <div>
-            <Label htmlFor="project-context" className="text-xs text-muted-foreground">Project Context (Optional)</Label>
-            <Select onValueChange={setSelectedProjectContext} value={selectedProjectContext} disabled={isLoading}>
-                <SelectTrigger id="project-context" className="w-full">
-                    <SelectValue placeholder="Select a project for context..." />
-                </SelectTrigger>
-                <SelectContent>
-                     <ScrollArea className="h-40">
-                        {projects.map(p => (
-                            <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
-                        ))}
-                    </ScrollArea>
-                </SelectContent>
-            </Select>
-        </div>
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-2">
+                <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Smart Prompts</Label>
+                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading}>
+                            <Sparkles className="mr-2 h-4 w-4" /> Summarize Week
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Based on my projects and skills, suggest a plan for the next 3 days.")} disabled={isLoading}>
+                            <Zap className="mr-2 h-4 w-4" /> Plan Next 3 Days
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Generate a high-level vision statement based on my current projects and skills.")} disabled={isLoading}>
+                            <Brain className="mr-2 h-4 w-4" /> Generate Vision
+                        </Button>
+                    </div>
+                </div>
+                <div>
+                    <Label htmlFor="project-context" className="text-xs text-muted-foreground flex items-center gap-2">
+                      <FolderKanban className="h-4 w-4" />
+                      Project Context (Optional)
+                    </Label>
+                    <Select onValueChange={(value) => { setSelectedProjectContext(value); if(value) {setIsActionsOpen(true)}}} value={selectedProjectContext} disabled={isLoading}>
+                        <SelectTrigger id="project-context" className="w-full">
+                            <SelectValue placeholder="Select a project for context..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <ScrollArea className="h-40">
+                                <SelectItem value="">None</SelectItem>
+                                {projects.map(p => (
+                                    <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                                ))}
+                            </ScrollArea>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 pt-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -312,3 +340,5 @@ export function AssistantTab() {
     </Card>
   );
 }
+
+    
