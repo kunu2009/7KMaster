@@ -90,10 +90,15 @@ export function AssistantTab() {
         handleAddProject(action.args);
         break;
       case 'generateProjectTodos':
-        handleAddTodosToProject(action.args, action.result);
+        if(action.result) {
+            handleAddTodosToProject(action.args, action.result);
+        } else {
+            toast({ title: "Error", description: "The AI tool did not return any todos.", variant: "destructive" });
+        }
         break;
       default:
         console.warn('Unknown tool action:', action.toolName);
+        toast({ title: "Unknown Action", description: "The AI suggested an action I don't know how to do.", variant: "destructive" });
     }
   };
 
@@ -157,7 +162,7 @@ export function AssistantTab() {
                     {message.toolAction && (
                         <div className="mt-3 border-t pt-3">
                             <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
-                             <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!)}>
+                             <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!)} className="bg-background/80 hover:bg-background">
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 {message.toolAction.toolName === 'addProject' && `Confirm: Add Project`}
                                 {message.toolAction.toolName === 'generateProjectTodos' && `Confirm: Add Todos`}
