@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -128,7 +129,7 @@ export function AssistantTab() {
         const assistantMessage: Message = {
             role: 'assistant',
             content: response.text,
-            toolAction: response.toolAction
+            toolAction: response.toolAction ?? undefined
         };
         setMessages(prev => [...prev, assistantMessage]);
 
