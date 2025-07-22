@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -9,14 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { RefreshCw, Loader } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialTodayTasks, initialProjects, initialSkills } from "@/lib/data";
@@ -29,7 +30,7 @@ export function TodayTab() {
     "todayTasks",
     initialTodayTasks
   );
-   const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -61,8 +62,26 @@ export function TodayTab() {
     }
   };
 
+  const { completedTasks, totalTasks, progress, allTasksCompleted, groupedTasks } = useMemo(() => {
+    const total = tasks.length;
+    const completed = tasks.filter(task => task.done).length;
+    const groups = tasks.reduce((acc, task) => {
+      const { timeBlock } = task;
+      if (!acc[timeBlock]) {
+        acc[timeBlock] = [];
+      }
+      acc[timeBlock].push(task);
+      return acc;
+    }, {} as Record<string, TodayTask[]>);
 
-  const allTasksCompleted = tasks.every(task => task.done);
+    return {
+        completedTasks: completed,
+        totalTasks: total,
+        progress: total > 0 ? (completed / total) * 100 : 0,
+        allTasksCompleted: total > 0 && completed === total,
+        groupedTasks: Object.entries(groups)
+    }
+  }, [tasks]);
 
   return (
     <>
@@ -88,28 +107,44 @@ export function TodayTab() {
                 </Button>
             </div>
           </div>
+           <div className="pt-4 space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Daily Progress</span>
+                  <span>{completedTasks} / {totalTasks} Tasks</span>
+              </div>
+              <Progress value={progress} />
+           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableBody>
-                {tasks.map((task) => (
-                  <TableRow key={task.id} className={task.done ? "text-muted-foreground" : ""}>
-                    <TableCell className="font-medium w-1/3 sm:w-[150px] pr-2">{task.timeBlock}</TableCell>
-                    <TableCell>{task.task}</TableCell>
-                    <TableCell className="w-[50px] text-center pl-2">
-                      <Checkbox
-                        id={`task-${task.id}`}
-                        checked={task.done}
-                        onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
-                        aria-label={`Mark ${task.task} as done`}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <Accordion type="multiple" defaultValue={groupedTasks.map(([timeBlock]) => timeBlock)} className="w-full">
+            {groupedTasks.map(([timeBlock, tasksInGroup]) => (
+                <AccordionItem value={timeBlock} key={timeBlock}>
+                    <AccordionTrigger className="font-semibold text-base hover:no-underline">
+                        {timeBlock}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <div className="space-y-4 pl-1">
+                            {tasksInGroup.map(task => (
+                                <div key={task.id} className="flex items-center gap-4">
+                                    <Checkbox
+                                        id={`task-${task.id}`}
+                                        checked={task.done}
+                                        onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
+                                        aria-label={`Mark ${task.task} as done`}
+                                        className="h-5 w-5"
+                                    />
+                                    <label 
+                                        htmlFor={`task-${task.id}`} 
+                                        className={`flex-1 text-sm ${task.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                                        {task.task}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
       <PomodoroTimer />
