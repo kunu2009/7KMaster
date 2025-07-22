@@ -100,7 +100,7 @@ export type AssistantInput = z.infer<typeof AssistantInputSchema>;
 
 const AssistantOutputSchema = z.object({
   text: z.string().describe('The textual response from the assistant.'),
-  toolAction: AssistantToolActionSchema.optional().describe('An action the user can take based on the assistant\'s response.'),
+  toolAction: AssistantToolActionSchema.optional().nullable().describe('An action the user can take based on the assistant\'s response.'),
 });
 export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 
@@ -123,7 +123,7 @@ const assistantPrompt = ai.definePrompt({
         {{#if history}}
             Here is the conversation history:
             {{#each history}}
-                {{role}}: {{content}}
+                {{#if isUser}}User{{else}}AI{{/if}}: {{content}}
             {{/each}}
         {{/if}}
 
@@ -149,7 +149,7 @@ const assistantFlow = ai.defineFlow(
   async (input) => {
     // Pre-process history for Handlebars
     const processedHistory = (input.history || []).map(m => ({
-        role: m.role === 'user' ? 'User' : 'AI',
+        isUser: m.role === 'user',
         content: m.content[0]?.text || ''
     }));
 
@@ -178,7 +178,7 @@ const assistantFlow = ai.defineFlow(
 
     return {
         text: response.text,
-        toolAction: undefined,
+        toolAction: response.output?.toolAction,
     };
   }
 );
