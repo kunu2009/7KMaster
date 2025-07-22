@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Edit } from "lucide-react";
 import type { SelfSpaceItem } from "@/lib/types";
+import Image from "next/image";
 
 interface EditSelfSpaceDialogProps {
     item: SelfSpaceItem;
@@ -26,22 +27,55 @@ export function EditSelfSpaceDialog({ item, onUpdateItem }: EditSelfSpaceDialogP
   const [area, setArea] = useState(item.area);
   const [status, setStatus] = useState(item.status);
   const [goal, setGoal] = useState(item.goal);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(item.imageUrl);
+
 
   useEffect(() => {
     if (open) {
         setArea(item.area);
         setStatus(item.status);
         setGoal(item.goal);
+        setImagePreview(item.imageUrl);
+        setImageFile(null);
     }
   }, [open, item]);
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        setImageFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    }
+  };
+  
+  const fileToDataUri = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      resolve(event.target?.result as string);
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
+    reader.readAsDataURL(file);
+  });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (area && status && goal) {
+       let newImageUrl = item.imageUrl;
+      if (imageFile) {
+        newImageUrl = await fileToDataUri(imageFile);
+      }
       onUpdateItem({
         ...item,
         area,
         status,
         goal,
+        imageUrl: newImageUrl
       });
       setOpen(false);
     }
@@ -79,6 +113,19 @@ export function EditSelfSpaceDialog({ item, onUpdateItem }: EditSelfSpaceDialogP
               Goal
             </Label>
             <Input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} className="col-span-3" />
+          </div>
+           <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="image" className="text-right pt-2">
+                Image
+            </Label>
+            <div className="col-span-3 space-y-2">
+                {imagePreview && (
+                    <div className="relative h-24 w-full rounded-md overflow-hidden">
+                        <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" />
+                    </div>
+                )}
+                <Input id="image" type="file" onChange={handleImageChange} className="col-span-3" accept="image/*" />
+            </div>
           </div>
         </div>
         <DialogFooter>

@@ -22,7 +22,7 @@ export type Project = {
 
 export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number };
 
-export type SelfSpaceItem = { id: string; area: string; status: string; goal: string };
+export type SelfSpaceItem = { id: string; area: string; status: string; goal: string; imageUrl?: string };
 
 export type ResearchType = 'Tool' | 'Website' | 'Article' | 'Video' | 'Course';
 

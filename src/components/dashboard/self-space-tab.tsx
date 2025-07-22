@@ -67,7 +67,7 @@ export function SelfSpaceTab() {
               <CardContent className="flex-grow space-y-4">
                 <div className="aspect-video relative overflow-hidden rounded-md">
                    <Image 
-                      src={`https://placehold.co/600x400.png`}
+                      src={item.imageUrl || `https://placehold.co/600x400.png`}
                       alt={item.area}
                       fill
                       className="object-cover"
