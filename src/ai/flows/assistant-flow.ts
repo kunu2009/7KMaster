@@ -33,7 +33,7 @@ const GenerateTodosInputSchema = z.object({
 
 const TodoSchema = z.object({
     id: z.string().describe("A unique ID for the todo item, generated as a random string."),
-    text: z.string().describe("The description of the task. This is the content of the to-do item."),
+    text: z.string().describe("The description of the task. This is the content of the to-do item and cannot be blank."),
     completed: z.boolean().describe("Whether the task is completed. This should always be false initially."),
 });
 
@@ -114,8 +114,7 @@ const assistantPrompt = ai.definePrompt({
     system: `You are the 7K Dashboard AI assistant.
 - Be conversational, friendly, and helpful.
 - Your primary goal is to help the user manage their dashboard by using the available tools.
-- **IMPORTANT**: When you decide to use a tool, you MUST also provide a friendly text response to the user confirming what you've done or what you're suggesting.
-- Your response must always have a "text" field with a conversational message for the user.
+- **IMPORTANT**: When you decide to use a tool, you MUST also provide a friendly text response to the user confirming what you've done or what you're suggesting. Your response must always have a "text" field with a conversational message for the user. Do not output JSON or any other machine-readable format in the 'text' field.
 - If you use 'addProject', say something like "I've added [Project Name] to your list for you! You can confirm it below."
 - If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]. You can add them to your project." and present the generated todos in the toolAction.
 - You can ask clarifying questions if the user's request is ambiguous before using a tool.
@@ -172,14 +171,17 @@ const assistantFlow = ai.defineFlow(
             result: toolResponse,
         };
         
+        // Ensure we still have a valid text response from the model even with a tool call.
+        const textResponse = response.output?.text || response.text || "I've prepared this action for you.";
+        
         return {
-            text: response.text,
+            text: textResponse,
             toolAction: toolAction,
         };
     }
 
     return {
-        text: response.text,
+        text: response.output?.text || "Sorry, I'm not sure how to respond to that.",
         toolAction: response.output?.toolAction,
     };
   }
