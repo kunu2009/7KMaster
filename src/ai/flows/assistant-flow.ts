@@ -9,7 +9,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z, generate } from 'genkit';
-import type { Project, ProjectStatus, Todo } from '@/lib/types';
+import type { Project, ProjectStatus } from '@/lib/types';
 
 
 // Schemas for AI Tools

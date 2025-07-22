@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import { generateProjectTodos } from '@/ai/flows/generate-project-todos-flow';
+import { runAssistant } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -67,15 +67,15 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
   const handleGenerateTodos = async () => {
     setIsGeneratingTodos(true);
     try {
-        const result = await generateProjectTodos({
-            projectName: project.name,
-            projectContext: project.nextAction,
-            numberOfTodos: 5,
+        const response = await runAssistant({
+            message: `Generate 5 todos for my project called "${project.name}". The overall goal is "${project.nextAction}".`,
         });
 
-        if (result && result.todos) {
+        const action = response.toolAction;
+        if (action?.toolName === 'generateProjectTodos' && action.result?.todos) {
+            const result = action.result;
             const existingTodoTexts = new Set((project.todos || []).map(t => t.text));
-            const newTodos = result.todos.filter(t => !existingTodoTexts.has(t.text));
+            const newTodos = result.todos.filter((t: Todo) => !existingTodoTexts.has(t.text));
 
             if (newTodos.length < result.todos.length) {
                 toast({ title: "Duplicate tasks skipped", description: "Some suggested tasks already existed."});
@@ -91,6 +91,8 @@ export function ProjectDetail({ project, onUpdateProject, onBack }: ProjectDetai
             } else {
                  toast({ title: "No new tasks", description: "The AI didn't generate any new unique tasks."});
             }
+        } else {
+             toast({ title: "Error", description: "The AI assistant couldn't generate tasks for this project.", variant: 'destructive' });
         }
     } catch (e) {
         console.error("Failed to generate todos:", e);
