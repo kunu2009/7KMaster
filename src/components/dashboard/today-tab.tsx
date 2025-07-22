@@ -18,8 +18,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, Loader, Clock } from "lucide-react";
+import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialTodayTasks, initialProjects, initialSkills } from "@/lib/data";
 import type { TodayTask, Project, Skill } from "@/lib/types";
@@ -34,6 +35,9 @@ export function TodayTab() {
   const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTask, setNewTask] = useState('');
+
 
   const handleCheckedChange = (taskId: string, checked: boolean) => {
     setTasks(
@@ -67,7 +71,7 @@ export function TodayTab() {
     const total = tasks.length;
     const completed = tasks.filter(task => task.done).length;
     
-    const uniqueTimeBlocks = [...new Set(tasks.map(t => t.timeBlock))];
+    const uniqueTimeBlocks = [...new Set(tasks.map(t => t.timeBlock))].sort();
 
     const grouped = uniqueTimeBlocks.map(timeBlock => ({
         timeBlock,
@@ -83,6 +87,28 @@ export function TodayTab() {
     }
   }, [tasks]);
 
+  const handleEditTask = (taskId: string, newText: string) => {
+    setTasks(tasks.map(task => task.id === taskId ? { ...task, task: newText } : task));
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
+
+  const handleAddTask = (timeBlock: string) => {
+    if (newTask.trim()) {
+        const newTaskObject: TodayTask = {
+            id: `${Date.now()}`,
+            timeBlock: timeBlock,
+            task: newTask.trim(),
+            done: false,
+        };
+        setTasks([...tasks, newTaskObject]);
+        setNewTask(''); // Clear input after adding
+    }
+  };
+
+
   return (
     <>
       <Card>
@@ -96,6 +122,10 @@ export function TodayTab() {
             </div>
             <div className="flex items-center gap-2 self-end sm:self-auto">
                 {allTasksCompleted && <Badge color="green">All Done! 🎉</Badge>}
+                <Button onClick={() => setIsEditing(!isEditing)} size="sm" variant={isEditing ? 'default' : 'outline'}>
+                    {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Edit className="mr-2 h-4 w-4" />}
+                    {isEditing ? 'Save' : 'Edit'}
+                </Button>
                 <Button onClick={handleGeneratePlan} disabled={isGenerating} size="sm" variant="outline">
                   {isGenerating ? (
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -123,7 +153,7 @@ export function TodayTab() {
                        <div className="flex items-center justify-between w-full">
                          <div className="flex items-center gap-3">
                             <Clock className="h-5 w-5 text-primary" />
-                            <span className="text-lg">{tasksInBlock[0].task.split(':')[0]}</span>
+                            <span className="text-lg">{tasksInBlock[0]?.task.split(':')[0] || 'Tasks'}</span>
                          </div>
                          <Badge variant="outline" className="font-mono text-sm mr-2">{timeBlock}</Badge>
                        </div>
@@ -131,21 +161,49 @@ export function TodayTab() {
                     <AccordionContent>
                         <div className="space-y-4 pl-4 border-l-2 ml-4">
                             {tasksInBlock.map(task => (
-                                <div key={task.id} className="flex items-center gap-4">
+                                <div key={task.id} className="flex items-center gap-3">
                                     <Checkbox
                                         id={`task-${task.id}`}
                                         checked={task.done}
                                         onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
                                         aria-label={`Mark ${task.task} as done`}
                                         className="h-5 w-5"
+                                        disabled={isEditing}
                                     />
-                                    <label 
-                                        htmlFor={`task-${task.id}`} 
-                                        className={`flex-1 text-sm ${task.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                                        {task.task}
-                                    </label>
+                                    {isEditing ? (
+                                        <Input 
+                                            value={task.task}
+                                            onChange={(e) => handleEditTask(task.id, e.target.value)}
+                                            className="h-9 flex-1"
+                                        />
+                                    ) : (
+                                        <label 
+                                            htmlFor={`task-${task.id}`} 
+                                            className={`flex-1 text-sm ${task.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                                            {task.task}
+                                        </label>
+                                    )}
+                                    {isEditing && (
+                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(task.id)}>
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                        </Button>
+                                    )}
                                 </div>
                             ))}
+                             {isEditing && (
+                                <div className="flex items-center gap-2 pt-2">
+                                    <Input 
+                                        placeholder="Add a new task..."
+                                        value={newTask}
+                                        onChange={(e) => setNewTask(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAddTask(timeBlock)}
+                                        className="h-9 flex-1"
+                                    />
+                                    <Button size="sm" onClick={() => handleAddTask(timeBlock)}>
+                                        <PlusCircle className="h-4 w-4 mr-2" /> Add
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </AccordionContent>
                 </AccordionItem>

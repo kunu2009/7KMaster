@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialSkills } from "@/lib/data";
 import type { Skill } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -15,6 +14,7 @@ import { NewSkillDialog } from './new-skill-dialog';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { generateFocusSuggestions } from '@/ai/flows/generate-focus-suggestions-flow';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '../ui/badge';
 
 export function SkillsTab() {
   const [skills, setSkills] = useLocalStorage<Skill[]>(
@@ -108,39 +108,35 @@ export function SkillsTab() {
                 </AlertDescription>
             </Alert>
         )}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Skill Area</TableHead>
-                <TableHead className="hidden sm:table-cell">Current Level</TableHead>
-                <TableHead>Weekly Goal</TableHead>
-                <TableHead className="w-[200px] sm:w-[250px]">Progress</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {displayedSkills.map((skill) => (
-                <TableRow key={skill.id}>
-                  <TableCell className="font-medium">{skill.area}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{skill.level}</TableCell>
-                  <TableCell>{skill.weeklyGoal}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                       <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateProgress(skill.id, -1)}>
-                            <Minus className="h-4 w-4" />
-                       </Button>
-                      <Progress value={(skill.progress / skill.maxProgress) * 100} className="w-full" />
-                       <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateProgress(skill.id, 1)}>
-                            <Plus className="h-4 w-4" />
-                       </Button>
-                      <span className="text-sm text-muted-foreground min-w-[40px] text-center">{skill.progress}/{skill.maxProgress}</span>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {displayedSkills.map((skill) => (
+            <Card key={skill.id} className={`flex flex-col ${focusMode && focusSkillIds.includes(skill.id) ? 'border-primary shadow-lg' : ''}`}>
+                <CardHeader>
+                    <div className='flex justify-between items-start gap-2'>
+                        <CardTitle className="text-lg">{skill.area}</CardTitle>
+                        <Badge variant="outline">{skill.level}</Badge>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <CardDescription>{skill.weeklyGoal}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow space-y-4">
+                     <div className="space-y-2">
+                        <Progress value={(skill.progress / skill.maxProgress) * 100} />
+                        <p className="text-right text-sm text-muted-foreground">{skill.progress} / {skill.maxProgress}</p>
+                     </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, -1)} disabled={skill.progress <= 0}>
+                        <Minus className="h-4 w-4" />
+                   </Button>
+                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, 1)} disabled={skill.progress >= skill.maxProgress}>
+                        <Plus className="h-4 w-4" />
+                   </Button>
+                </CardFooter>
+            </Card>
+          ))}
         </div>
+
         {skills.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
                 <p>No skills added yet. Click "New Skill" to start tracking your progress!</p>
