@@ -12,12 +12,19 @@ import { runAssistant, type AssistantToolAction, type AssistantOutput } from '@/
 import { initialProjects } from '@/lib/data';
 import type { Project, Todo } from '@/lib/types';
 import type { Message as GenkitMessage } from 'genkit';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   toolAction?: AssistantToolAction;
+}
+
+interface PendingTodoAction {
+    messageId: number;
+    args: any;
+    result: any;
 }
 
 export function AssistantTab() {
@@ -27,6 +34,7 @@ export function AssistantTab() {
   const { toast } = useToast();
   
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [pendingTodoAction, setPendingTodoAction] = useState<PendingTodoAction | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -49,10 +57,7 @@ export function AssistantTab() {
       toast({ title: "Project Added!", description: `"${args.name}" has been added to your projects.` });
   }, [setProjects, toast]);
 
-  const handleAddTodosToProject = useCallback((args: any, result: any) => {
-    const { projectName } = args;
-    const { todos } = result;
-
+  const handleAddTodosToProject = useCallback((projectName: string, todos: Todo[]) => {
     if (!todos || todos.length === 0) {
         toast({ title: "Couldn't add todos", description: "The AI didn't generate any tasks.", variant: 'destructive'});
         return;
@@ -66,7 +71,6 @@ export function AssistantTab() {
       }
       return prevProjects.map(p => {
         if (p.name.toLowerCase() === projectName.toLowerCase()) {
-          // Filter out duplicate todos based on text
           const existingTodoTexts = new Set((p.todos || []).map(t => t.text));
           const newTodos = todos.filter((t: Todo) => t.text && !existingTodoTexts.has(t.text));
           
@@ -82,17 +86,30 @@ export function AssistantTab() {
       });
     });
     toast({ title: "To-dos Added!", description: `${todos.length} tasks have been added to "${projectName}".` });
+    setPendingTodoAction(null); // Clear the pending action
 
   }, [setProjects, toast]);
+  
+  const handleConfirmAddTodos = (projectName: string) => {
+    if (pendingTodoAction && projectName) {
+      handleAddTodosToProject(projectName, pendingTodoAction.result.todos);
+    } else {
+        toast({
+            title: "Selection Required",
+            description: "Please select a project from the list.",
+            variant: "destructive"
+        })
+    }
+  }
 
-  const handleToolAction = (action: AssistantToolAction) => {
+  const handleToolAction = (action: AssistantToolAction, messageId: number) => {
     switch (action.toolName) {
       case 'addProject':
         handleAddProject(action.args);
         break;
       case 'generateProjectTodos':
         if(action.result) {
-            handleAddTodosToProject(action.args, action.result);
+            setPendingTodoAction({ messageId, args: action.args, result: action.result });
         } else {
             toast({ title: "Error", description: "The AI tool did not return any todos.", variant: "destructive" });
         }
@@ -111,6 +128,7 @@ export function AssistantTab() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setPendingTodoAction(null);
 
     try {
         const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction }));
@@ -143,6 +161,30 @@ export function AssistantTab() {
     }
   };
 
+  const ProjectSelector = ({ onConfirm }: { onConfirm: (projectName: string) => void }) => {
+    const [selectedProject, setSelectedProject] = useState('');
+    return (
+        <div className="mt-3 border-t pt-3 space-y-3">
+            <p className="text-xs font-semibold">Select a project to add these tasks to:</p>
+            <Select onValueChange={setSelectedProject} value={selectedProject}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Choose project..." />
+                </SelectTrigger>
+                <SelectContent>
+                    {projects.map(p => (
+                        <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Button size="sm" variant="outline" onClick={() => onConfirm(selectedProject)} className="w-full bg-background/80 hover:bg-background">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add to Project
+            </Button>
+        </div>
+    );
+};
+
+
   return (
     <Card className="flex flex-col h-[calc(100vh-12rem)]">
         <CardHeader>
@@ -160,13 +202,26 @@ export function AssistantTab() {
                 )}
                 <div className={`rounded-lg p-3 max-w-sm ${message.role === 'user' ? 'bg-muted' : 'bg-accent text-accent-foreground'}`}>
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    {message.toolAction && (
-                        <div className="mt-3 border-t pt-3">
+                    {pendingTodoAction?.messageId === index ? (
+                        <ProjectSelector onConfirm={handleConfirmAddTodos} />
+                    ) : (
+                        message.toolAction && message.toolAction.toolName === 'addProject' && (
+                            <div className="mt-3 border-t pt-3">
+                                <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
+                                <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index)} className="bg-background/80 hover:bg-background">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Confirm: Add Project
+                                </Button>
+                            </div>
+                        )
+                    )}
+
+                    {message.toolAction && message.toolAction.toolName === 'generateProjectTodos' && !pendingTodoAction && (
+                         <div className="mt-3 border-t pt-3">
                             <p className="text-xs font-semibold mb-2">AI has suggested an action:</p>
-                             <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!)} className="bg-background/80 hover:bg-background">
+                             <Button size="sm" variant="outline" onClick={() => handleToolAction(message.toolAction!, index)} className="bg-background/80 hover:bg-background">
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                {message.toolAction.toolName === 'addProject' && `Confirm: Add Project`}
-                                {message.toolAction.toolName === 'generateProjectTodos' && `Confirm: Add Todos`}
+                                Review & Add Todos
                             </Button>
                         </div>
                     )}
