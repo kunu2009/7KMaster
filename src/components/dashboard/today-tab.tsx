@@ -179,9 +179,7 @@ export function TodayTab() {
             </div>
         </CardContent>
       </Card>
-      <div className="lg:col-span-1">
-        <PomodoroTimer focusedTask={focusedTask ? focusedTask.text : null} />
-      </div>
+      <PomodoroTimer focusedTask={focusedTask ? focusedTask.text : null} />
     </div>
   );
 }
