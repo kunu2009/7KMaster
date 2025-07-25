@@ -84,7 +84,7 @@ export default function Home() {
             <item.icon className="size-5" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right" sideOffset={5}>
+        <TooltipContent side="left" sideOffset={5}>
           {item.label}
         </TooltipContent>
       </Tooltip>
@@ -93,7 +93,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-      <aside className="fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r bg-background">
+      <aside className="fixed inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
          <nav className="flex flex-col items-center gap-4 px-2 py-5">
             <div className="flex items-center gap-2 mb-2">
                  <svg
@@ -112,7 +112,7 @@ export default function Home() {
                {navItems.map(item => <NavLink key={item.id} item={item} />)}
           </nav>
       </aside>
-      <div className="flex flex-col gap-4 py-4 pl-14 w-full">
+      <div className="flex flex-col gap-4 py-4 pr-14 w-full">
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>7K Life</span>
