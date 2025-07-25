@@ -12,6 +12,7 @@ import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { StudyTab } from "@/components/dashboard/study-tab";
 import { PromptsTab } from "@/components/dashboard/prompts-tab";
 import { AppsTab } from "@/components/dashboard/apps-tab";
+import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -27,6 +28,7 @@ import {
   PanelLeft,
   PenSquare,
   Home as HomeIcon,
+  Bookmark,
 } from "lucide-react";
 
 
@@ -37,6 +39,7 @@ const navItems = [
   { id: 'skills', label: 'Skills', icon: BrainCircuit },
   { id: 'journal', label: 'Journal', icon: PenSquare },
   { id: 'study', label: 'Study', icon: Book },
+  { id: 'research', label: 'Research', icon: Bookmark },
   { id: 'prompts', label: 'Prompts', icon: Sparkles },
   { id: 'apps', label: 'Apps', icon: AppWindow },
   { id: 'web-links', label: 'Links', icon: Link },
@@ -55,6 +58,7 @@ export default function Home() {
       case 'skills': return <SkillsTab />;
       case 'journal': return <JournalTab />;
       case 'study': return <StudyTab />;
+      case 'research': return <ResearchTab />;
       case 'prompts': return <PromptsTab />;
       case 'apps': return <AppsTab />;
       case 'web-links': return <WebLinksTab />;
