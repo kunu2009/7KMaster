@@ -14,14 +14,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { GanttChartSquare, FileText, Target, BookOpen } from "lucide-react";
+import { GanttChartSquare, FileText, Target, BookOpen, Focus } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialProjects, initialNotes, initialFocusThing, initialJournalEntry } from "@/lib/data";
+import { initialProjects, initialNotes, initialJournalEntry } from "@/lib/data";
 import type { Project, Note, NoteBlock, Todo } from "@/lib/types";
 import { PomodoroTimer } from "./pomodoro-timer";
+import { Button } from "../ui/button";
 
 // A unified type for todos from any source
-interface AggregatedTodo {
+export interface AggregatedTodo {
     id: string; // Unique ID of the todo item itself
     text: string;
     isCompleted: boolean;
@@ -35,7 +36,8 @@ export function TodayTab() {
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [notes, setNotes] = useLocalStorage<Note[]>("notes", initialNotes);
   const [journalEntry, setJournalEntry] = useLocalStorage<string>("journalEntry", initialJournalEntry);
-  const [focusThing, setFocusThing] = useLocalStorage<string>("focusThing", initialFocusThing);
+  const [focusThing, setFocusThing] = useLocalStorage<string>("focusThing", "");
+  const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
 
   const aggregatedTodos = useMemo((): AggregatedTodo[] => {
     const fromProjects = projects.flatMap(project =>
@@ -94,6 +96,39 @@ export function TodayTab() {
         );
     }
   };
+  
+  const onPomodoroComplete = (task: AggregatedTodo) => {
+    const sessionMarker = "🍅";
+     if (task.sourceType === 'Project') {
+        setProjects(prevProjects => 
+            prevProjects.map(p => {
+                if (p.id === task.sourceId) {
+                    const updatedTodos = (p.todos || []).map(t => 
+                        t.id === task.id ? { ...t, text: t.text + ` ${sessionMarker}` } : t
+                    );
+                    return { ...p, todos: updatedTodos };
+                }
+                return p;
+            })
+        );
+    } else if (task.sourceType === 'Note' && task.blockId) {
+        const blockId = task.blockId;
+        setNotes(prevNotes => 
+            prevNotes.map(n => {
+                if (n.id === task.sourceId) {
+                    const updatedContent = (Array.isArray(n.content) ? n.content : []).map(b => 
+                        b.id === blockId ? { ...b, content: b.content + ` ${sessionMarker}` } : b
+                    );
+                    return { ...n, content: updatedContent };
+                }
+                return n;
+            })
+        );
+    }
+
+    // Unset the focused task after completion
+    setFocusedTask(null);
+  };
 
   const { completedTasks, totalTasks, progress } = useMemo(() => {
     const total = aggregatedTodos.length;
@@ -141,7 +176,7 @@ export function TodayTab() {
                 <div className="space-y-4">
                     {aggregatedTodos.length > 0 ? (
                         aggregatedTodos.map(todo => (
-                            <div key={`${todo.sourceType}-${todo.id}`} className={`flex items-start gap-3 p-3 rounded-md border bg-muted/30`}>
+                            <div key={`${todo.sourceType}-${todo.id}`} className={`flex items-start gap-3 p-3 rounded-md border ${focusedTask?.id === todo.id ? "border-primary bg-primary/10" : "bg-muted/30"}`}>
                                <Checkbox
                                     id={todo.id}
                                     checked={todo.isCompleted}
@@ -159,6 +194,16 @@ export function TodayTab() {
                                         <span>{todo.sourceType}: {todo.sourceName}</span>
                                     </div>
                                 </div>
+                                 <Button 
+                                     variant={focusedTask?.id === todo.id ? "default" : "ghost"} 
+                                     size="sm" 
+                                     onClick={() => setFocusedTask(todo)}
+                                     disabled={todo.isCompleted}
+                                     className="self-center"
+                                >
+                                    <Focus className="mr-2 h-4 w-4" />
+                                    Focus
+                                 </Button>
                             </div>
                         ))
                     ) : (
@@ -179,7 +224,7 @@ export function TodayTab() {
             </CardContent>
           </Card>
       </div>
-      <PomodoroTimer />
+      <PomodoroTimer focusedTask={focusedTask} onPomodoroComplete={onPomodoroComplete} />
     </div>
   );
 }
