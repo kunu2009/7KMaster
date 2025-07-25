@@ -16,6 +16,7 @@ import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { AppsTab } from "@/components/dashboard/apps-tab";
 import {
   Tooltip,
   TooltipContent,
