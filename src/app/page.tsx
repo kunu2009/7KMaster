@@ -33,6 +33,8 @@ import {
   PenSquare,
   Home as HomeIcon,
   Bookmark,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 
 
@@ -52,6 +54,7 @@ const navItems = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -93,8 +96,8 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-      <aside className="fixed inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
-         <nav className="flex flex-col items-center gap-4 px-2 py-5">
+      <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
+         <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
             <div className="flex items-center gap-2 mb-2">
                  <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -111,8 +114,30 @@ export default function Home() {
               </div>
                {navItems.map(item => <NavLink key={item.id} item={item} />)}
           </nav>
+          <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+             <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-lg"
+                aria-label="Toggle Sidebar"
+                onClick={() => setIsSidebarOpen(prev => !prev)}
+             >
+                <ChevronsRight className="size-5" />
+             </Button>
+          </nav>
       </aside>
-      <div className="flex flex-1 flex-col gap-4 py-4 pr-14">
+       {!isSidebarOpen && (
+            <Button
+                variant="ghost"
+                size="icon"
+                className="fixed top-1/2 right-2 z-20 rounded-full"
+                aria-label="Toggle Sidebar"
+                onClick={() => setIsSidebarOpen(prev => !prev)}
+            >
+                <ChevronsLeft className="size-5" />
+            </Button>
+        )}
+      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen ? 'pr-14' : 'pr-0'}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>7K Life</span>
