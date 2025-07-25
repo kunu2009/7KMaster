@@ -68,7 +68,7 @@ export function NotesTab() {
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle>Notepad</CardTitle>
             <CardDescription>
               Your personal notepad. Click a note to open the editor.
             </CardDescription>
