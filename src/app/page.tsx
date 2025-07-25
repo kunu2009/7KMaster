@@ -15,7 +15,7 @@ import { AppsTab } from "@/components/dashboard/apps-tab";
 import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   GanttChartSquare,
   BrainCircuit,
@@ -119,6 +119,7 @@ export default function Home() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <nav className="grid gap-2 text-lg font-medium">
                  <div className="flex items-center gap-2 h-16 border-b">
                      <svg
