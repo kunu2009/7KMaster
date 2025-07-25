@@ -12,40 +12,54 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2 } from 'lucide-react';
+import { Loader, Wand2, PlusCircle } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import {
   initialTodayTasks,
   initialProjects,
   initialSkills,
 } from "@/lib/data";
-import type { TodayTask, Project, Skill } from "@/lib/types";
+import type { TodayTask, Project, Skill, AggregatedTodo } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
 import { generateBlockTasks } from "@/ai/flows/generate-block-tasks-flow";
 import { useToast } from "@/hooks/use-toast";
+import { PomodoroTimer } from "./pomodoro-timer";
+import { ScrollArea } from "../ui/scroll-area";
 
-
-// Group tasks by time block
-const groupTasks = (tasks: TodayTask[]) => {
-    return tasks.reduce((acc, task) => {
-        const block = task.timeBlock;
-        if (!acc[block]) {
-            acc[block] = [];
-        }
-        acc[block].push(task);
-        return acc;
-    }, {} as Record<string, TodayTask[]>);
-};
 
 export function TodayTab() {
   const [tasks, setTasks] = useLocalStorage<TodayTask[]>("todayTasks", initialTodayTasks);
-  const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
+  const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
   const { toast } = useToast();
 
-  const handleToggleTask = (id: string) => {
+  const aggregatedTasks = useMemo<AggregatedTodo[]>(() => {
+    const projectNextActions: AggregatedTodo[] = projects
+        .filter(p => p.status === 'In Progress' || p.status === 'Not Started')
+        .map(p => ({
+            id: `proj-${p.id}`,
+            text: p.nextAction,
+            source: p.name,
+            completed: false // Not trackable here
+        }));
+
+    const dailyPlanTasks: AggregatedTodo[] = tasks.map(t => ({
+        id: t.id,
+        text: t.task,
+        source: t.timeBlock,
+        completed: t.done,
+    }));
+    
+    return [...dailyPlanTasks, ...projectNextActions];
+  }, [tasks, projects]);
+  
+  const handleToggleTask = (id: string, source: string) => {
+    // Only daily plan tasks can be toggled
+    if (id.startsWith('proj-')) return;
+    
     setTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, done: !task.done } : task
@@ -102,81 +116,125 @@ export function TodayTab() {
         setGeneratingBlock(null);
     }
   };
+  
+  const handlePomodoroComplete = (task: AggregatedTodo) => {
+     if (task.id.startsWith('proj-')) {
+         toast({title: "Pomodoro Complete!", description: `Great focus session on "${task.text}"!`})
+     } else {
+        handleToggleTask(task.id, task.source);
+        toast({title: "Pomodoro Complete!", description: `Task "${task.text}" marked as done.`})
+     }
+  }
 
+  const groupedTasks = useMemo(() => {
+    return aggregatedTasks.reduce((acc, task) => {
+        const group = task.id.startsWith('proj-') ? "Project Next Actions" : task.source;
+        if (!acc[group]) {
+            acc[group] = [];
+        }
+        acc[group].push(task);
+        return acc;
+    }, {} as Record<string, AggregatedTodo[]>);
+  }, [aggregatedTasks]);
 
-  const grouped = useMemo(() => groupTasks(tasks), [tasks]);
-  const sortedBlocks = useMemo(() => Object.keys(grouped).sort((a, b) => a.localeCompare(b)), [grouped]);
+  const sortedGroups = useMemo(() => {
+      const allGroups = Object.keys(groupedTasks);
+      const projectActionsGroup = allGroups.filter(g => g === "Project Next Actions");
+      const timeBlockGroups = allGroups.filter(g => g !== "Project Next Actions").sort();
+      return [...timeBlockGroups, ...projectActionsGroup];
+  }, [groupedTasks]);
+
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-            <div>
-              <CardTitle>Today's Plan</CardTitle>
-              <CardDescription>
-                Your schedule for today. Check off items as you complete them.
-              </CardDescription>
-            </div>
-            {tasks.length === 0 && (
-                <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan}>
-                    {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                    AI Generate Plan
-                </Button>
-            )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {tasks.length > 0 ? (
-          <div className="space-y-6">
-            {sortedBlocks.map((block) => (
-              <div key={block}>
-                <div className="flex justify-between items-center mb-2 border-b pb-1">
-                    <h3 className="font-semibold text-lg text-primary">{block}</h3>
-                     <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => handleGenerateBlockTasks(block)} 
-                        disabled={generatingBlock === block}
-                        className="text-muted-foreground"
-                    >
-                       {generatingBlock === block ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                        Suggest Tasks
-                    </Button>
-                </div>
-                <div className="space-y-2">
-                  {grouped[block].map((task) => (
-                    <div key={task.id} className="flex items-center gap-3">
-                      <Checkbox
-                        id={task.id}
-                        checked={task.done}
-                        onCheckedChange={() => handleToggleTask(task.id)}
-                      />
-                      <label
-                        htmlFor={task.id}
-                        className={`flex-1 text-sm ${
-                          task.done ? "line-through text-muted-foreground" : ""
-                        }`}
-                      >
-                        {task.task}
-                      </label>
+    <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                      <CardTitle>Today's Command Center</CardTitle>
+                      <CardDescription>
+                        Your aggregated tasks for today from all sources.
+                      </CardDescription>
                     </div>
-                  ))}
+                    {tasks.length === 0 && (
+                        <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan}>
+                            {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                            AI Generate Daily Plan
+                        </Button>
+                    )}
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-            <div className="text-center py-12 text-muted-foreground">
-                <p>Your plan for today is empty.</p>
-                <p>Click "AI Generate Plan" to get started!</p>
-            </div>
-        )}
-      </CardContent>
-      {tasks.length > 0 && (
-        <CardFooter>
-            <Button variant="destructive" onClick={() => setTasks([])}>Clear All Tasks</Button>
-        </CardFooter>
-      )}
-    </Card>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[calc(100vh-22rem)] pr-4">
+                  {aggregatedTasks.length > 0 ? (
+                    <div className="space-y-6">
+                      {sortedGroups.map((groupName) => (
+                        <div key={groupName}>
+                          <div className="flex justify-between items-center mb-2 border-b pb-1">
+                              <h3 className="font-semibold text-lg text-primary">{groupName}</h3>
+                               {groupName !== "Project Next Actions" && (
+                                   <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      onClick={() => handleGenerateBlockTasks(groupName)} 
+                                      disabled={generatingBlock === groupName}
+                                      className="text-muted-foreground"
+                                  >
+                                     {generatingBlock === groupName ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                                      AI Suggest
+                                  </Button>
+                               )}
+                          </div>
+                          <div className="space-y-2">
+                            {groupedTasks[groupName].map((task) => (
+                              <div key={task.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50">
+                                <Checkbox
+                                  id={task.id}
+                                  checked={task.completed}
+                                  onCheckedChange={() => handleToggleTask(task.id, task.source)}
+                                  disabled={task.id.startsWith('proj-')}
+                                />
+                                <label
+                                  htmlFor={task.id}
+                                  className={`flex-1 text-sm ${
+                                    task.completed ? "line-through text-muted-foreground" : ""
+                                  }`}
+                                >
+                                  {task.text}
+                                </label>
+                                 <Button 
+                                    size="sm" 
+                                    variant={focusedTask?.id === task.id ? "default" : "ghost"}
+                                    onClick={() => setFocusedTask(task)}
+                                    className="ml-auto"
+                                >
+                                    Focus
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                      <div className="text-center py-12 text-muted-foreground">
+                          <p>Your plan for today is empty.</p>
+                          <p>Click "AI Generate Daily Plan" to get started!</p>
+                      </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+               {tasks.length > 0 && (
+                <CardFooter>
+                    <Button variant="destructive" size="sm" onClick={() => setTasks([])}>Clear Daily Plan</Button>
+                </CardFooter>
+              )}
+            </Card>
+        </div>
+        <div className="lg:col-span-1">
+            <PomodoroTimer focusedTask={focusedTask} onPomodoroComplete={handlePomodoroComplete} />
+        </div>
+    </div>
   );
 }

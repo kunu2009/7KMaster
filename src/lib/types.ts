@@ -2,6 +2,13 @@
 
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
+export type AggregatedTodo = {
+    id: string;
+    text: string;
+    source: string; // e.g., 'Daily Plan' or Project Name
+    completed: boolean;
+};
+
 export enum ProjectStatus {
     InProgress = 'In Progress',
     NotStarted = 'Not Started',

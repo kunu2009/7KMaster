@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Timer, Play, Pause, RotateCw, Target } from 'lucide-react';
-import type { AggregatedTodo } from './today-tab';
+import type { AggregatedTodo } from '@/lib/types';
 
 interface PomodoroTimerProps {
     focusedTask: AggregatedTodo | null;
@@ -19,6 +19,7 @@ export function PomodoroTimer({ focusedTask, onPomodoroComplete }: PomodoroTimer
   const [isBreak, setIsBreak] = useState(false);
 
   const toggle = () => {
+    if (!focusedTask) return;
     setIsActive(!isActive);
   };
 
@@ -85,11 +86,11 @@ export function PomodoroTimer({ focusedTask, onPomodoroComplete }: PomodoroTimer
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col items-center justify-center">
-        <div className="text-4xl sm:text-6xl font-bold mb-4">
+        <div className="text-4xl sm:text-6xl font-bold mb-4" style={{ color: 'hsl(var(--primary))'}}>
           {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
         </div>
         <div className="flex justify-center gap-4 flex-wrap">
-          <Button onClick={toggle} size="lg" disabled={!focusedTask || (isActive && !focusedTask)}>
+          <Button onClick={toggle} size="lg" disabled={!focusedTask}>
             {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
             {isActive ? 'Pause' : 'Start'}
           </Button>
