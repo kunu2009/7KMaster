@@ -37,10 +37,17 @@ export type ResearchItem = {
     attachment?: string;
 };
 
+export type NoteBlock = {
+  id: string;
+  type: 'paragraph' | 'todo';
+  content: string;
+  checked?: boolean; // Only for 'todo' type
+};
+
 export type Note = {
   id: string;
   title: string;
-  content: string;
+  content: NoteBlock[];
   createdAt: string;
   modifiedAt: string;
 };

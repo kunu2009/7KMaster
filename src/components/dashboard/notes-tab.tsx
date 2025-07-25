@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialNotes } from "@/lib/data";
-import type { Note } from "@/lib/types";
+import type { Note, NoteBlock } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NewNoteDialog } from "./new-note-dialog";
@@ -21,10 +21,10 @@ export function NotesTab() {
 
   const addNote = (newNote: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content'>) => {
     const createdDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-    const fullNote = {
+    const fullNote: Note = {
       ...newNote,
       id: `${Date.now()}`,
-      content: '',
+      content: [{ id: `${Date.now()}-initial`, type: 'paragraph', content: '' }], // Start with one empty paragraph
       createdAt: createdDate,
       modifiedAt: createdDate,
     };
@@ -53,6 +53,15 @@ export function NotesTab() {
   const handleBackToList = () => {
     setSelectedNote(null);
   }
+  
+  const getNotePreview = (content: NoteBlock[]) => {
+    const firstTextualBlock = content.find(block => block.content.trim() !== '');
+    if (firstTextualBlock) {
+        return firstTextualBlock.content;
+    }
+    return "No content yet...";
+  }
+
 
   if (selectedNote) {
     return <NoteDetail 
@@ -91,7 +100,7 @@ export function NotesTab() {
                 </CardHeader>
                 <CardContent className="flex-grow">
                    <p className="text-sm text-muted-foreground line-clamp-3">
-                     {note.content || "No content yet..."}
+                     {getNotePreview(note.content)}
                    </p>
                 </CardContent>
                 <CardFooter>

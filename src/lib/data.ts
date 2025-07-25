@@ -38,7 +38,19 @@ export const initialResearchItems: ResearchItem[] = [
     { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.' },
 ];
 
-export const initialNotes: Note[] = [];
+export const initialNotes: Note[] = [
+  {
+    id: '1',
+    title: 'Welcome Note',
+    content: [
+      { id: 'b1', type: 'paragraph', content: 'This is your new block-based notepad!' },
+      { id: 'b2', type: 'todo', content: 'Explore the new features.', checked: false },
+      { id: 'b3', type: 'todo', content: 'Create a new note.', checked: false },
+    ],
+    createdAt: 'July 25, 2024',
+    modifiedAt: 'July 25, 2024',
+  }
+];
 
 export const initialJournalEntry = "";
 export const initialFocusThing = "";
