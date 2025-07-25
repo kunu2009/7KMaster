@@ -1,4 +1,5 @@
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export enum ProjectStatus {
@@ -76,6 +77,41 @@ export type CareerPath = {
     content: string;
   }[];
 };
+
+export type MCQ = {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+  explanation: string;
+  topic: string;
+};
+
+export interface StudyEvent {
+  date: Date;
+  title: string;
+  description: string;
+}
+
+export interface ProgressState {
+  attempted: number;
+  correct: number;
+  history: { [mcqId: string]: 'correct' | 'incorrect' };
+}
+
+export interface Reel {
+  id: string;
+  title: string;
+  content: string;
+  icon: string;
+}
+
+export interface CaseSimulation {
+  id: string;
+  title: string;
+  scenario: string;
+  playerRole: string;
+}
 
 
 export type ChartConfig = {

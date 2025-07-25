@@ -9,12 +9,7 @@ import { JournalTab } from "@/components/dashboard/journal-tab";
 import { WebLinksTab } from "@/components/dashboard/web-links-tab";
 import { UtilitiesTab } from "@/components/dashboard/utilities-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
-import { StudyTab } from "@/components/dashboard/study-tab";
-import { LawNotesTab } from "@/components/dashboard/law-notes-tab";
-import { LawFlashcardsTab } from "@/components/dashboard/law-flashcards-tab";
-import { LawCareerTab } from "@/components/dashboard/law-career-tab";
-import { PromptsTab } from "@/components/dashboard/prompts-tab";
-import { AppsTab } from "@/components/dashboard/apps-tab";
+import { LawPrepApp } from "@/components/lawprep/law-prep-app";
 import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -57,37 +52,20 @@ const navItems = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
-  const [activeStudyTab, setStudyTab] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const handleStudyNavigation = (subTab: string) => {
-    setActiveTab('study');
-    setStudyTab(subTab);
-  }
-  
   const handleTabChange = (tabId: string) => {
       setActiveTab(tabId);
-      if (tabId !== 'study') {
-          setStudyTab(null);
-      }
   }
 
   const renderContent = () => {
-    if (activeTab === 'study') {
-        switch (activeStudyTab) {
-            case 'law-notes': return <LawNotesTab />;
-            case 'law-flashcards': return <LawFlashcardsTab />;
-            case 'law-career': return <LawCareerTab />;
-            default: return <StudyTab onNavigate={handleStudyNavigation} />;
-        }
-    }
-
     switch (activeTab) {
       case 'today': return <TodayTab />;
       case 'assistant': return <AssistantTab />;
       case 'projects': return <ProjectsTab />;
       case 'skills': return <SkillsTab />;
       case 'journal': return <JournalTab />;
+      case 'study': return <LawPrepApp />;
       case 'research': return <ResearchTab />;
       case 'prompts': return <PromptsTab />;
       case 'apps': return <AppsTab />;

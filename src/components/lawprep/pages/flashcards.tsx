@@ -11,7 +11,7 @@ import {
 import { lawFlashcards } from "@/lib/law-data";
 import type { LawFlashcard as LawFlashcardType } from "@/lib/types";
 
-export function LawFlashcardsTab() {
+export function LawFlashcards() {
   return (
     <div className="space-y-6">
       <div>

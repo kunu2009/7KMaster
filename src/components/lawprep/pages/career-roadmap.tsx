@@ -1,5 +1,4 @@
 
-
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +8,7 @@ import {
 import { careerRoadmaps } from "@/lib/law-data";
 import { CheckCircle2 } from "lucide-react";
 
-export function LawCareerTab() {
+export function LawCareer() {
   return (
     <div className="space-y-6">
       <div>
