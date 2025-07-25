@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 import withPWAInit from "@ducanh2912/next-pwa";
 
@@ -26,6 +27,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+   serverComponentsExternalPackages: [
+    '@genkit-ai/next',
+  ],
 };
 
 export default withPWA(nextConfig);
