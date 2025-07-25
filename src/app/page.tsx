@@ -34,6 +34,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 
 
 const navItems = [
@@ -52,6 +53,7 @@ const navItems = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
+  const [activeLawPage, setActiveLawPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleTabChange = (tabId: string) => {
@@ -65,7 +67,7 @@ export default function Home() {
       case 'projects': return <ProjectsTab />;
       case 'skills': return <SkillsTab />;
       case 'journal': return <JournalTab />;
-      case 'study': return <LawPrepApp />;
+      case 'study': return <LawPrepApp activePage={activeLawPage} />;
       case 'research': return <ResearchTab />;
       case 'prompts': return <PromptsTab />;
       case 'apps': return <AppsTab />;
@@ -98,37 +100,46 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-      <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
-         <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="flex items-center gap-2 mb-2">
-                 <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6 text-primary"
-                  >
-                    <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
-                  </svg>
-              </div>
-               {navItems.map(item => <NavLink key={item.id} item={item} />)}
-          </nav>
-          <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-             <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-lg"
-                aria-label="Toggle Sidebar"
-                onClick={() => setIsSidebarOpen(prev => !prev)}
-             >
-                <ChevronsRight className="size-5" />
-             </Button>
-          </nav>
-      </aside>
-       {!isSidebarOpen && (
+        {activeTab === 'study' ? (
+             <LawPrepSidebar 
+                activePage={activeLawPage}
+                setActivePage={setActiveLawPage}
+                onBack={() => setActiveTab('today')}
+             />
+        ) : (
+          <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
+            <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-primary"
+                    >
+                        <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                    </svg>
+                </div>
+                {navItems.map(item => <NavLink key={item.id} item={item} />)}
+            </nav>
+            <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-lg"
+                    aria-label="Toggle Sidebar"
+                    onClick={() => setIsSidebarOpen(prev => !prev)}
+                >
+                    <ChevronsRight className="size-5" />
+                </Button>
+            </nav>
+          </aside>
+        )}
+       
+       {!isSidebarOpen && activeTab !== 'study' && (
             <Button
                 variant="ghost"
                 size="icon"
@@ -139,10 +150,11 @@ export default function Home() {
                 <ChevronsLeft className="size-5" />
             </Button>
         )}
-      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen ? 'pr-14' : 'pr-0'}`}>
+
+      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${activeTab === 'study' || !isSidebarOpen ? 'pr-0' : 'pr-14'}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
-             <span>7K Life</span>
+             <span>{activeTab === 'study' ? 'LawPrep Sprint' : '7K Life'}</span>
             </div>
 
             <div className="flex items-center gap-2 ml-auto">
