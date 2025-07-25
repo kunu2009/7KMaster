@@ -6,11 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Timer, Play, Pause, RotateCw } from 'lucide-react';
 
-interface PomodoroTimerProps {
-    focusedTask: string | null;
-}
-
-export function PomodoroTimer({ focusedTask }: PomodoroTimerProps) {
+export function PomodoroTimer() {
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
@@ -76,7 +72,7 @@ export function PomodoroTimer({ focusedTask }: PomodoroTimerProps) {
             <span>{isBreak ? 'Break Time' : 'Pomodoro Timer'}</span>
         </CardTitle>
         <CardDescription>
-            {focusedTask ? `Focusing on: ${focusedTask}`: "Select a task to begin focusing."}
+            Stay focused and take regular breaks.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,7 +80,7 @@ export function PomodoroTimer({ focusedTask }: PomodoroTimerProps) {
           {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
         </div>
         <div className="flex justify-center gap-4">
-          <Button onClick={toggle} size="lg" disabled={!focusedTask}>
+          <Button onClick={toggle} size="lg">
             {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
             {isActive ? 'Pause' : 'Start'}
           </Button>

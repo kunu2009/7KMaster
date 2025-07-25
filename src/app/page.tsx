@@ -112,7 +112,7 @@ export default function Home() {
                {navItems.map(item => <NavLink key={item.id} item={item} />)}
           </nav>
       </aside>
-      <div className="flex flex-col gap-4 py-4 pr-14 w-full">
+      <div className="flex flex-1 flex-col gap-4 py-4 pr-14">
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>7K Life</span>
