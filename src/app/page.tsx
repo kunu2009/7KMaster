@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState } from "react";
 import { TodayTab } from "@/components/dashboard/today-tab";
 import { ProjectsTab } from "@/components/dashboard/projects-tab";
 import { SkillsTab } from "@/components/dashboard/skills-tab";
@@ -9,102 +12,138 @@ import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { StudyTab } from "@/components/dashboard/study-tab";
 import { PromptsTab } from "@/components/dashboard/prompts-tab";
 import { AppsTab } from "@/components/dashboard/apps-tab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
-import { ListTodo, GanttChartSquare, BrainCircuit, Bot, Book, Sparkles, AppWindow, Link, Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  GanttChartSquare,
+  BrainCircuit,
+  Bot,
+  Book,
+  Sparkles,
+  AppWindow,
+  Link,
+  Wrench,
+  PanelLeft,
+  PenSquare,
+  Home as HomeIcon,
+} from "lucide-react";
+
+
+const navItems = [
+  { id: 'today', label: 'Today', icon: HomeIcon },
+  { id: 'assistant', label: 'Assistant', icon: Bot },
+  { id: 'projects', label: 'Projects', icon: GanttChartSquare },
+  { id: 'skills', label: 'Skills', icon: BrainCircuit },
+  { id: 'journal', label: 'Journal', icon: PenSquare },
+  { id: 'study', label: 'Study', icon: Book },
+  { id: 'prompts', label: 'Prompts', icon: Sparkles },
+  { id: 'apps', label: 'Apps', icon: AppWindow },
+  { id: 'web-links', label: 'Links', icon: Link },
+  { id: 'utilities', label: 'Utilities', icon: Wrench },
+]
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState("today");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'today': return <TodayTab />;
+      case 'assistant': return <AssistantTab />;
+      case 'projects': return <ProjectsTab />;
+      case 'skills': return <SkillsTab />;
+      case 'journal': return <JournalTab />;
+      case 'study': return <StudyTab />;
+      case 'prompts': return <PromptsTab />;
+      case 'apps': return <AppsTab />;
+      case 'web-links': return <WebLinksTab />;
+      case 'utilities': return <UtilitiesTab />;
+      default: return <TodayTab />;
+    }
+  };
+
+  const NavLink = ({ item, isMobile = false }: { item: typeof navItems[0], isMobile?: boolean }) => (
+    <Button
+      variant={activeTab === item.id ? "secondary" : "ghost"}
+      className="w-full justify-start gap-2"
+      onClick={() => {
+        setActiveTab(item.id)
+        if (isMobile) setIsSheetOpen(false);
+      }}
+    >
+      <item.icon className="h-5 w-5" />
+      {item.label}
+    </Button>
+  );
+
   return (
-    <Tabs defaultValue="today" className="flex min-h-screen w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
-        <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-primary"
-            >
-              <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
-            </svg>
-            <h1 className="text-lg font-semibold md:text-xl">7K Dashboard</h1>
+    <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+      <aside className="hidden border-r bg-muted/40 lg:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-16 items-center border-b px-6">
+             <div className="flex items-center gap-2">
+                 <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6 text-primary"
+                  >
+                    <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                  </svg>
+                  <h1 className="text-lg font-semibold md:text-xl">7K Dashboard</h1>
+              </div>
+          </div>
+          <nav className="flex-1 overflow-auto px-4 py-4">
+            <div className="grid items-start gap-1">
+              {navItems.map(item => <NavLink key={item.id} item={item} />)}
+            </div>
+          </nav>
         </div>
-        <div className="ml-auto">
+      </aside>
+      <div className="flex flex-col">
+        <header className="flex h-16 items-center gap-4 border-b bg-muted/40 px-6">
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="shrink-0 lg:hidden">
+                <PanelLeft className="h-5 w-5" />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="flex flex-col">
+              <nav className="grid gap-2 text-lg font-medium">
+                 <div className="flex items-center gap-2 h-16 border-b">
+                     <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-primary"
+                      >
+                        <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                      </svg>
+                      <h1 className="text-lg font-semibold md:text-xl">7K Dashboard</h1>
+                  </div>
+                   {navItems.map(item => <NavLink key={item.id} item={item} isMobile />)}
+              </nav>
+            </SheetContent>
+          </Sheet>
+           <div className="flex-1">
+             {/* Can be used for a search bar in the future */}
+           </div>
           <ThemeToggle />
-        </div>
-      </header>
-      <main className="flex-1 overflow-y-auto p-4 md:p-6 mb-20">
-          <TabsContent value="today">
-            <TodayTab />
-          </TabsContent>
-          <TabsContent value="study">
-            <StudyTab />
-          </TabsContent>
-          <TabsContent value="prompts">
-            <PromptsTab />
-          </TabsContent>
-           <TabsContent value="apps">
-            <AppsTab />
-          </TabsContent>
-          <TabsContent value="assistant">
-            <AssistantTab />
-          </TabsContent>
-          <TabsContent value="projects">
-            <ProjectsTab />
-          </TabsContent>
-          <TabsContent value="skills">
-            <SkillsTab />
-          </TabsContent>
-          <TabsContent value="web-links">
-            <WebLinksTab />
-          </TabsContent>
-          <TabsContent value="utilities">
-            <UtilitiesTab />
-          </TabsContent>
-      </main>
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <TabsList className="grid h-auto w-full grid-cols-9 rounded-none bg-transparent p-0">
-            <TabsTrigger value="today" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <ListTodo className="h-5 w-5" />
-                <span className="hidden sm:inline">Today</span>
-            </TabsTrigger>
-            <TabsTrigger value="study" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <Book className="h-5 w-5" />
-                <span className="hidden sm:inline">Study</span>
-            </TabsTrigger>
-            <TabsTrigger value="prompts" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <Sparkles className="h-5 w-5" />
-                <span className="hidden sm:inline">Prompts</span>
-            </TabsTrigger>
-            <TabsTrigger value="apps" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <AppWindow className="h-5 w-5" />
-                <span className="hidden sm:inline">Apps</span>
-            </TabsTrigger>
-             <TabsTrigger value="assistant" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <Bot className="h-5 w-5" />
-                <span className="hidden sm:inline">Assistant</span>
-            </TabsTrigger>
-            <TabsTrigger value="projects" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <GanttChartSquare className="h-5 w-5" />
-                <span className="hidden sm:inline">Projects</span>
-            </TabsTrigger>
-            <TabsTrigger value="skills" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <BrainCircuit className="h-5 w-5" />
-                <span className="hidden sm:inline">Skills</span>
-            </TabsTrigger>
-            <TabsTrigger value="web-links" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <Link className="h-5 w-5" />
-                <span className="hidden sm:inline">Links</span>
-            </TabsTrigger>
-            <TabsTrigger value="utilities" className="flex-col h-16 text-xs gap-1 rounded-none data-[state=active]:border-t-2 data-[state=active]:border-primary data-[state=active]:bg-primary/10">
-                <Wrench className="h-5 w-5" />
-                <span className="hidden sm:inline">Utilities</span>
-            </TabsTrigger>
-        </TabsList>
-      </footer>
-    </Tabs>
+        </header>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+            {renderContent()}
+        </main>
+      </div>
+    </div>
   );
 }
