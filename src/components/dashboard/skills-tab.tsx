@@ -119,15 +119,17 @@ export function SkillsTab() {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {focusMode && (isGeneratingFocus || focusReasoning) && (
-            <Alert className="mb-6 bg-primary/5 border-primary/20">
-                {isGeneratingFocus ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Wand2 className="h-4 w-4" />}
-                <AlertTitle>{isGeneratingFocus ? "Generating Suggestions..." : "AI Focus Suggestions"}</AlertTitle>
-                <AlertDescription>
-                    {isGeneratingFocus ? "The AI is analyzing your skills to suggest what to focus on." : focusReasoning}
-                </AlertDescription>
-            </Alert>
+             <div className="mb-6">
+                <Alert className="bg-primary/5 border-primary/20">
+                    {isGeneratingFocus ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Wand2 className="h-4 w-4" />}
+                    <AlertTitle>{isGeneratingFocus ? "Generating Suggestions..." : "AI Focus Suggestions"}</AlertTitle>
+                    <AlertDescription>
+                        {isGeneratingFocus ? "The AI is analyzing your skills to suggest what to focus on." : focusReasoning}
+                    </AlertDescription>
+                </Alert>
+            </div>
         )}
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
