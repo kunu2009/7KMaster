@@ -35,6 +35,8 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
+import { PromptsTab } from "@/components/dashboard/prompts-tab";
+import { AppsTab } from "@/components/dashboard/apps-tab";
 
 
 const navItems = [
@@ -151,7 +153,7 @@ export default function Home() {
             </Button>
         )}
 
-      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${activeTab === 'study' || !isSidebarOpen ? 'pr-0' : 'pr-14'}`}>
+      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen || activeTab === 'study' ? 'pr-14' : 'pr-0'}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>{activeTab === 'study' ? 'LawPrep Sprint' : '7K Life'}</span>

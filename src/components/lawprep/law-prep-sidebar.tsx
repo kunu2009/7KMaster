@@ -21,13 +21,13 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
+import { ScrollArea } from '../ui/scroll-area';
 
 const menuItems = [
   { href: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -84,32 +84,35 @@ export function LawPrepSidebar({ activePage, setActivePage, onBack }: LawPrepSid
 
   return (
     <aside className="fixed inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
-      <nav className="flex flex-col items-center gap-4 px-2 py-5">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-lg mb-4"
-                aria-label="Back to Dashboard"
-                onClick={onBack}
-              >
-                <ArrowLeft className="size-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left" sideOffset={5}>
-                Back to Dashboard
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        
-        {menuItems.map(item => <NavLink key={item.href} item={item} />)}
-        <div className="my-2 h-px w-full bg-border" />
-        {newFeatures.map(item => <NavLink key={item.href} item={item} />)}
-         <div className="my-2 h-px w-full bg-border" />
-        {aiTools.map(item => <NavLink key={item.href} item={item} />)}
-      </nav>
+        <div className="flex h-14 items-center justify-center border-b">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-lg"
+                    aria-label="Back to Dashboard"
+                    onClick={onBack}
+                  >
+                    <ArrowLeft className="size-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" sideOffset={5}>
+                    Back to Dashboard
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+        </div>
+        <ScrollArea className="flex-1">
+          <nav className="flex flex-col items-center gap-4 px-2 py-5">
+            {menuItems.map(item => <NavLink key={item.href} item={item} />)}
+            <div className="my-2 h-px w-full bg-border" />
+            {newFeatures.map(item => <NavLink key={item.href} item={item} />)}
+            <div className="my-2 h-px w-full bg-border" />
+            {aiTools.map(item => <NavLink key={item.href} item={item} />)}
+          </nav>
+        </ScrollArea>
     </aside>
   );
 }
