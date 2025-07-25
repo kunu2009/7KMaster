@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Note, NoteBlock } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,16 @@ export function NoteDetail({ note, onUpdateNote, onDeleteNote, onBack }: NoteDet
   useEffect(() => {
     setCurrentNote(note);
   }, [note]);
+  
+  const safeContent = useMemo(() => {
+    if (Array.isArray(currentNote.content)) {
+        return currentNote.content;
+    }
+    // If content is a string (old format), convert it to the new block format
+    const contentAsString = typeof currentNote.content === 'string' ? currentNote.content : '';
+    return [{ id: `${Date.now()}-migrated`, type: 'paragraph', content: contentAsString }];
+  }, [currentNote.content]);
+
 
   const updateNote = (updatedContent: NoteBlock[]) => {
     const updatedNote = {
@@ -49,14 +59,14 @@ export function NoteDetail({ note, onUpdateNote, onDeleteNote, onBack }: NoteDet
   };
 
   const handleUpdateBlock = (blockId: string, newContent: string) => {
-    const updatedBlocks = currentNote.content.map(block => 
+    const updatedBlocks = safeContent.map(block => 
       block.id === blockId ? { ...block, content: newContent } : block
     );
     updateNote(updatedBlocks);
   };
   
   const handleToggleTodo = (blockId: string, checked: boolean) => {
-    const updatedBlocks = currentNote.content.map(block => 
+    const updatedBlocks = safeContent.map(block => 
         block.id === blockId ? { ...block, checked: checked } : block
     );
     updateNote(updatedBlocks);
@@ -69,12 +79,12 @@ export function NoteDetail({ note, onUpdateNote, onDeleteNote, onBack }: NoteDet
       content: '',
       checked: type === 'todo' ? false : undefined,
     };
-    const updatedBlocks = [...currentNote.content, newBlock];
+    const updatedBlocks = [...safeContent, newBlock];
     updateNote(updatedBlocks);
   };
   
   const deleteBlock = (blockId: string) => {
-    const updatedBlocks = currentNote.content.filter(block => block.id !== blockId);
+    const updatedBlocks = safeContent.filter(block => block.id !== blockId);
     updateNote(updatedBlocks);
   };
   
@@ -132,7 +142,7 @@ export function NoteDetail({ note, onUpdateNote, onDeleteNote, onBack }: NoteDet
       </CardHeader>
       <CardContent className="flex-1 flex flex-col overflow-y-auto pr-2">
           <div className="space-y-3">
-              {currentNote.content.map(block => (
+              {safeContent.map(block => (
                   <div key={block.id} className="group flex items-start gap-2">
                       {block.type === 'paragraph' && (
                           <Textarea
