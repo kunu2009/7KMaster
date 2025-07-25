@@ -1,6 +1,5 @@
 
 
-
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -150,3 +149,40 @@ export type ChartConfig = {
     | { color?: never; theme: Record<"light" | "dark", string> }
   )
 }
+
+// 7K Itihas Types
+export type Era = {
+  id: string;
+  name: string;
+  period: string;
+  description: string;
+  imageUrl: string;
+  aiHint: string;
+};
+
+export type HistoricalFigure = {
+  id: string;
+  name: string;
+  era: string;
+  description: string;
+  imageUrl: string;
+  aiHint: string;
+};
+
+export type HistoricalEvent = {
+  id: string;
+  name: string;
+  era: string;
+  date: string;
+  description: string;
+  imageUrl: string;
+  aiHint: string;
+};
+
+export type QuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  era: string;
+};

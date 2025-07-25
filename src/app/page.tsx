@@ -11,6 +11,7 @@ import { WebLinksTab } from "@/components/dashboard/web-links-tab";
 import { NotesTab } from "@/components/dashboard/notes-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { LawPrepApp } from "@/components/lawprep/law-prep-app";
+import { ItihasApp } from "@/components/itihas/itihas-app";
 import { ResearchTab } from "@/components/dashboard/research-tab";
 import { HabitTrackerTab } from "@/components/dashboard/habit-tracker-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
@@ -40,8 +41,11 @@ import {
   NotepadText,
   Zap,
   CheckSquare,
+  Scale,
+  ScrollText,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
+import { ItihasSidebar } from "@/components/itihas/itihas-sidebar";
 
 
 const navItems = [
@@ -51,7 +55,8 @@ const navItems = [
   { id: 'skills', label: 'Skills', icon: BrainCircuit },
   { id: 'habits', label: 'Habits', icon: CheckSquare },
   { id: 'journal', label: 'Journal', icon: PenSquare },
-  { id: 'study', label: 'Study', icon: Book },
+  { id: 'study', label: 'LawPrep', icon: Scale },
+  { id: 'itihas', label: 'Itihas', icon: ScrollText },
   { id: 'research', label: 'Research', icon: Bookmark },
   { id: 'progress', label: 'Progress', icon: LineChart },
   { id: 'notes', label: 'Notepad', icon: NotepadText },
@@ -62,6 +67,7 @@ const navItems = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
   const [activeLawPage, setActiveLawPage] = useState('dashboard');
+  const [activeItihasPage, setActiveItihasPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
 
@@ -72,6 +78,8 @@ export default function Home() {
   const displayedNavItems = focusMode
     ? navItems.filter(item => ['today', 'projects', 'skills'].includes(item.id))
     : navItems;
+    
+  const isSpecialAppView = activeTab === 'study' || activeTab === 'itihas';
 
   const renderContent = () => {
     switch (activeTab) {
@@ -82,6 +90,7 @@ export default function Home() {
       case 'habits': return <HabitTrackerTab />;
       case 'journal': return <JournalTab />;
       case 'study': return <LawPrepApp activePage={activeLawPage} />;
+      case 'itihas': return <ItihasApp activePage={activeItihasPage} />;
       case 'research': return <ResearchTab />;
       case 'progress': return <ProgressTab />;
       case 'notes': return <NotesTab />;
@@ -111,49 +120,61 @@ export default function Home() {
       </Tooltip>
     </TooltipProvider>
   );
+  
+  const renderSidebar = () => {
+    if (activeTab === 'study') {
+        return <LawPrepSidebar 
+            activePage={activeLawPage}
+            setActivePage={setActiveLawPage}
+            onBack={() => setActiveTab('today')}
+         />;
+    }
+    if (activeTab === 'itihas') {
+        return <ItihasSidebar 
+            activePage={activeItihasPage}
+            setActivePage={setActiveItihasPage}
+            onBack={() => setActiveTab('today')}
+         />;
+    }
+    return (
+        <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
+        <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="flex items-center gap-2 mb-2">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6 text-primary"
+                >
+                    <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                </svg>
+            </div>
+            {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
+        </nav>
+        <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-lg"
+                aria-label="Toggle Sidebar"
+                onClick={() => setIsSidebarOpen(prev => !prev)}
+            >
+                <ChevronsRight className="size-5" />
+            </Button>
+        </nav>
+      </aside>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-        {activeTab === 'study' ? (
-             <LawPrepSidebar 
-                activePage={activeLawPage}
-                setActivePage={setActiveLawPage}
-                onBack={() => setActiveTab('today')}
-             />
-        ) : (
-          <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
-            <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="flex items-center gap-2 mb-2">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-6 w-6 text-primary"
-                    >
-                        <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
-                    </svg>
-                </div>
-                {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
-            </nav>
-            <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-lg"
-                    aria-label="Toggle Sidebar"
-                    onClick={() => setIsSidebarOpen(prev => !prev)}
-                >
-                    <ChevronsRight className="size-5" />
-                </Button>
-            </nav>
-          </aside>
-        )}
+        {renderSidebar()}
        
-       {!isSidebarOpen && activeTab !== 'study' && (
+       {!isSidebarOpen && !isSpecialAppView && (
             <Button
                 variant="ghost"
                 size="icon"
@@ -165,10 +186,10 @@ export default function Home() {
             </Button>
         )}
 
-      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen || activeTab === 'study' ? 'pr-14' : 'pr-0'}`}>
+      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen || isSpecialAppView ? 'pr-14' : 'pr-0'}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
-             <span>{activeTab === 'study' ? 'LawPrep Sprint' : '7K Life'}</span>
+             <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : '7K Life'}</span>
             </div>
 
             <div className="flex items-center gap-4 ml-auto">
