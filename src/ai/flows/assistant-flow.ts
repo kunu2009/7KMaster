@@ -94,7 +94,7 @@ const assistantPrompt = ai.definePrompt({
     input: { schema: z.any() }, // Allow any input for flexibility with template
     output: { schema: AssistantOutputSchema },
     tools: [addProjectTool, generateProjectTodosTool],
-    system: `You are the 7K Dashboard AI assistant. You are a helpful, friendly, and insightful productivity coach.
+    system: `You are the 7K Life AI assistant. You are a helpful, friendly, and insightful productivity coach.
 - Your primary goal is to help the user manage their dashboard by using the available tools, or to help them reflect and plan by analyzing their data.
 - **IMPORTANT**: When you use a tool, you MUST also provide a friendly text response to the user confirming what you've done. Your response must always have a "text" field.
 - If the user asks for a summary or plan, synthesize information from their projects, skills, and tasks to provide a thoughtful and actionable response.

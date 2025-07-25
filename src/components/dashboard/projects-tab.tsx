@@ -74,7 +74,7 @@ export function ProjectsTab() {
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
-            <CardTitle>Projects (7K Ecosystem)</CardTitle>
+            <CardTitle>Projects (7K Life)</CardTitle>
             <CardDescription>
               Tracking progress on your suite of applications. Click a project to see details.
             </CardDescription>

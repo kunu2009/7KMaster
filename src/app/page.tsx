@@ -83,7 +83,7 @@ export default function Home() {
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <aside className="hidden border-r bg-muted/40 lg:block">
+      <aside className="hidden border-r bg-muted/40 lg:block lg:fixed lg:h-full lg:w-[280px]">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-16 items-center border-b px-6">
              <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export default function Home() {
                   >
                     <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
                   </svg>
-                  <h1 className="text-lg font-semibold md:text-xl">7K Dashboard</h1>
+                  <h1 className="text-lg font-semibold md:text-xl">7K Life</h1>
               </div>
           </div>
           <nav className="flex-1 overflow-auto px-4 py-4">
@@ -109,8 +109,8 @@ export default function Home() {
           </nav>
         </div>
       </aside>
-      <div className="flex flex-col">
-        <header className="flex h-16 items-center gap-4 border-b bg-muted/40 px-6">
+      <div className="flex flex-col lg:pl-[280px]">
+        <header className="flex h-16 items-center gap-4 border-b bg-muted/40 px-6 sticky top-0 z-30">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0 lg:hidden">
@@ -134,14 +134,14 @@ export default function Home() {
                       >
                         <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
                       </svg>
-                      <h1 className="text-lg font-semibold md:text-xl">7K Dashboard</h1>
+                      <h1 className="text-lg font-semibold md:text-xl">7K Life</h1>
                   </div>
                    {navItems.map(item => <NavLink key={item.id} item={item} isMobile />)}
               </nav>
             </SheetContent>
           </Sheet>
-           <div className="flex-1">
-             {/* Can be used for a search bar in the future */}
+           <div className="flex-1 text-center font-bold text-xl">
+             <span className="hidden lg:inline-block">7K Life</span>
            </div>
           <ThemeToggle />
         </header>

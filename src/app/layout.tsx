@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "7K Master Dashboard",
+  title: "7K Life",
   description: "A dashboard to track your 7K master plan.",
   manifest: "/manifest.json",
 };
