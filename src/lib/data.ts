@@ -1,5 +1,6 @@
 
-import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem, Note } from './types';
+
+import type { TodayTask, Project, Skill, SelfSpaceItem, ChartConfig, ResearchItem, Note, Habit, HabitLog } from './types';
 
 export const initialTodayTasks: TodayTask[] = [];
 
@@ -43,6 +44,15 @@ export const initialNotes: Note[] = [
     modifiedAt: 'July 25, 2024',
   }
 ];
+
+export const initialHabits: Habit[] = [
+    { id: 'h1', name: 'Meditate', frequency: 'daily', goal: 7, icon: 'BrainCircuit' },
+    { id: 'h2', name: 'Read 10 Pages', frequency: 'daily', goal: 7, icon: 'BookOpen' },
+    { id: 'h3', name: 'Morning Walk', frequency: 'daily', goal: 7, icon: 'Sunrise' },
+    { id: 'h4', name: 'Review Tasks', frequency: 'daily', goal: 7, icon: 'ClipboardCheck' },
+];
+
+export const initialHabitLogs: HabitLog = {};
 
 export const initialJournalEntry = "";
 export const initialFocusThing = "";

@@ -12,6 +12,7 @@ import { NotesTab } from "@/components/dashboard/notes-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { LawPrepApp } from "@/components/lawprep/law-prep-app";
 import { ResearchTab } from "@/components/dashboard/research-tab";
+import { HabitTrackerTab } from "@/components/dashboard/habit-tracker-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -28,10 +29,8 @@ import {
   BrainCircuit,
   Bot,
   Book,
-  Sparkles,
   AppWindow,
   Link,
-  Wrench,
   PenSquare,
   Home as HomeIcon,
   Bookmark,
@@ -40,6 +39,7 @@ import {
   LineChart,
   NotepadText,
   Zap,
+  CheckSquare,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 
@@ -49,6 +49,7 @@ const navItems = [
   { id: 'assistant', label: 'Assistant', icon: Bot },
   { id: 'projects', label: 'Projects', icon: GanttChartSquare },
   { id: 'skills', label: 'Skills', icon: BrainCircuit },
+  { id: 'habits', label: 'Habits', icon: CheckSquare },
   { id: 'journal', label: 'Journal', icon: PenSquare },
   { id: 'study', label: 'Study', icon: Book },
   { id: 'research', label: 'Research', icon: Bookmark },
@@ -78,6 +79,7 @@ export default function Home() {
       case 'assistant': return <AssistantTab />;
       case 'projects': return <ProjectsTab />;
       case 'skills': return <SkillsTab />;
+      case 'habits': return <HabitTrackerTab />;
       case 'journal': return <JournalTab />;
       case 'study': return <LawPrepApp activePage={activeLawPage} />;
       case 'research': return <ResearchTab />;

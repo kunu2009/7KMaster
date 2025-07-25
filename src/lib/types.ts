@@ -1,5 +1,6 @@
 
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -61,6 +62,16 @@ export type Note = {
   modifiedAt: string;
 };
 
+export type Habit = {
+    id: string;
+    name: string;
+    icon: string;
+    frequency: 'daily';
+    goal: number; // e.g., 7 times a week for a daily habit
+};
+
+export type HabitLog = Record<string, string[]>; // habitId: ['2024-07-28', '2024-07-29']
+
 export type LawNote = {
   topic: string;
   category: 'Constitution' | 'Legal Aptitude' | 'Legal Maxims' | 'General Knowledge' | 'English' | 'Current Affairs' | 'Logical Reasoning';
@@ -115,9 +126,19 @@ export interface Reel {
 
 export interface CaseSimulation {
   id: string;
+  title: string;
   scenario: string;
   playerRole: string;
 }
+
+export type VisualLawItem = {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    imageUrl: string;
+    aiHint: string;
+};
 
 
 export type ChartConfig = {
