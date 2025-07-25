@@ -12,10 +12,10 @@ import { Button } from "../ui/button";
 import { ExternalLink } from "lucide-react";
 
 const apps = [
-    { name: "LawPrep", url: "#" },
-    { name: "Polyglot", url: "#" },
-    { name: "Ittihas", url: "#" },
-    { name: "7K Life", url: "#" },
+    { name: "7K LawPrep", url: "https://7-klawprep.vercel.app/" },
+    { name: "7K Polyglot", url: "https://7-k-polyglot.vercel.app/Dashboard" },
+    { name: "7K Itihas", url: "https://7-k-itihaas.vercel.app/" },
+    { name: "7K Life", url: "https://7-klife-newsss-msdh1vil9-kunu2009s-projects.vercel.app/" },
 ];
 
 

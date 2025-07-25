@@ -15,7 +15,7 @@ const webLinks = [
     { name: "ChatGPT", url: "https://chat.openai.com/" },
     { name: "YouTube", url: "https://www.youtube.com/" },
     { name: "Chess.com", url: "https://www.chess.com/" },
-    { name: "GitHub", url: "https://github.com/" },
+    { name: "GitHub", url: "https://github.com/kunu2009?tab=repositories" },
     { name: "Vercel", url: "https://vercel.com/" },
     { name: "Google", url: "https://google.com/" },
 ];
