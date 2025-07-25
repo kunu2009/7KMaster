@@ -1,5 +1,6 @@
 
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -151,6 +152,16 @@ export type ChartConfig = {
 }
 
 // 7K Itihas Types
+export interface ItihasChapter {
+  id: number;
+  title: string;
+  description: string;
+  summary: string;
+  mcqs: MCQ[];
+  flashcards: LawFlashcard[];
+  reels: Reel[];
+}
+
 export type Era = {
   id: string;
   name: string;

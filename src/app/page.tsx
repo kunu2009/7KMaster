@@ -89,8 +89,8 @@ export default function Home() {
       case 'skills': return <SkillsTab />;
       case 'habits': return <HabitTrackerTab />;
       case 'journal': return <JournalTab />;
-      case 'study': return <LawPrepApp activePage={activeLawPage} />;
-      case 'itihas': return <ItihasApp activePage={activeItihasPage} />;
+      case 'study': return <LawPrepApp activePage={activeLawPage} setActivePage={setActiveLawPage}/>;
+      case 'itihas': return <ItihasApp activePage={activeItihasPage} setActivePage={setActiveItihasPage} />;
       case 'research': return <ResearchTab />;
       case 'progress': return <ProgressTab />;
       case 'notes': return <NotesTab />;

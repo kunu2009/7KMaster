@@ -3,12 +3,9 @@
 
 import {
   Landmark,
-  Users,
-  CalendarDays,
-  Map,
-  HelpCircle,
   LayoutDashboard,
   ArrowLeft,
+  BookCopy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +18,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 const menuItems = [
   { href: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: 'eras', label: 'Eras', icon: Landmark },
-  { href: 'figures', label: 'Figures', icon: Users },
-  { href: 'events', label: 'Events', icon: CalendarDays },
-  { href: 'maps', label: 'Maps', icon: Map },
-  { href: 'quiz', label: 'Quiz', icon: HelpCircle },
 ];
 
 interface ItihasSidebarProps {
@@ -74,7 +66,7 @@ export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSideb
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="left" sideOffset={5}>
-                    Back to Dashboard
+                    Back to Main App
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -82,6 +74,25 @@ export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSideb
         <ScrollArea className="flex-1">
           <nav className="flex flex-col items-center gap-4 px-2 py-5">
             {menuItems.map(item => <NavLink key={item.href} item={item} />)}
+            <div className="my-2 h-px w-full bg-border" />
+             <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activePage === 'chapter' ? "secondary" : "ghost"}
+                    size="icon"
+                    className="rounded-lg"
+                    aria-label="Current Chapter"
+                    disabled={activePage !== 'chapter'}
+                  >
+                    <BookCopy className="size-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" sideOffset={5}>
+                  Chapter View
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </nav>
         </ScrollArea>
     </aside>

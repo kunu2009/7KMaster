@@ -1,28 +1,34 @@
 
 "use client";
 
+import { useState } from 'react';
 import { ItihasDashboard } from './pages/dashboard';
-import { ItihasEras } from './pages/eras';
-import { ItihasFigures } from './pages/figures';
-import { ItihasEvents } from './pages/events';
-import { ItihasMaps } from './pages/maps';
-import { ItihasQuiz } from './pages/quiz';
+import { ItihasChapterView } from './pages/chapter-view';
+import type { ItihasChapter } from '@/lib/types';
 
 interface ItihasAppProps {
     activePage: string;
+    setActivePage: (page: string) => void;
 }
 
-export function ItihasApp({ activePage }: ItihasAppProps) {
+export function ItihasApp({ activePage, setActivePage }: ItihasAppProps) {
+  const [selectedChapter, setSelectedChapter] = useState<ItihasChapter | null>(null);
+
+  const handleSelectChapter = (chapter: ItihasChapter) => {
+    setSelectedChapter(chapter);
+    setActivePage('chapter');
+  };
+  
+  const handleBackToDashboard = () => {
+    setSelectedChapter(null);
+    setActivePage('dashboard');
+  }
+
   const renderContent = () => {
-    switch (activePage) {
-      case 'dashboard': return <ItihasDashboard />;
-      case 'eras': return <ItihasEras />;
-      case 'figures': return <ItihasFigures />;
-      case 'events': return <ItihasEvents />;
-      case 'maps': return <ItihasMaps />;
-      case 'quiz': return <ItihasQuiz />;
-      default: return <ItihasDashboard />;
+    if (activePage === 'chapter' && selectedChapter) {
+        return <ItihasChapterView chapter={selectedChapter} />;
     }
+    return <ItihasDashboard onSelectChapter={handleSelectChapter} />;
   };
 
   return (
