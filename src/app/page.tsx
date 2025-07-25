@@ -6,6 +6,7 @@ import { TodayTab } from "@/components/dashboard/today-tab";
 import { ProjectsTab } from "@/components/dashboard/projects-tab";
 import { SkillsTab } from "@/components/dashboard/skills-tab";
 import { JournalTab } from "@/components/dashboard/journal-tab";
+import { ProgressTab } from "@/components/dashboard/progress-tab";
 import { WebLinksTab } from "@/components/dashboard/web-links-tab";
 import { UtilitiesTab } from "@/components/dashboard/utilities-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
@@ -33,6 +34,7 @@ import {
   Bookmark,
   ChevronsLeft,
   ChevronsRight,
+  LineChart,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 import { PromptsTab } from "@/components/dashboard/prompts-tab";
@@ -47,6 +49,7 @@ const navItems = [
   { id: 'journal', label: 'Journal', icon: PenSquare },
   { id: 'study', label: 'Study', icon: Book },
   { id: 'research', label: 'Research', icon: Bookmark },
+  { id: 'progress', label: 'Progress', icon: LineChart },
   { id: 'prompts', label: 'Prompts', icon: Sparkles },
   { id: 'apps', label: 'Apps', icon: AppWindow },
   { id: 'web-links', label: 'Links', icon: Link },
@@ -71,6 +74,7 @@ export default function Home() {
       case 'journal': return <JournalTab />;
       case 'study': return <LawPrepApp activePage={activeLawPage} />;
       case 'research': return <ResearchTab />;
+      case 'progress': return <ProgressTab />;
       case 'prompts': return <PromptsTab />;
       case 'apps': return <AppsTab />;
       case 'web-links': return <WebLinksTab />;
