@@ -16,11 +16,11 @@ import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
   GanttChartSquare,
   BrainCircuit,
@@ -30,7 +30,6 @@ import {
   AppWindow,
   Link,
   Wrench,
-  Menu,
   PenSquare,
   Home as HomeIcon,
   Bookmark,
@@ -70,35 +69,34 @@ export default function Home() {
       default: return <TodayTab />;
     }
   };
-
-  const NavLink = ({ item }: { item: typeof navItems[0] }) => (
-    <Button
-      variant={activeTab === item.id ? "secondary" : "ghost"}
-      className="w-full justify-start gap-2"
-      onClick={() => setActiveTab(item.id)}
-    >
-      <item.icon className="h-5 w-5" />
-      {item.label}
-    </Button>
-  );
   
-  const MobileNavLink = ({ item }: { item: typeof navItems[0] }) => (
-     <DropdownMenuItem
-        className="flex items-center gap-2"
-        onClick={() => setActiveTab(item.id)}
-      >
-        <item.icon className="h-5 w-5 text-muted-foreground" />
-        <span>{item.label}</span>
-      </DropdownMenuItem>
-  )
+  const NavLink = ({ item }: { item: typeof navItems[0] }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={activeTab === item.id ? "secondary" : "ghost"}
+            size="icon"
+            className="rounded-lg"
+            aria-label={item.label}
+            onClick={() => setActiveTab(item.id)}
+          >
+            <item.icon className="size-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" sideOffset={5}>
+          {item.label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 
 
   return (
-    <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <aside className="hidden border-r bg-muted/40 lg:block lg:fixed lg:h-full lg:w-[280px]">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-16 items-center border-b px-6">
-             <div className="flex items-center gap-2">
+    <div className="flex min-h-screen w-full bg-muted/40">
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
+         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+            <div className="flex items-center gap-2 mb-2">
                  <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -111,57 +109,58 @@ export default function Home() {
                   >
                     <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
                   </svg>
-                  <h1 className="text-lg font-semibold md:text-xl">7K Life</h1>
               </div>
-          </div>
-          <nav className="flex-1 overflow-auto px-4 py-4">
-            <div className="grid items-start gap-1">
-              {navItems.map(item => <NavLink key={item.id} item={item} />)}
-            </div>
+               {navItems.map(item => <NavLink key={item.id} item={item} />)}
           </nav>
-        </div>
       </aside>
-      <div className="flex flex-col lg:pl-[280px]">
-        <header className="flex h-16 items-center gap-4 border-b bg-muted/40 px-6 sticky top-0 z-30">
-           <div className="lg:hidden flex-1">
-            <div className="flex items-center gap-2">
-                 <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6 text-primary"
-                  >
-                    <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
-                  </svg>
-                  <h1 className="text-lg font-semibold md:text-xl">7K Life</h1>
-              </div>
-           </div>
-           <div className="hidden lg:flex-1 text-center font-bold text-xl">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
+         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+            <div className="sm:hidden">
+              <div className="flex items-center gap-2">
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-primary"
+                    >
+                      <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                    </svg>
+                    <h1 className="text-lg font-semibold md:text-xl">7K Life</h1>
+                </div>
+            </div>
+            
+            <div className="flex-1 text-center font-bold text-xl hidden sm:block">
              <span>7K Life</span>
-           </div>
-          <ThemeToggle />
-          <div className="lg:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="shrink-0">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle navigation menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {navItems.map(item => <MobileNavLink key={item.id} item={item} />)}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+            </div>
+
+            <div className="flex items-center gap-2 ml-auto">
+              <ThemeToggle />
+            </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 sm:p-0 sm:px-6">
             {renderContent()}
         </main>
+         <footer className="sm:hidden flex items-center justify-around p-2 border-t bg-background sticky bottom-0">
+             {navItems.slice(0, 5).map(item => (
+                <Button
+                    key={item.id}
+                    variant={activeTab === item.id ? "secondary" : "ghost"}
+                    size="icon"
+                    className="flex-col h-14 w-14 rounded-lg"
+                    onClick={() => setActiveTab(item.id)}
+                >
+                    <item.icon className="size-5 mb-1" />
+                    <span className="text-xs">{item.label}</span>
+                </Button>
+            ))}
+        </footer>
       </div>
     </div>
   );
 }
+
+    
