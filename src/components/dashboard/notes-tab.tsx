@@ -55,6 +55,10 @@ export function NotesTab() {
   }
   
   const getNotePreview = (content: NoteBlock[]) => {
+    // Defensive check to handle old data format
+    if (!Array.isArray(content)) {
+      return "No content preview available.";
+    }
     const firstTextualBlock = content.find(block => block.content.trim() !== '');
     if (firstTextualBlock) {
         return firstTextualBlock.content;
