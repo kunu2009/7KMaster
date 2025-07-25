@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { NotesTab } from "./notes-tab";
 
 export function PromptsTab() {
   return (

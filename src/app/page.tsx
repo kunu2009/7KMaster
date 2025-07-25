@@ -8,12 +8,14 @@ import { SkillsTab } from "@/components/dashboard/skills-tab";
 import { JournalTab } from "@/components/dashboard/journal-tab";
 import { ProgressTab } from "@/components/dashboard/progress-tab";
 import { WebLinksTab } from "@/components/dashboard/web-links-tab";
-import { UtilitiesTab } from "@/components/dashboard/utilities-tab";
+import { NotesTab } from "@/components/dashboard/notes-tab";
 import { AssistantTab } from "@/components/dashboard/assistant-tab";
 import { LawPrepApp } from "@/components/lawprep/law-prep-app";
 import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
@@ -35,10 +37,10 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LineChart,
+  NotepadText,
+  Zap,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
-import { PromptsTab } from "@/components/dashboard/prompts-tab";
-import { AppsTab } from "@/components/dashboard/apps-tab";
 
 
 const navItems = [
@@ -50,20 +52,24 @@ const navItems = [
   { id: 'study', label: 'Study', icon: Book },
   { id: 'research', label: 'Research', icon: Bookmark },
   { id: 'progress', label: 'Progress', icon: LineChart },
-  { id: 'prompts', label: 'Prompts', icon: Sparkles },
+  { id: 'notes', label: 'Notepad', icon: NotepadText },
   { id: 'apps', label: 'Apps', icon: AppWindow },
   { id: 'web-links', label: 'Links', icon: Link },
-  { id: 'utilities', label: 'Utilities', icon: Wrench },
-]
+];
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
   const [activeLawPage, setActiveLawPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [focusMode, setFocusMode] = useState(false);
 
   const handleTabChange = (tabId: string) => {
       setActiveTab(tabId);
   }
+
+  const displayedNavItems = focusMode
+    ? navItems.filter(item => ['today', 'projects', 'skills'].includes(item.id))
+    : navItems;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -75,10 +81,9 @@ export default function Home() {
       case 'study': return <LawPrepApp activePage={activeLawPage} />;
       case 'research': return <ResearchTab />;
       case 'progress': return <ProgressTab />;
-      case 'prompts': return <PromptsTab />;
+      case 'notes': return <NotesTab />;
       case 'apps': return <AppsTab />;
       case 'web-links': return <WebLinksTab />;
-      case 'utilities': return <UtilitiesTab />;
       default: return <TodayTab />;
     }
   };
@@ -129,7 +134,7 @@ export default function Home() {
                         <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
                     </svg>
                 </div>
-                {navItems.map(item => <NavLink key={item.id} item={item} />)}
+                {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
             </nav>
             <nav className={`mt-auto flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
                 <Button
@@ -163,7 +168,18 @@ export default function Home() {
              <span>{activeTab === 'study' ? 'LawPrep Sprint' : '7K Life'}</span>
             </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-4 ml-auto">
+              <div className="flex items-center space-x-2">
+                <Switch 
+                    id="focus-mode" 
+                    checked={focusMode}
+                    onCheckedChange={setFocusMode}
+                />
+                <Label htmlFor="focus-mode" className="flex items-center gap-1 text-sm">
+                    <Zap className="h-4 w-4" />
+                    <span>Focus</span>
+                </Label>
+              </div>
               <ThemeToggle />
             </div>
         </header>

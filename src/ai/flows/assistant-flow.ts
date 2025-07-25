@@ -12,6 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z, generate } from 'genkit';
 import { ProjectStatus } from '@/lib/types';
 import { generateProjectTodos } from './generate-project-todos-flow';
+import { summarizeWebArticle } from './summarize-web-article-flow';
 import type { GenerateTodosOutput } from './generate-project-todos-flow';
 import type { TodayTask, Skill } from '@/lib/types';
 
@@ -28,6 +29,10 @@ const GenerateTodosInputSchema = z.object({
   projectName: z.string().describe('The name of the project to generate todos for.'),
   numberOfTodos: z.number().int().positive().describe('The number of todos to generate.'),
   projectContext: z.string().optional().describe('Any additional context about the project provided by the user.'),
+});
+
+const SummarizeArticleInputSchema = z.object({
+    url: z.string().url().describe("The URL of the web article to summarize."),
 });
 
 const TodoSchema = z.object({
@@ -64,6 +69,20 @@ const generateProjectTodosTool = ai.defineTool(
   }
 );
 
+const summarizeArticleTool = ai.defineTool(
+    {
+        name: 'summarizeArticle',
+        description: 'Fetches the content from a web URL and provides a concise summary. Use this when the user provides a URL and asks to summarize it.',
+        inputSchema: SummarizeArticleInputSchema,
+        outputSchema: z.object({ summary: z.string() }),
+    },
+    async (input) => {
+        const result = await summarizeWebArticle({ url: input.url });
+        return { summary: result.summary };
+    }
+);
+
+
 // Types for the main assistant flow
 const AssistantToolActionSchema = z.object({
     toolName: z.string().describe("The name of the tool that was called, e.g., 'addProject'."),
@@ -93,14 +112,15 @@ const assistantPrompt = ai.definePrompt({
     name: 'assistantPrompt',
     input: { schema: z.any() }, // Allow any input for flexibility with template
     output: { schema: AssistantOutputSchema },
-    tools: [addProjectTool, generateProjectTodosTool],
+    tools: [addProjectTool, generateProjectTodosTool, summarizeArticleTool],
     system: `You are the 7K Life AI assistant. You are a helpful, friendly, and insightful productivity coach.
 - Your primary goal is to help the user manage their dashboard by using the available tools, or to help them reflect and plan by analyzing their data.
-- **IMPORTANT**: When you use a tool, you MUST also provide a friendly text response to the user confirming what you've done. Your response must always have a "text" field.
+- **IMPORTANT**: When you use a tool, you MUST also provide a friendly text response to the user confirming what you've done or presenting the result. Your response must always have a "text" field.
 - If the user asks for a summary or plan, synthesize information from their projects, skills, and tasks to provide a thoughtful and actionable response.
 - Be conversational. Do not output JSON or any other machine-readable format in the 'text' field.
 - If you use 'addProject', say something like "I've added [Project Name] to your list for you!"
 - If you use 'generateProjectTodos', say "Here are some task ideas for [Project Name]." and present the todos in the toolAction.
+- If you use 'summarizeArticle', respond with "Here is the summary of the article:" followed by the summary text. Do not put the summary in the toolAction.
 - Use all the provided context (projects, skills, tasks) to answer questions comprehensively.
 `,
     prompt: `
@@ -167,6 +187,16 @@ const assistantFlow = ai.defineFlow(
     
     if (toolRequest) {
         const toolResponse = await toolRequest.run();
+
+        // For the summarizer, the result is embedded in the main text response.
+        if (toolRequest.toolName === 'summarizeArticle') {
+            const finalResponse = await assistantPrompt({
+                ...promptRequest,
+                // Provide the tool's output back to the model
+                toolResponse: { toolName: 'summarizeArticle', result: toolResponse }
+            });
+            return finalResponse.output || { text: finalResponse.text || "Error processing summary.", toolAction: null };
+        }
 
         const toolAction: AssistantToolAction = {
             toolName: toolRequest.toolName,

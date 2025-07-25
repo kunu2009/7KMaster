@@ -127,6 +127,10 @@ export function AssistantTab() {
             toast({ title: "Error", description: "The AI tool did not return any todos.", variant: "destructive" });
         }
         break;
+      case 'summarizeArticle':
+        // The summary is handled directly in the assistant's text response.
+        // No client-side action needed here.
+        break;
       default:
         console.warn('Unknown tool action:', action.toolName);
         toast({ title: "Unknown Action", description: "The AI suggested an action I don't know how to do.", variant: "destructive" });
@@ -340,5 +344,3 @@ export function AssistantTab() {
     </Card>
   );
 }
-
-    

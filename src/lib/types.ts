@@ -115,7 +115,6 @@ export interface Reel {
 
 export interface CaseSimulation {
   id: string;
-  title: string;
   scenario: string;
   playerRole: string;
 }

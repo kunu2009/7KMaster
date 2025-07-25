@@ -6,6 +6,8 @@ import './flows/generate-focus-suggestions-flow';
 import './flows/generate-project-todos-flow';
 import './flows/generate-block-tasks-flow';
 import './flows/mood-mirror-flow';
+import './flows/generate-journal-image-flow';
+import './flows/summarize-web-article-flow';
 
 // LawPrep Flows
 import './flows/answer-law-questions';
