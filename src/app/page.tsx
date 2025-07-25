@@ -111,6 +111,12 @@ export default function Home() {
       </aside>
       <div className="flex flex-col lg:pl-[280px]">
         <header className="flex h-16 items-center gap-4 border-b bg-muted/40 px-6 sticky top-0 z-30">
+          <div className="lg:hidden"></div>
+           <div className="flex-1 text-center font-bold text-xl">
+             <span className="lg:hidden">7K Life</span>
+             <span className="hidden lg:inline-block">7K Life</span>
+           </div>
+          <ThemeToggle />
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0 lg:hidden">
@@ -140,10 +146,6 @@ export default function Home() {
               </nav>
             </SheetContent>
           </Sheet>
-           <div className="flex-1 text-center font-bold text-xl">
-             <span className="hidden lg:inline-block">7K Life</span>
-           </div>
-          <ThemeToggle />
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
             {renderContent()}
