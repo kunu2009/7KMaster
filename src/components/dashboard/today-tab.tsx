@@ -9,156 +9,103 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, Loader, Clock, Edit, Save, PlusCircle, Trash2, Wand2, Play, Target, BookOpen } from "lucide-react";
+import { GanttChartSquare, FileText, Target, BookOpen } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialTodayTasks, initialProjects, initialSkills, initialJournalEntry, initialFocusThing } from "@/lib/data";
-import type { TodayTask, Project, Skill } from "@/lib/types";
-import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
-import { generateBlockTasks } from "@/ai/flows/generate-block-tasks-flow";
+import { initialProjects, initialNotes, initialFocusThing, initialJournalEntry } from "@/lib/data";
+import type { Project, Note, NoteBlock, Todo } from "@/lib/types";
 import { PomodoroTimer } from "./pomodoro-timer";
-import { useToast } from "@/hooks/use-toast";
 
+// A unified type for todos from any source
+interface AggregatedTodo {
+    id: string; // Unique ID of the todo item itself
+    text: string;
+    isCompleted: boolean;
+    sourceType: 'Project' | 'Note';
+    sourceName: string; // Name of the Project or Title of the Note
+    sourceId: string; // ID of the source Project or Note
+    blockId?: string; // Only for Note todos, to identify the block
+}
 
 export function TodayTab() {
-  const [tasks, setTasks] = useLocalStorage<TodayTask[]>(
-    "todayTasks",
-    initialTodayTasks
-  );
-  const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
-  const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
+  const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [notes, setNotes] = useLocalStorage<Note[]>("notes", initialNotes);
   const [journalEntry, setJournalEntry] = useLocalStorage<string>("journalEntry", initialJournalEntry);
   const [focusThing, setFocusThing] = useLocalStorage<string>("focusThing", initialFocusThing);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [newTask, setNewTask] = useState('');
-  const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
-  const { toast } = useToast();
-  const [focusedTask, setFocusedTask] = useState<TodayTask | null>(null);
-
-
-  const handleCheckedChange = (taskId: string, checked: boolean) => {
-    setTasks(
-      tasks.map((task) => (task.id === taskId ? { ...task, done: checked } : task))
-    );
-  };
   
-  const handleGeneratePlan = async () => {
-    setIsGenerating(true);
-    try {
-      const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction }));
-      const simplifiedSkills = skills.map(s => ({ area: s.area, weeklyGoal: s.weeklyGoal }));
+  const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
 
-      const result = await generateDailyPlan({
-        projects: simplifiedProjects,
-        skills: simplifiedSkills,
-      });
+  const aggregatedTodos = useMemo((): AggregatedTodo[] => {
+    const fromProjects = projects.flatMap(project =>
+      (project.todos || []).map((todo: Todo) => ({
+        id: todo.id,
+        text: todo.text,
+        isCompleted: todo.completed,
+        sourceType: 'Project',
+        sourceName: project.name,
+        sourceId: project.id,
+      }))
+    );
 
-      if (result && result.tasks) {
-        setTasks(result.tasks);
-      }
-    } catch (e) {
-      console.error("Failed to generate new plan:", e);
-      toast({ title: "Error", description: "Could not generate a new plan.", variant: "destructive" });
-    } finally {
-      setIsGenerating(false);
+    const fromNotes = notes.flatMap(note =>
+        (Array.isArray(note.content) ? note.content : [])
+        .filter((block: NoteBlock) => block.type === 'todo')
+        .map((block: NoteBlock) => ({
+            id: `${note.id}-${block.id}`,
+            text: block.content,
+            isCompleted: block.checked || false,
+            sourceType: 'Note',
+            sourceName: note.title,
+            sourceId: note.id,
+            blockId: block.id,
+        }))
+    );
+
+    return [...fromProjects, ...fromNotes];
+  }, [projects, notes]);
+
+  const handleToggleTodo = (todo: AggregatedTodo) => {
+    if (todo.sourceType === 'Project') {
+        setProjects(prevProjects => 
+            prevProjects.map(p => {
+                if (p.id === todo.sourceId) {
+                    const updatedTodos = (p.todos || []).map(t => 
+                        t.id === todo.id ? { ...t, completed: !t.completed } : t
+                    );
+                    return { ...p, todos: updatedTodos };
+                }
+                return p;
+            })
+        );
+    } else if (todo.sourceType === 'Note' && todo.blockId) {
+        const blockId = todo.blockId;
+        setNotes(prevNotes => 
+            prevNotes.map(n => {
+                if (n.id === todo.sourceId) {
+                    const updatedContent = (Array.isArray(n.content) ? n.content : []).map(b => 
+                        b.id === blockId ? { ...b, checked: !b.checked } : b
+                    );
+                    return { ...n, content: updatedContent };
+                }
+                return n;
+            })
+        );
     }
   };
 
-  const handleGenerateBlockTasks = useCallback(async (timeBlock: string, blockTitle: string) => {
-    setGeneratingBlock(timeBlock);
-    try {
-        const simplifiedProjects = projects.map(p => ({ name: p.name, nextAction: p.nextAction }));
-        const simplifiedSkills = skills.map(s => ({ area: s.area, weeklyGoal: s.weeklyGoal }));
-        const existingTasks = tasks.filter(t => t.timeBlock === timeBlock).map(t => t.task);
-
-        const result = await generateBlockTasks({
-            blockTitle,
-            existingTasks,
-            projects: simplifiedProjects,
-            skills: simplifiedSkills,
-        });
-
-        if (result && result.tasks.length > 0) {
-            const newTasks: TodayTask[] = result.tasks.map(taskText => ({
-                id: `${Date.now()}-${Math.random()}`,
-                timeBlock: timeBlock,
-                task: taskText,
-                done: false,
-            }));
-            setTasks(prev => [...prev, ...newTasks]);
-            toast({ title: "Tasks Suggested", description: `${result.tasks.length} new tasks were added to this block.`});
-        } else {
-             toast({ title: "No new tasks", description: "The AI didn't suggest any new tasks for this block."});
-        }
-    } catch (e) {
-        console.error("Failed to generate block tasks:", e);
-        toast({ title: "Error", description: "Could not suggest tasks.", variant: "destructive" });
-    } finally {
-        setGeneratingBlock(null);
-    }
-  }, [projects, skills, tasks, setTasks, toast]);
-
-  const { completedTasks, totalTasks, progress, allTasksCompleted, tasksByTimeBlock } = useMemo(() => {
-    const total = tasks.length;
-    const completed = tasks.filter(task => task.done).length;
-    
-    // Group tasks by timeBlock
-    const grouped = tasks.reduce((acc, task) => {
-        (acc[task.timeBlock] = acc[task.timeBlock] || []).push(task);
-        return acc;
-    }, {} as Record<string, TodayTask[]>);
-
-    // Sort the blocks by time
-    const sortedTimeBlocks = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
-
-    const finalGrouped = sortedTimeBlocks.map(timeBlock => ({
-        timeBlock,
-        tasks: grouped[timeBlock],
-        title: grouped[timeBlock][0]?.task.split(':')[0] || 'Tasks' // Use first task for title guess
-    }));
-
-
+  const { completedTasks, totalTasks, progress } = useMemo(() => {
+    const total = aggregatedTodos.length;
+    const completed = aggregatedTodos.filter(task => task.isCompleted).length;
     return {
         completedTasks: completed,
         totalTasks: total,
         progress: total > 0 ? (completed / total) * 100 : 0,
-        allTasksCompleted: total > 0 && completed === total,
-        tasksByTimeBlock: finalGrouped,
     }
-  }, [tasks]);
-
-  const handleEditTask = (taskId: string, newText: string) => {
-    setTasks(tasks.map(task => task.id === taskId ? { ...task, task: newText } : task));
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-  };
-
-  const handleAddTask = (timeBlock: string) => {
-    if (newTask.trim()) {
-        const newTaskObject: TodayTask = {
-            id: `${Date.now()}`,
-            timeBlock: timeBlock,
-            task: newTask.trim(),
-            done: false,
-        };
-        setTasks([...tasks, newTaskObject]);
-        setNewTask(''); // Clear input after adding
-    }
-  };
+  }, [aggregatedTodos]);
 
 
   return (
@@ -167,32 +114,16 @@ export function TodayTab() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
             <div>
-              <CardTitle>Today's Plan</CardTitle>
+              <CardTitle>Today's Inbox</CardTitle>
               <CardDescription>
-                Your AI-generated, time-blocked schedule for the day.
+                A unified view of all tasks from your projects and notes.
               </CardDescription>
-            </div>
-            <div className="flex items-center gap-2 self-end sm:self-auto">
-                {allTasksCompleted && <Badge color="green">All Done! 🎉</Badge>}
-                <Button onClick={() => setIsEditing(!isEditing)} size="sm" variant={isEditing ? 'default' : 'outline'}>
-                    {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Edit className="mr-2 h-4 w-4" />}
-                    {isEditing ? 'Save' : 'Edit'}
-                </Button>
-                <Button onClick={handleGeneratePlan} disabled={isGenerating} size="sm" variant="outline">
-                  {isGenerating ? (
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                  )}
-                  <span className="hidden sm:inline">New Plan</span>
-                  <span className="sm:hidden">Refresh</span>
-                </Button>
             </div>
           </div>
            <div className="pt-4 space-y-2">
               <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Daily Progress</span>
-                  <span>{completedTasks} / {totalTasks} Tasks</span>
+                  <span>Overall Progress</span>
+                  <span>{completedTasks} / {totalTasks} Tasks Completed</span>
               </div>
               <Progress value={progress} />
            </div>
@@ -208,96 +139,38 @@ export function TodayTab() {
                 </div>
             </div>
 
-          <Accordion type="multiple" defaultValue={tasksByTimeBlock.map(g => g.timeBlock)} className="w-full">
-            {tasksByTimeBlock.map(({ timeBlock, tasks: tasksInBlock, title }) => (
-                <AccordionItem value={timeBlock} key={timeBlock}>
-                    <AccordionTrigger className="font-semibold text-base hover:no-underline">
-                       <div className="flex items-center justify-between w-full">
-                         <div className="flex items-center gap-3">
-                            <Clock className="h-5 w-5 text-primary" />
-                            <span className="text-lg">{title}</span>
-                         </div>
-                         <Badge variant="outline" className="font-mono text-sm mr-2">{timeBlock}</Badge>
-                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <div className="space-y-4 pl-4 border-l-2 ml-4">
-                            {tasksInBlock.map(task => (
-                                <div key={task.id} className={`flex items-center gap-3 p-2 rounded-md ${focusedTask?.id === task.id ? 'bg-primary/10' : ''}`}>
-                                    <Checkbox
-                                        id={`task-${task.id}`}
-                                        checked={task.done}
-                                        onCheckedChange={(checked) => handleCheckedChange(task.id, !!checked)}
-                                        aria-label={`Mark ${task.task} as done`}
-                                        className="h-5 w-5"
-                                        disabled={isEditing}
-                                    />
-                                    {isEditing ? (
-                                        <Input 
-                                            value={task.task}
-                                            onChange={(e) => handleEditTask(task.id, e.target.value)}
-                                            className="h-9 flex-1"
-                                        />
-                                    ) : (
-                                        <label 
-                                            htmlFor={`task-${task.id}`} 
-                                            className={`flex-1 text-sm ${task.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                                            {task.task}
-                                        </label>
-                                    )}
-                                    {isEditing ? (
-                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(task.id)}>
-                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                        </Button>
-                                    ) : (
-                                        <Button variant="ghost" size="icon" onClick={() => setFocusedTask(task)} disabled={task.done}>
-                                            <Play className="h-4 w-4 text-primary" />
-                                        </Button>
-                                    )}
+            <div className="space-y-4">
+                {aggregatedTodos.length > 0 ? (
+                    aggregatedTodos.map(todo => (
+                        <div key={`${todo.sourceType}-${todo.id}`} className={`flex items-start gap-3 p-3 rounded-md border ${focusedTask?.id === todo.id ? 'bg-primary/10 border-primary/40' : 'bg-muted/30'}`}>
+                           <Checkbox
+                                id={todo.id}
+                                checked={todo.isCompleted}
+                                onCheckedChange={() => handleToggleTodo(todo)}
+                                className="h-5 w-5 mt-0.5"
+                            />
+                            <div className="flex-1">
+                                <label 
+                                    htmlFor={todo.id} 
+                                    className={`text-sm ${todo.isCompleted ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                                    {todo.text}
+                                </label>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                    {todo.sourceType === 'Project' ? <GanttChartSquare className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+                                    <span>{todo.sourceType}: {todo.sourceName}</span>
                                 </div>
-                            ))}
-                             {isEditing && (
-                                <div className="space-y-3 pt-4 border-t mt-4">
-                                  <div className="flex items-center gap-2">
-                                      <Input 
-                                          placeholder="Add a new task..."
-                                          value={newTask}
-                                          onChange={(e) => setNewTask(e.target.value)}
-                                          onKeyDown={(e) => e.key === 'Enter' && handleAddTask(timeBlock)}
-                                          className="h-9 flex-1"
-                                      />
-                                      <Button size="sm" onClick={() => handleAddTask(timeBlock)}>
-                                          <PlusCircle className="h-4 w-4 mr-2" /> Add
-                                      </Button>
-                                  </div>
-                                   <Button 
-                                        variant="outline" 
-                                        size="sm" 
-                                        className="w-full" 
-                                        onClick={() => handleGenerateBlockTasks(timeBlock, title)}
-                                        disabled={generatingBlock === timeBlock}
-                                    >
-                                        {generatingBlock === timeBlock ? (
-                                            <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <Wand2 className="mr-2 h-4 w-4" />
-                                        )}
-                                        AI Suggest Tasks
-                                    </Button>
-                                </div>
-                            )}
+                            </div>
                         </div>
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-          </Accordion>
-           {tasks.length === 0 && !isGenerating && (
-                <div className="text-center py-10 text-muted-foreground">
-                    <p>No tasks for today.</p>
-                    <p>Click "New Plan" to generate a schedule.</p>
-                </div>
-            )}
-            <div className="space-y-2 pt-4">
+                    ))
+                ) : (
+                    <div className="text-center py-10 text-muted-foreground">
+                        <p>No tasks found.</p>
+                        <p>Add to-dos in your Projects or Notes to see them here.</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="space-y-2 pt-4 border-t">
                 <Label htmlFor="journal-entry" className="flex items-center gap-2 text-muted-foreground">
                     <BookOpen className="h-4 w-4" />
                     Mini Journal (1-Line Reflection)
@@ -307,7 +180,7 @@ export function TodayTab() {
         </CardContent>
       </Card>
       <div className="lg:col-span-1">
-        <PomodoroTimer focusedTask={focusedTask ? focusedTask.task : null} />
+        <PomodoroTimer focusedTask={focusedTask ? focusedTask.text : null} />
       </div>
     </div>
   );
