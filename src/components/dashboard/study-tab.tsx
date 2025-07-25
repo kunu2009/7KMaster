@@ -9,9 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "../ui/button";
-import { BookMarked, GraduationCap, Scale } from "lucide-react";
+import { BookMarked, GraduationCap, Scale, Layers, Map } from "lucide-react";
 
-export function StudyTab() {
+interface StudyTabProps {
+    onNavigate: (subTab: string) => void;
+}
+
+export function StudyTab({ onNavigate }: StudyTabProps) {
   return (
      <div className="space-y-6">
       <Card>
@@ -22,42 +26,61 @@ export function StudyTab() {
             </CardDescription>
         </CardHeader>
       </Card>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
             <CardHeader className="flex-row items-center gap-4 space-y-0">
                 <div className="p-3 rounded-full bg-primary/10 text-primary">
-                    <GraduationCap className="h-8 w-8" />
+                    <Scale className="h-8 w-8" />
                 </div>
                 <div>
-                    <CardTitle>12th Grade Studies</CardTitle>
+                    <CardTitle>Law Topic Notes</CardTitle>
                     <CardDescription>
-                       Notes, textbooks, and mock tests.
+                       In-depth notes on key legal subjects.
                     </CardDescription>
                 </div>
             </CardHeader>
             <CardContent>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => onNavigate('law-notes')}>
                     <BookMarked className="mr-2 h-4 w-4" />
-                    View Resources (Coming Soon)
+                    View Notes
                 </Button>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex-row items-center gap-4 space-y-0">
                  <div className="p-3 rounded-full bg-accent/10 text-accent">
-                    <Scale className="h-8 w-8" />
+                    <Layers className="h-8 w-8" />
                 </div>
                 <div>
-                    <CardTitle>Law School Prep</CardTitle>
+                    <CardTitle>Law Flashcards</CardTitle>
                     <CardDescription>
-                        Case studies, statutes, and exam prep.
+                        Quick revision for legal terms and maxims.
                     </CardDescription>
                 </div>
             </CardHeader>
             <CardContent>
-                <Button variant="outline" className="w-full">
-                    <BookMarked className="mr-2 h-4 w-4" />
-                    View Resources (Coming Soon)
+                <Button variant="outline" className="w-full" onClick={() => onNavigate('law-flashcards')}>
+                    <Layers className="mr-2 h-4 w-4" />
+                    View Flashcards
+                </Button>
+            </CardContent>
+        </Card>
+         <Card>
+            <CardHeader className="flex-row items-center gap-4 space-y-0">
+                 <div className="p-3 rounded-full bg-green-500/10 text-green-500">
+                    <Map className="h-8 w-8" />
+                </div>
+                <div>
+                    <CardTitle>Career Roadmap</CardTitle>
+                    <CardDescription>
+                        Explore potential career paths after law.
+                    </CardDescription>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Button variant="outline" className="w-full" onClick={() => onNavigate('law-career')}>
+                    <Map className="mr-2 h-4 w-4" />
+                    View Roadmaps
                 </Button>
             </CardContent>
         </Card>

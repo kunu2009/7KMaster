@@ -1,3 +1,4 @@
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export enum ProjectStatus {
@@ -50,6 +51,30 @@ export type Note = {
   content: NoteBlock[];
   createdAt: string;
   modifiedAt: string;
+};
+
+export type LawNote = {
+  topic: string;
+  category: 'Constitution' | 'Legal Aptitude' | 'Legal Maxims' | 'General Knowledge' | 'English' | 'Current Affairs' | 'Logical Reasoning';
+  content: string;
+  links: { title: string; url: string }[];
+};
+
+export type LawFlashcard = {
+  id: string;
+  term: string;
+  definition: string;
+  topic: string;
+};
+
+export type CareerPath = {
+  id: string;
+  title: string;
+  description: string;
+  steps: {
+    title: string;
+    content: string;
+  }[];
 };
 
 
