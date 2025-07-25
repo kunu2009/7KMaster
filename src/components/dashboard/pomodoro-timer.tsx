@@ -65,7 +65,7 @@ export function PomodoroTimer() {
   }, []);
 
   return (
-    <Card className="text-center h-full flex flex-col justify-center">
+    <Card className="text-center h-full flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center justify-center gap-2">
             <Timer className="h-6 w-6" />
@@ -75,11 +75,11 @@ export function PomodoroTimer() {
             Stay focused and take regular breaks.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="text-6xl font-bold mb-4">
+      <CardContent className="flex-1 flex flex-col items-center justify-center">
+        <div className="text-4xl sm:text-6xl font-bold mb-4">
           {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
         </div>
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4 flex-wrap">
           <Button onClick={toggle} size="lg">
             {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
             {isActive ? 'Pause' : 'Start'}

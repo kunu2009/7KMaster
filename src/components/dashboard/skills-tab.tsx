@@ -146,7 +146,7 @@ export function SkillsTab() {
                         <p className="text-right text-sm text-muted-foreground">{skill.progress} / {skill.maxProgress}</p>
                      </div>
                 </CardContent>
-                <CardFooter className="flex justify-between items-center">
+                <CardFooter className="flex flex-wrap justify-between items-center gap-2">
                   <div className='flex gap-1'>
                      <EditSkillDialog skill={skill} onUpdateSkill={updateSkill} />
                       <AlertDialog>
