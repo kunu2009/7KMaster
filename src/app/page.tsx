@@ -15,7 +15,6 @@ import { AppsTab } from "@/components/dashboard/apps-tab";
 import { ResearchTab } from "@/components/dashboard/research-tab";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
@@ -34,7 +33,6 @@ import {
   PenSquare,
   Home as HomeIcon,
   Bookmark,
-  PanelLeft,
 } from "lucide-react";
 
 
@@ -54,7 +52,6 @@ const navItems = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -73,52 +70,31 @@ export default function Home() {
     }
   };
 
-  const handleTabClick = (tabId: string) => {
-    setActiveTab(tabId);
-    setIsSheetOpen(false); // Close sheet on navigation
-  };
-  
-  const NavLink = ({ item, isMobile = false }: { item: typeof navItems[0], isMobile?: boolean }) => {
-    if (isMobile) {
-      return (
-         <Button
+  const NavLink = ({ item }: { item: typeof navItems[0] }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
             variant={activeTab === item.id ? "secondary" : "ghost"}
-            className="justify-start w-full"
+            size="icon"
+            className="rounded-lg"
             aria-label={item.label}
-            onClick={() => handleTabClick(item.id)}
+            onClick={() => setActiveTab(item.id)}
           >
-            <item.icon className="size-5 mr-4" />
-            {item.label}
+            <item.icon className="size-5" />
           </Button>
-      )
-    }
-
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={activeTab === item.id ? "secondary" : "ghost"}
-              size="icon"
-              className="rounded-lg"
-              aria-label={item.label}
-              onClick={() => setActiveTab(item.id)}
-            >
-              <item.icon className="size-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right" sideOffset={5}>
-            {item.label}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
+        </TooltipTrigger>
+        <TooltipContent side="right" sideOffset={5}>
+          {item.label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+      <aside className="fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r bg-background">
+         <nav className="flex flex-col items-center gap-4 px-2 py-5">
             <div className="flex items-center gap-2 mb-2">
                  <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -136,25 +112,8 @@ export default function Home() {
                {navItems.map(item => <NavLink key={item.id} item={item} />)}
           </nav>
       </aside>
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
-         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild>
-                <Button size="icon" variant="outline" className="sm:hidden">
-                  <PanelLeft className="h-5 w-5" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="sm:max-w-xs">
-                <SheetHeader>
-                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                </SheetHeader>
-                <nav className="grid gap-2 text-lg font-medium pt-4">
-                  {navItems.map(item => <NavLink key={item.id} item={item} isMobile={true} />)}
-                </nav>
-              </SheetContent>
-            </Sheet>
-            
+      <div className="flex flex-col gap-4 py-4 pl-14 w-full">
+         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>7K Life</span>
             </div>
