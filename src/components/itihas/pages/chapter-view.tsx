@@ -50,13 +50,22 @@ export function ItihasChapterView({ chapter }: ItihasChapterViewProps) {
           <Card>
             <CardHeader><CardTitle>Multiple Choice Questions</CardTitle></CardHeader>
             <CardContent>
-              <ScrollArea className="h-[calc(100vh-20rem)]">
-                <div className="space-y-4 pr-4">
-                  {chapter.mcqs.map((mcq, index) => (
-                    <McqCard key={mcq.id} mcq={mcq} questionNumber={index + 1} />
-                  ))}
-                </div>
-              </ScrollArea>
+               <Carousel
+                    opts={{ align: "start" }}
+                    className="w-full max-w-sm sm:max-w-md md:max-w-2xl mx-auto"
+                >
+                    <CarouselContent>
+                    {chapter.mcqs.map((mcq, index) => (
+                        <CarouselItem key={mcq.id}>
+                        <div className="p-1">
+                            <McqCard mcq={mcq} questionNumber={index + 1} />
+                        </div>
+                        </CarouselItem>
+                    ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="ml-12 sm:ml-8" />
+                    <CarouselNext className="mr-12 sm:mr-8" />
+                </Carousel>
             </CardContent>
           </Card>
         </TabsContent>
@@ -83,11 +92,15 @@ export function ItihasChapterView({ chapter }: ItihasChapterViewProps) {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="reels" className="mt-4 h-[calc(100vh-17rem)]">
-           <div className="h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg bg-muted/20">
-              {chapter.reels.map((reel) => (
-                <ReelCard key={reel.id} reel={reel} />
-              ))}
+         <TabsContent value="reels" className="mt-4 h-full">
+           <div className="h-[calc(100vh-17rem)] w-full flex flex-col -m-4 sm:-m-6">
+                <div className="flex-1 relative">
+                    <div className="absolute inset-0 h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg">
+                        {chapter.reels.map((reel) => (
+                            <ReelCard key={reel.id} reel={reel} />
+                        ))}
+                    </div>
+                </div>
             </div>
         </TabsContent>
       </Tabs>
