@@ -5,25 +5,25 @@ import type { MCQ, LawFlashcard, Reel } from './types';
 // For this prototype, we'll generate repetitive but uniquely identifiable content.
 
 const keywords: Record<number, { events: string[], figures: string[], concepts: string[], places: string[] }> = {
-    1: { events: ["Fall of Constantinople", "Invention of Printing Press"], figures: ["Leonardo da Vinci", "Copernicus", "Galileo"], concepts: ["Humanism", "Rationalism", "Scientific Method"], places: ["Florence", "Rome"] },
-    2: { events: ["Discovery of the Americas", "Treaty of Tordesillas"], figures: ["Vasco da Gama", "Christopher Columbus"], concepts: ["Mercantilism", "Imperialism", "Slave Trade"], places: ["Goa", "Americas"] },
-    3: { events: ["Battle of Plassey", "Battle of Buxar"], figures: ["Robert Clive", "Tipu Sultan"], concepts: ["Doctrine of Lapse", "Subsidiary Alliance"], places: ["Bengal", "Mysore"] },
-    4: { events: ["First Anglo-Maratha War", "Third Anglo-Maratha War"], figures: ["Shivaji Maharaj", "Peshwa Bajirao I"], concepts: ["Chauth", "Sardeshmukhi", "Maratha Confederacy"], places: ["Pune", "Panipat"] },
-    5: { events: ["Abolition of Sati", "Widow Remarriage Act"], figures: ["Raja Ram Mohan Roy", "Jyotiba Phule", "Savitribai Phule"], concepts: ["Brahmo Samaj", "Arya Samaj", "Satyashodhak Samaj"], places: ["Calcutta", "Maharashtra"] },
-    6: { events: ["Revolt of 1857", "Non-Cooperation Movement", "Quit India Movement"], figures: ["Mahatma Gandhi", "Jawaharlal Nehru", "Subhas Chandra Bose"], concepts: ["Satyagraha", "Swadeshi", "Civil Disobedience"], places: ["Meerut", "Dandi"] },
-    7: { events: ["Partition of India", "Integration of Princely States"], figures: ["Sardar Vallabhbhai Patel", "Lord Mountbatten"], concepts: ["Instrument of Accession", "Linguistic Reorganisation"], places: ["Hyderabad", "Kashmir"] },
-    8: { events: ["Gallipoli Campaign", "Singapore Campaign"], figures: ["Indian soldiers in WW1", "INA soldiers"], concepts: ["Colonial contribution", "Strengthening of nationalism"], places: ["Mesopotamia", "Burma"] },
-    9: { events: ["Bandung Conference", "Suez Crisis"], figures: ["Ho Chi Minh", "Kwame Nkrumah"], concepts: ["Non-Aligned Movement", "Third World", "Neocolonialism"], places: ["Vietnam", "Ghana"] },
-    10: { events: ["Cuban Missile Crisis", "Vietnam War"], figures: ["John F. Kennedy", "Nikita Khrushchev"], concepts: ["Bipolar World", "NATO vs Warsaw Pact", "Arms Race"], places: ["Berlin", "Cuba"] },
-    11: { events: ["First Five-Year Plan", "Indo-China War"], figures: ["Jawaharlal Nehru", "Dr. B.R. Ambedkar"], concepts: ["Mixed Economy", "Panchsheel", "Planned Development"], places: ["Bhakra Dam", "New Delhi"] },
-    12: { events: ["Green Revolution", "Economic Liberalization 1991"], figures: ["Indira Gandhi", "P.V. Narasimha Rao"], concepts: ["Emergency", "Pokhran Nuclear Tests", "IT Revolution"], places: ["Punjab", "Bangalore"] },
+    1: { events: ["Fall of Constantinople", "Invention of Printing Press", "Medici Family Patronage", "Council of Florence"], figures: ["Leonardo da Vinci", "Copernicus", "Galileo Galilei", "Martin Luther", "Michelangelo"], concepts: ["Humanism", "Rationalism", "Scientific Method", "Protestant Reformation", "Perspective in art"], places: ["Florence", "Rome", "Venice", "Wittenberg"] },
+    2: { events: ["Discovery of the Americas", "Treaty of Tordesillas", "Vasco da Gama reaches India", "Conquest of the Aztec Empire"], figures: ["Vasco da Gama", "Christopher Columbus", "Ferdinand Magellan", "Hernán Cortés"], concepts: ["Mercantilism", "Imperialism", "Slave Trade", "Columbian Exchange", "Triangular Trade"], places: ["Goa", "Americas", "Cape of Good Hope", "Spice Islands"] },
+    3: { events: ["Battle of Plassey", "Battle of Buxar", "Establishment of East India Company", "Regulating Act of 1773"], figures: ["Robert Clive", "Tipu Sultan", "Mir Jafar", "Warren Hastings"], concepts: ["Doctrine of Lapse", "Subsidiary Alliance", "Permanent Settlement", "Diwani Rights"], places: ["Bengal", "Mysore", "Calcutta", "Surat"] },
+    4: { events: ["First Anglo-Maratha War", "Third Anglo-Maratha War", "Treaty of Salbai", "Treaty of Bassein"], figures: ["Shivaji Maharaj", "Peshwa Bajirao I", "Mahadji Scindia", "Nana Phadnavis"], concepts: ["Chauth", "Sardeshmukhi", "Maratha Confederacy", "Ashta Pradhan Mandal"], places: ["Pune", "Panipat", "Raigad", "Delhi"] },
+    5: { events: ["Abolition of Sati", "Widow Remarriage Act", "Female Infanticide Prevention Act", "Formation of Prarthana Samaj"], figures: ["Raja Ram Mohan Roy", "Jyotiba Phule", "Savitribai Phule", "Swami Dayananda Saraswati"], concepts: ["Brahmo Samaj", "Arya Samaj", "Satyashodhak Samaj", "Western Education"], places: ["Calcutta", "Maharashtra", "Punjab", "Pune"] },
+    6: { events: ["Revolt of 1857", "Non-Cooperation Movement", "Quit India Movement", "Jallianwala Bagh massacre", "Dandi March"], figures: ["Mahatma Gandhi", "Jawaharlal Nehru", "Subhas Chandra Bose", "Bhagat Singh", "Rani Lakshmibai"], concepts: ["Satyagraha", "Swadeshi", "Civil Disobedience", "Purna Swaraj"], places: ["Meerut", "Dandi", "Amritsar", "Chauri Chaura"] },
+    7: { events: ["Partition of India", "Integration of Princely States", "Formation of the Constituent Assembly", "Operation Polo"], figures: ["Sardar Vallabhbhai Patel", "Lord Mountbatten", "Jawaharlal Nehru", "Muhammad Ali Jinnah"], concepts: ["Instrument of Accession", "Linguistic Reorganisation", "Two-Nation Theory", "Standstill Agreement"], places: ["Hyderabad", "Kashmir", "Junagadh", "New Delhi"] },
+    8: { events: ["Gallipoli Campaign", "Singapore Campaign", "Mesopotamian Campaign", "Formation of the Indian National Army (INA)"], figures: ["Indian soldiers in WW1", "INA soldiers", "Mahatma Gandhi", "Subhas Chandra Bose"], concepts: ["Colonial contribution", "Strengthening of nationalism", "Khilafat Movement", "Montagu-Chelmsford Reforms"], places: ["Mesopotamia", "Burma", "France", "East Africa"] },
+    9: { events: ["Bandung Conference", "Suez Crisis", "Ghanaian Independence", "Indonesian War of Independence"], figures: ["Ho Chi Minh", "Kwame Nkrumah", "Sukarno", "Gamal Abdel Nasser"], concepts: ["Non-Aligned Movement", "Third World", "Neocolonialism", "Pan-Africanism"], places: ["Vietnam", "Ghana", "Egypt", "Indonesia"] },
+    10: { events: ["Cuban Missile Crisis", "Vietnam War", "Berlin Wall construction", "Korean War", "Soviet invasion of Afghanistan"], figures: ["John F. Kennedy", "Nikita Khrushchev", "Fidel Castro", "Mao Zedong"], concepts: ["Bipolar World", "NATO vs Warsaw Pact", "Arms Race", "Iron Curtain", "Containment"], places: ["Berlin", "Cuba", "Korea", "Afghanistan"] },
+    11: { events: ["First Five-Year Plan", "Indo-China War of 1962", "Adoption of the Constitution", "States Reorganisation Act, 1956"], figures: ["Jawaharlal Nehru", "Dr. B.R. Ambedkar", "Sardar Patel", "Dr. Rajendra Prasad"], concepts: ["Mixed Economy", "Panchsheel", "Planned Development", "Secularism"], places: ["Bhakra Dam", "New Delhi", "Bandung", "Aksai Chin"] },
+    12: { events: ["Green Revolution", "Economic Liberalization 1991", "The Emergency (1975-77)", "Pokhran Nuclear Tests"], figures: ["Indira Gandhi", "P.V. Narasimha Rao", "M.S. Swaminathan", "Dr. Manmohan Singh"], concepts: ["LPG Reforms (Liberalization, Privatization, Globalization)", "JP Movement", "Operation Blue Star", "IT Revolution"], places: ["Punjab", "Bangalore", "Pokhran", "Sriharikota"] },
 };
 
 
 export function generateContentForChapter(chapterId: number, chapterTitle: string, chapterSummary: string) {
     const chapterKeywords = keywords[chapterId] || { events: [], figures: [], concepts: [], places: [] };
 
-    const mcqs: MCQ[] = Array.from({ length: 50 }, (_, i) => {
+    const mcqs: MCQ[] = Array.from({ length: 75 }, (_, i) => {
         const type = i % 4;
         let question = '';
         let correctAnswer = '';
@@ -49,9 +49,9 @@ export function generateContentForChapter(chapterId: number, chapterTitle: strin
 
         const options = [
             correctAnswer,
-            `Unrelated option Alpha`,
-            `Unrelated option Beta`,
-            `Unrelated option Gamma`
+            `Unrelated option Alpha from another era`,
+            `Unrelated option Beta from another era`,
+            `Unrelated option Gamma from another era`
         ].sort(() => Math.random() - 0.5);
         const correctAnswerIndex = options.indexOf(correctAnswer);
 
@@ -65,7 +65,7 @@ export function generateContentForChapter(chapterId: number, chapterTitle: strin
         };
     });
 
-    const flashcards: LawFlashcard[] = Array.from({ length: 50 }, (_, i) => {
+    const flashcards: LawFlashcard[] = Array.from({ length: 75 }, (_, i) => {
         const term = chapterKeywords.concepts[i % chapterKeywords.concepts.length] || `Key Term ${i + 1}`;
         return {
             id: `ch${chapterId}-fc-${i + 1}`,
@@ -75,7 +75,7 @@ export function generateContentForChapter(chapterId: number, chapterTitle: strin
         };
     });
 
-    const reels: Reel[] = Array.from({ length: 50 }, (_, i) => {
+    const reels: Reel[] = Array.from({ length: 75 }, (_, i) => {
         const fact = chapterKeywords.events[i % chapterKeywords.events.length] || `An important event`;
         return {
             id: `ch${chapterId}-reel-${i + 1}`,
@@ -92,3 +92,5 @@ export function generateContentForChapter(chapterId: number, chapterTitle: strin
         reels,
     };
 }
+
+    

@@ -856,7 +856,7 @@ export const mcqs: MCQ[] = [
     question: 'What does the "Right to Constitutional Remedies" under Article 32 empower a citizen to do?',
     options: ['To amend the Constitution', 'To move the Supreme Court to enforce their Fundamental Rights', 'To seek advisory opinions from the President', 'To appeal any High Court decision'],
     correctAnswerIndex: 1,
-    explanation: 'Article 32 is called the "heart and soul" of the Constitution because it provides a guaranteed remedy for the enforcement of all other Fundamental Rights. A citizen can directly approach the Supreme Court if their rights are violated.',
+    explanation: 'Article 32 is called the "heart and soul" of the Constitution by Dr. Ambedkar because it provides a guaranteed remedy for the enforcement of all other Fundamental Rights. A citizen can directly approach the Supreme Court if their rights are violated.',
   },
   {
     id: 'mcq-108',
@@ -1912,3 +1912,6 @@ export const visualLawData: VisualLawItem[] = [
   { id: 'vl-3', title: 'Elements of a Valid Contract', description: 'A mindmap breaking down the essential components required for a contract to be legally enforceable.', category: 'Contract Law', imageUrl: 'https://placehold.co/600x400.png', aiHint: 'mindmap contract elements' },
   { id: 'vl-4', title: 'Types of Writs', description: 'A visual guide explaining the five types of writs (Habeas Corpus, Mandamus, etc.) and their purpose.', category: 'Constitution', imageUrl: 'https://placehold.co/600x400.png', aiHint: 'visual guide legal writs' }
 ];
+
+
+    
