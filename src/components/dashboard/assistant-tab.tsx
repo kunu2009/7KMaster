@@ -295,14 +295,14 @@ export function AssistantTab() {
             <CollapsibleContent className="space-y-4 pt-2">
                 <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Smart Prompts</Label>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
-                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading}>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 lg:flex'>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading} className="flex-1">
                             <Sparkles className="mr-2 h-4 w-4" /> Summarize Week
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Based on my projects and skills, suggest a plan for the next 3 days.")} disabled={isLoading}>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Based on my projects and skills, suggest a plan for the next 3 days.")} disabled={isLoading} className="flex-1">
                             <Zap className="mr-2 h-4 w-4" /> Plan Next 3 Days
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Generate a high-level vision statement based on my current projects and skills.")} disabled={isLoading}>
+                        <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Generate a high-level vision statement based on my current projects and skills.")} disabled={isLoading} className="flex-1">
                             <Brain className="mr-2 h-4 w-4" /> Generate Vision
                         </Button>
                     </div>

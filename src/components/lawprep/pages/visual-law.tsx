@@ -110,10 +110,9 @@ export function LawVisual() {
                         className="object-contain"
                     />
                 </div>
-                <div className="prose prose-sm dark:prose-invert max-w-none p-4 border rounded-lg bg-muted/50">
-                    <h3 className="text-lg font-semibold">Diagram Description</h3>
-                    <div dangerouslySetInnerHTML={{ __html: generatedVisual.description }} />
-                </div>
+                <div className="prose prose-sm dark:prose-invert max-w-none p-4 border rounded-lg bg-muted/50"
+                     dangerouslySetInnerHTML={{ __html: generatedVisual.description }}
+                />
               </div>
             ) : (
               <div className="text-center text-muted-foreground">

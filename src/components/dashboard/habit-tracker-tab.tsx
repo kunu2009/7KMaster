@@ -124,7 +124,7 @@ export function HabitTrackerTab() {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse min-w-[600px]">
                 <thead>
                     <tr className="bg-muted/50">
                         <th className="p-2 text-left font-semibold text-sm w-1/3 sm:w-1/4">Habit</th>
@@ -137,7 +137,7 @@ export function HabitTrackerTab() {
                             </th>
                         ))}
                         <th className="p-2 text-center font-semibold text-sm">Streak</th>
-                        <th className="p-2 text-center font-semibold text-sm hidden sm:table-cell">Weekly</th>
+                        <th className="p-2 text-center font-semibold text-sm">Weekly</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -160,7 +160,7 @@ export function HabitTrackerTab() {
                                     <span>{getStreak(habit.id)}</span>
                                 </div>
                             </td>
-                            <td className="p-2 text-center hidden sm:table-cell">
+                            <td className="p-2 text-center">
                                 <div className="flex items-center justify-center gap-1">
                                     <TrendingUp className="h-4 w-4 text-green-500"/>
                                     <span>{getWeeklyProgress(habit.id)}%</span>

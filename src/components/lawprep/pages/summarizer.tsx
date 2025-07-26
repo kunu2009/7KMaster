@@ -86,14 +86,14 @@ export function LawSummarizer() {
             <CardTitle>AI Summary</CardTitle>
             <CardDescription>This is the AI-generated summary of your text.</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 flex">
+          <CardContent className="flex-1 flex items-center justify-center">
             {isPending && !summary && (
               <div className="flex flex-1 items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             )}
             {summary && (
-              <div className="text-sm leading-relaxed whitespace-pre-wrap flex-1">
+              <div className="prose prose-sm dark:prose-invert max-w-none">
                 {summary}
               </div>
             )}

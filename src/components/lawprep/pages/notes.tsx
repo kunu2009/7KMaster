@@ -72,7 +72,9 @@ export function LawNotes() {
                 <CardDescription>A brief overview of important concepts in {selectedNote.category}.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="leading-relaxed whitespace-pre-wrap">{selectedNote.content}</p>
+                <div className="leading-relaxed whitespace-pre-wrap prose prose-sm dark:prose-invert max-w-none">
+                  {selectedNote.content}
+                </div>
                 {selectedNote.links.length > 0 && (
                    <div>
                      <h3 className="font-semibold mb-2 flex items-center gap-2"><LinkIcon className="h-4 w-4"/> Useful Links</h3>

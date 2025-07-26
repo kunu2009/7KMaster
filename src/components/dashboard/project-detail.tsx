@@ -175,7 +175,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className='flex items-center gap-2 sm:gap-4'>
                  <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
                     <ArrowLeft className="h-5 w-5" />
@@ -189,7 +189,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
                     </CardDescription>
                 </div>
             </div>
-             <div className='flex gap-2 w-full sm:w-auto shrink-0'>
+             <div className='flex gap-2 w-full sm:w-auto shrink-0 justify-end'>
                 <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full sm:w-auto">
                     {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Edit className="mr-2 h-4 w-4" />}
                     {isEditing ? 'Save' : 'Edit'}
