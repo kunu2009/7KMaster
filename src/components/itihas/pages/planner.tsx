@@ -28,8 +28,8 @@ import { AddTodayTask } from "@/components/dashboard/add-today-task";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 
-export function LawPlanner() {
-  const [tasks, setTasks] = useLocalStorage<TodayTask[]>("lawPrepTodayTasks", initialTodayTasks);
+export function ItihasPlanner() {
+  const [tasks, setTasks] = useLocalStorage<TodayTask[]>("itihasTodayTasks", initialTodayTasks);
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
@@ -67,7 +67,7 @@ export function LawPlanner() {
       });
       if (result.tasks) {
         setTasks(result.tasks);
-        toast({ title: 'Plan Generated!', description: 'Your daily law prep plan has been created.' });
+        toast({ title: 'Plan Generated!', description: 'Your daily Itihas study plan has been created.' });
       }
     } catch (error) {
       console.error("Error generating daily plan:", error);
@@ -82,7 +82,7 @@ export function LawPlanner() {
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
         const result = await generateBlockTasks({
-            blockTitle: `Law Study: ${blockTitle}`,
+            blockTitle: `History Study: ${blockTitle}`,
             existingTasks,
             projects: [],
             skills: [],
@@ -136,9 +136,9 @@ export function LawPlanner() {
               <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                     <div>
-                      <CardTitle>LawPrep Study Planner</CardTitle>
+                      <CardTitle>Itihas Study Planner</CardTitle>
                       <CardDescription>
-                        Your dedicated daily planner for law studies.
+                        Your dedicated study plan for History.
                       </CardDescription>
                     </div>
                     {tasks.length === 0 && (

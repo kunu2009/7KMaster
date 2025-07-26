@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   BookCopy,
   ChevronsRight,
+  CalendarClock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 const menuItems = [
   { href: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: 'planner', label: 'Planner', icon: CalendarClock },
 ];
 
 interface ItihasSidebarProps {

@@ -47,12 +47,12 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateDailyPlanInputSchema},
   output: {schema: GenerateDailyPlanOutputSchema},
   prompt: `You are a productivity assistant. Your goal is to create a simple, actionable daily plan with exactly 7 tasks for the user, presented in chronological order.
-The plan should be time-blocked. Each task needs a specific start and end time. The plan should feel balanced, with focus work, breaks, and personal tasks.
+The plan should be time-blocked. Each task needs a specific start and end time. The plan should feel balanced, with focus work, breaks, and personal/study tasks.
 
 The plan should include:
 1.  A short morning routine task.
 2.  Two long focus blocks (e.g., 1.5-2 hours) dedicated to specific projects or skills.
-3.  A shorter skill practice session.
+3.  A shorter skill practice session or a dedicated study session for 'LawPrep' or 'Itihas' topics.
 4.  A mid-day break or administrative task.
 5.  An afternoon wrap-up task.
 6.  An evening task for review or wind-down.
@@ -68,6 +68,8 @@ Skills:
 {{#each skills}}
 - {{area}}: The weekly goal is "{{weeklyGoal}}"
 {{/each}}
+
+Incorporate at least one study-related task from Law (e.g., "Review Constitution notes", "Practice 10 MCQs on Torts") or History (e.g., "Read Chapter on the Renaissance", "Make flashcards for the Mughal Empire").
 
 Based on this, generate a new list of 7 tasks. The tasks should be specific and actionable. For example, instead of 'Work on Project X', say 'Project: 7K Life - Add rewards system'.
 Ensure the output is a JSON object with a "tasks" array, where each task has an id, a specific timeBlock (e.g., '09:00 - 11:00'), a task description, and done (default to false).

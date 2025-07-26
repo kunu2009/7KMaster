@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { ItihasDashboard } from './pages/dashboard';
 import { ItihasChapterView } from './pages/chapter-view';
+import { ItihasPlanner } from './pages/planner';
 import type { ItihasChapter } from '@/lib/types';
 
 interface ItihasAppProps {
@@ -25,10 +26,19 @@ export function ItihasApp({ activePage, setActivePage }: ItihasAppProps) {
   }
 
   const renderContent = () => {
-    if (activePage === 'chapter' && selectedChapter) {
-        return <ItihasChapterView chapter={selectedChapter} />;
+    switch (activePage) {
+        case 'dashboard':
+            return <ItihasDashboard onSelectChapter={handleSelectChapter} />;
+        case 'chapter':
+            if (selectedChapter) {
+                return <ItihasChapterView chapter={selectedChapter} />;
+            }
+            return <ItihasDashboard onSelectChapter={handleSelectChapter} />; // Fallback
+        case 'planner':
+            return <ItihasPlanner />;
+        default:
+             return <ItihasDashboard onSelectChapter={handleSelectChapter} />;
     }
-    return <ItihasDashboard onSelectChapter={handleSelectChapter} />;
   };
 
   return (
