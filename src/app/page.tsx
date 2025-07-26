@@ -43,9 +43,12 @@ import {
   CheckSquare,
   Scale,
   ScrollText,
+  BookCopy,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 import { ItihasSidebar } from "@/components/itihas/itihas-sidebar";
+import { HscApp } from "@/components/hsc/hsc-app";
+import { HscSidebar } from "@/components/hsc/hsc-sidebar";
 
 
 const navItems = [
@@ -57,6 +60,7 @@ const navItems = [
   { id: 'journal', label: 'Journal', icon: PenSquare },
   { id: 'study', label: 'LawPrep', icon: Scale },
   { id: 'itihas', label: 'Itihas', icon: ScrollText },
+  { id: 'hsc', label: 'HSC', icon: BookCopy },
   { id: 'research', label: 'Research', icon: Bookmark },
   { id: 'progress', label: 'Progress', icon: LineChart },
   { id: 'notes', label: 'Notepad', icon: NotepadText },
@@ -68,6 +72,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("today");
   const [activeLawPage, setActiveLawPage] = useState('dashboard');
   const [activeItihasPage, setActiveItihasPage] = useState('dashboard');
+  const [activeHscPage, setActiveHscPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSpecialSidebarOpen, setIsSpecialSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
@@ -80,7 +85,7 @@ export default function Home() {
     ? navItems.filter(item => ['today', 'projects', 'skills'].includes(item.id))
     : navItems;
     
-  const isSpecialAppView = activeTab === 'study' || activeTab === 'itihas';
+  const isSpecialAppView = activeTab === 'study' || activeTab === 'itihas' || activeTab === 'hsc';
   const sidebarWidth = isSpecialAppView ? (isSpecialSidebarOpen ? 'pr-14' : 'pr-0') : (isSidebarOpen ? 'pr-14' : 'pr-0');
 
   const renderContent = () => {
@@ -93,6 +98,7 @@ export default function Home() {
       case 'journal': return <JournalTab />;
       case 'study': return <LawPrepApp activePage={activeLawPage} />;
       case 'itihas': return <ItihasApp activePage={activeItihasPage} setActivePage={setActiveItihasPage} />;
+      case 'hsc': return <HscApp activePage={activeHscPage} setActivePage={setActiveHscPage} />;
       case 'research': return <ResearchTab />;
       case 'progress': return <ProgressTab />;
       case 'notes': return <NotesTab />;
@@ -137,6 +143,15 @@ export default function Home() {
         return <ItihasSidebar 
             activePage={activeItihasPage}
             setActivePage={setActiveItihasPage}
+            onBack={() => setActiveTab('today')}
+            isOpen={isSpecialSidebarOpen}
+            setIsOpen={setIsSpecialSidebarOpen}
+         />;
+    }
+    if (activeTab === 'hsc') {
+        return <HscSidebar 
+            activePage={activeHscPage}
+            setActivePage={setActiveHscPage}
             onBack={() => setActiveTab('today')}
             isOpen={isSpecialSidebarOpen}
             setIsOpen={setIsSpecialSidebarOpen}
@@ -207,7 +222,7 @@ export default function Home() {
       <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${sidebarWidth}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
-             <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : '7K Life'}</span>
+             <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4 ml-auto">
