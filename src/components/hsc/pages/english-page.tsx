@@ -5,19 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
-import { hscEnglishProse } from "@/lib/hsc-data";
-import type { HscProseChapter } from "@/lib/types";
+import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
+import type { HscProseChapter, HscPoetryChapter } from "@/lib/types";
 
-const poetryChapters = [
-    { title: "Song of the Open Road", author: "Walt Whitman" },
-    { title: "Indian Weavers", author: "Sarojini Naidu" },
-    { title: "The Inchcape Rock", author: "Robert Southey" },
-    { title: "Have You Earned Your Tomorrow", author: "Edgar Guest" },
-    { title: "Father Returning Home", author: "Dilip Chitre" },
-    { title: "Money", author: "W.H. Davies" },
-    { title: "She Walks in Beauty", author: "Lord Byron" },
-    { title: "Small Towns and Rivers", author: "Mamang Dai" },
-];
 
 const writingSkills = [
     "View and Counter-view",
@@ -35,10 +25,11 @@ const writingSkills = [
 ];
 
 interface EnglishPageProps {
-    onSelectChapter: (chapter: HscProseChapter) => void;
+    onSelectProseChapter: (chapter: HscProseChapter) => void;
+    onSelectPoetryChapter: (poem: HscPoetryChapter) => void;
 }
 
-export function EnglishPage({ onSelectChapter }: EnglishPageProps) {
+export function EnglishPage({ onSelectProseChapter, onSelectPoetryChapter }: EnglishPageProps) {
     return (
         <div className="space-y-6">
             <div>
@@ -71,7 +62,7 @@ export function EnglishPage({ onSelectChapter }: EnglishPageProps) {
                                         <Button 
                                             variant="outline" 
                                             className="w-full" 
-                                            onClick={() => onSelectChapter(chapter)}
+                                            onClick={() => onSelectProseChapter(chapter)}
                                             disabled={!chapter.contentAvailable}
                                         >
                                             <BookOpen className="mr-2 h-4 w-4" /> Study
@@ -89,14 +80,18 @@ export function EnglishPage({ onSelectChapter }: EnglishPageProps) {
                             <CardDescription>Appreciation and analysis of poems.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {poetryChapters.map((poem) => (
-                                <Card key={poem.title} className="flex flex-col">
+                            {hscEnglishPoetry.map((poem) => (
+                                <Card key={poem.id} className="flex flex-col">
                                     <CardHeader className="flex-grow">
                                         <CardTitle className="text-lg">{poem.title}</CardTitle>
                                         <CardDescription>by {poem.author}</CardDescription>
                                     </CardHeader>
                                     <CardFooter>
-                                        <Button variant="outline" className="w-full" disabled>
+                                        <Button 
+                                            variant="outline" 
+                                            className="w-full" 
+                                            onClick={() => onSelectPoetryChapter(poem)}
+                                            disabled={!poem.contentAvailable}>
                                             <BookOpen className="mr-2 h-4 w-4" /> Study
                                         </Button>
                                     </CardFooter>

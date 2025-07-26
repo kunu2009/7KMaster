@@ -1,4 +1,5 @@
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -196,7 +197,7 @@ export interface HscPoetryChapter {
     title: string;
     author: string;
     contentAvailable: boolean;
-    poemText: string;
+    poemText: string[]; // Array of strings, each for a line or stanza
     summaries: {
         overall: string;
         stanzaWise: string;

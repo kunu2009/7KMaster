@@ -9,7 +9,8 @@ import { HindiPage } from './pages/hindi-page';
 import { EconomicsPage } from './pages/economics-page';
 import { PoliticalSciencePage } from './pages/political-science-page';
 import { ProseChapterView } from './pages/prose-chapter-view';
-import type { HscProseChapter } from '@/lib/types';
+import { PoetryChapterView } from './pages/poetry-chapter-view';
+import type { HscProseChapter, HscPoetryChapter } from '@/lib/types';
 
 interface HscAppProps {
     activePage: string;
@@ -18,14 +19,21 @@ interface HscAppProps {
 
 export function HscApp({ activePage, setActivePage }: HscAppProps) {
   const [selectedProseChapter, setSelectedProseChapter] = useState<HscProseChapter | null>(null);
+  const [selectedPoetryChapter, setSelectedPoetryChapter] = useState<HscPoetryChapter | null>(null);
 
   const handleSelectProseChapter = (chapter: HscProseChapter) => {
     setSelectedProseChapter(chapter);
     setActivePage('prose-chapter');
   };
+  
+  const handleSelectPoetryChapter = (poem: HscPoetryChapter) => {
+    setSelectedPoetryChapter(poem);
+    setActivePage('poetry-chapter');
+  };
 
   const handleBackToEnglish = () => {
     setSelectedProseChapter(null);
+    setSelectedPoetryChapter(null);
     setActivePage('english');
   };
 
@@ -35,7 +43,7 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
         case 'dashboard':
             return <HscDashboard setActivePage={setActivePage} />;
         case 'english':
-            return <EnglishPage onSelectChapter={handleSelectProseChapter} />;
+            return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'sanskrit':
             return <SanskritPage />;
         case 'hindi':
@@ -48,8 +56,12 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
             if (selectedProseChapter) {
                 return <ProseChapterView chapter={selectedProseChapter} onBack={handleBackToEnglish} />;
             }
-            // Fallback to English page if no chapter is selected
-            return <EnglishPage onSelectChapter={handleSelectProseChapter} />;
+            return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
+        case 'poetry-chapter':
+            if (selectedPoetryChapter) {
+                return <PoetryChapterView poem={selectedPoetryChapter} onBack={handleBackToEnglish} />;
+            }
+            return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         default:
              return <HscDashboard setActivePage={setActivePage} />;
     }

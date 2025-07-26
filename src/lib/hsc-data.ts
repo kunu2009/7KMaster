@@ -1,5 +1,5 @@
 
-import type { HscProseChapter } from './types';
+import type { HscProseChapter, HscPoetryChapter } from './types';
 
 export const hscEnglishProse: HscProseChapter[] = [
     {
@@ -180,7 +180,7 @@ Soapy's frustration grows.
 Soapy sees a man with a silk umbrella at a cigar store. He grabs it and walks off. The man follows, but when Soapy challenges him to call a cop, the man admits he found the umbrella himself and retreats. Soapy's final attempt at crime fails spectacularly.
 
 **Paragraph 13-15: The Epiphany at the Church**
-Disgusted with his luck, Soapy drifts towards a quiet old church. He hears a church organ playing an anthem, a piece of music that reminds him of his past life filled with family, ambition, and clean living. A sudden and powerful change comes over him. He realizes the mess he has made of his life and resolves to reform. He decides he will find a job the next day and become "somebody in the world."
+Disgusted with his luck, Soapy drifts towards a quiet old church. He hears a church organ playing an anthem, a piece of music that reminds him of his past life of family, ambition, and clean living. A sudden and powerful change comes over him. He realizes the mess he has made of his life and resolves to reform. He decides he will find a job the next day and become "somebody in the world."
 
 **Paragraph 16-17: The Final Irony**
 As Soapy stands there, filled with this new hope and purpose, a policeman approaches, asks what he's doing, and arrests him for loitering. The next morning, the magistrate sentences him to "three months on the Island"—the very fate he had tried so hard to achieve, but which he now no longer desires.`
@@ -387,3 +387,65 @@ After a long and successful corporate career, he embarks on a new "voyage" as a 
 The author concludes that his life has been a continuous journey or "voyage" towards excellence. He stresses that excellence is not a destination but a process. It is about having a thirst for knowledge, working hard, and constantly striving to be better. This spirit of curiosity and perseverance is the central message of his story.`
     }
 ];
+
+export const hscEnglishPoetry: HscPoetryChapter[] = [
+    {
+        id: 1,
+        title: "Song of the Open Road",
+        author: "Walt Whitman",
+        contentAvailable: true,
+        poemText: [
+            "Afoot and light-hearted I take to the open road,",
+            "Healthy, free, the world before me,",
+            "The long brown path before me leading wherever I choose.",
+            "Henceforth I ask not good-fortune, I myself am good-fortune,",
+            "Henceforth I whimper no more, postpone no more, need nothing,",
+            "Done with indoor complaints, libraries, querulous criticisms,",
+            "Strong and content I travel the open road."
+        ],
+        summaries: {
+            overall: "The poem is a celebration of freedom, mobility, and the journey of life. The speaker embraces the open road as a symbol of a life of free will and endless possibilities. He declares his independence from societal expectations and material needs, finding contentment and strength in the act of traveling and experiencing the world directly. It's a call to live a simple, unburdened, and self-reliant life.",
+            stanzaWise: `The poem, presented as a single stanza, conveys a powerful message of liberation.
+- **Lines 1-3:** The speaker begins his journey on foot, feeling cheerful and healthy. The "open road" symbolizes a life of choice and freedom, where he can go wherever he wishes.
+- **Lines 4-5:** He rejects the need for external luck, declaring that he is the creator of his own fortune. He resolves to stop complaining or delaying his life, shedding all dependencies.
+- **Lines 6-7:** He leaves behind the constraints of indoor life, which represents intellectual but detached experiences ('libraries') and constant complaining ('querulous criticisms'). He feels strong and content, ready to face the world on his own terms.`
+        },
+        centralIdea: "The central idea of the poem is the joy of a free and independent life. It emphasizes the importance of self-reliance, optimism, and the connection with nature and the world. The 'road' is a metaphor for the journey of life, and the poet encourages readers to travel it with a light heart, free from social constraints and full of confidence in their own abilities.",
+        figuresOfSpeech: [
+            { name: "Metaphor", line: "the open road", explanation: "The 'open road' is a metaphor for the journey of life, representing freedom, opportunity, and new beginnings." },
+            { name: "Repetition", line: "Henceforth I ask not good-fortune... Henceforth I whimper no more...", explanation: "The word 'Henceforth' is repeated to emphasize the speaker's firm resolution to change his life from this moment forward." },
+            { name: "Paradox", line: "I myself am good-fortune", explanation: "This is a paradoxical statement where the speaker claims to be an abstract concept (good-fortune), expressing his ultimate self-confidence and rejection of reliance on external luck." },
+            { name: "Alliteration", line: "not good-fortune", explanation: "Repetition of the 'n' sound in 'not' and 'fortune' (although not at the beginning of the word, it creates a consonance effect)." }
+        ],
+        poeticDevices: {
+            rhymeScheme: "The poem is written in free verse and does not have a consistent rhyme scheme or meter.",
+            repetition: "The word 'Henceforth' is repeated for emphasis."
+        },
+        appreciation: `The poem "Song of the Open Road" by Walt Whitman is an inspiring ode to freedom and the journey of life. The central theme is about breaking free from societal constraints and embracing a life of self-reliance and optimism. The poet uses the "open road" as a powerful metaphor for life itself, full of choices and possibilities.
+The poem is written in free verse, which complements its theme of freedom as it is not bound by a strict rhyme scheme or meter. Key figures of speech include Metaphor ('the open road'), Repetition ('Henceforth...'), and Paradox ('I myself am good-fortune'). These devices effectively convey the poet's message of empowerment and joy. The tone is uplifting and confident.
+My favorite line is "Henceforth I ask not good-fortune, I myself am good-fortune," as it's a powerful declaration of self-belief. I appreciate this poem for its timeless message about taking control of one's own destiny and finding happiness in the journey, not just the destination.`
+    }
+];
+
+// Placeholder for other poems
+const otherPoetryChapters = [
+    { id: 2, title: "Indian Weavers", author: "Sarojini Naidu", contentAvailable: false },
+    { id: 3, title: "The Inchcape Rock", author: "Robert Southey", contentAvailable: false },
+    { id: 4, title: "Have You Earned Your Tomorrow", author: "Edgar Guest", contentAvailable: false },
+    { id: 5, title: "Father Returning Home", author: "Dilip Chitre", contentAvailable: false },
+    { id: 6, title: "Money", author: "W.H. Davies", contentAvailable: false },
+    { id: 7, title: "She Walks in Beauty", author: "Lord Byron", contentAvailable: false },
+    { id: 8, title: "Small Towns and Rivers", author: "Mamang Dai", contentAvailable: false },
+];
+
+otherPoetryChapters.forEach(p => {
+    hscEnglishPoetry.push({
+        ...p,
+        poemText: ["Content for this poem is being prepared and will be available soon."],
+        summaries: { overall: "", stanzaWise: "" },
+        centralIdea: "",
+        figuresOfSpeech: [],
+        poeticDevices: { rhymeScheme: "" },
+        appreciation: ""
+    })
+})
