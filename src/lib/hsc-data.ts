@@ -167,5 +167,29 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Abstract", meaning: "Existing in thought or as an idea but not having a physical or concrete existence." },
             { word: "Paradox", meaning: "A seemingly absurd or self-contradictory statement or proposition that when investigated or explained may prove to be well founded or true." }
         ]
+    },
+    {
+        id: 8,
+        title: "Voyaging Towards Excellence",
+        author: "Achyut Godbole",
+        contentAvailable: true,
+        summaries: {
+            short: "This autobiographical piece by Achyut Godbole traces his journey from a middle-class, Marathi-medium student with an inferiority complex to a successful IT professional and author. He emphasizes that his 'thirst for knowledge,' curiosity, and dedication to self-improvement were the keys to his success. He argues that there is no shortcut to excellence and that one must embrace learning in all fields, from science to humanities, to develop a well-rounded personality.",
+            detailed: `In "Voyaging Towards Excellence," Achyut Godbole recounts his personal and professional journey, highlighting the principles that led to his success. He starts by describing his childhood and education in a Marathi-medium school, which initially led to a severe inferiority complex when he entered IIT. He felt out of place due to his poor English and limited exposure. However, he overcame this by developing a positive attitude and a deep-seated 'thirst for knowledge.'\n\nGodbole explains his philosophy of learning, which involved not just mastering his own field of Science and Technology but also delving deep into Music, Literature, and Art. He believed that this interdisciplinary approach was crucial for holistic development and for understanding the world in a broader context. He details his successful career at Patni Computers, where he rose to the position of General Manager at a young age, and his later ventures as a prolific author.\n\nThe author argues against the idea of 'shortcuts' to success. For him, excellence is a continuous process of hard work, curiosity, and perseverance. He concludes by stating that his journey has been a 'voyage' towards excellence, not a destination, emphasizing the importance of lifelong learning and the relentless pursuit of one's full potential.`,
+        },
+        characters: [
+            {
+                name: "Achyut Godbole",
+                sketch: "The author and protagonist of this autobiographical account. He portrays himself as an individual driven by an insatiable curiosity and a desire for self-improvement. He is humble about his beginnings but confident in his philosophy of hard work and broad, interdisciplinary learning. He serves as an inspirational figure who overcame personal insecurities to achieve great success in multiple fields."
+            }
+        ],
+        theme: "The central theme is the pursuit of excellence through continuous learning and hard work. Godbole's narrative is a testament to the power of curiosity and the importance of overcoming mental barriers like inferiority complexes. He advocates for a holistic approach to knowledge, integrating both sciences and arts to achieve a well-rounded and successful life. The key message is that true success is not about achieving a single goal but about the lifelong journey ('voyage') of growth and improvement.",
+        glossary: [
+            { word: "Voyage", meaning: "A long journey involving travel by sea or in space; here, used metaphorically for a life's journey." },
+            { word: "Excellence", meaning: "The quality of being outstanding or extremely good." },
+            { word: "Holistic", meaning: "Characterized by the belief that the parts of something are intimately interconnected and explicable only by reference to the whole." },
+            { word: "Inferiority Complex", meaning: "An unrealistic feeling of general inadequacy caused by actual or supposed inferiority in one sphere, sometimes marked by aggressive behavior in compensation." },
+            { word: "Prolific", meaning: "(Of an artist, author, or composer) producing many works." }
+        ]
     }
 ];
