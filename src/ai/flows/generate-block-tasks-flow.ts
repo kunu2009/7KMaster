@@ -13,6 +13,7 @@ import {z} from 'genkit';
 
 const GenerateBlockTasksInputSchema = z.object({
   blockTitle: z.string().describe("The title or theme of the time block (e.g., 'Focus Block', 'Admin')."),
+  taskType: z.enum(['Project-related', 'Skill-related', 'LawPrep Study', 'Itihas Study']).describe("The specific type of task to generate."),
   existingTasks: z.array(z.string()).describe("A list of tasks already in this time block."),
   projects: z.array(z.object({
     name: z.string(),
@@ -42,25 +43,38 @@ const prompt = ai.definePrompt({
   prompt: `You are a productivity assistant. Your goal is to suggest 2-3 new tasks for a specific time block in the user's daily plan.
 
 The theme for this block is: "{{blockTitle}}".
+The user wants tasks related to: "{{taskType}}".
 
 Do not repeat any of these existing tasks for this block:
 {{#each existingTasks}}
 - {{this}}
 {{/each}}
 
-Use the user's projects and skills as inspiration for the new tasks.
-
+Here is the user's context:
 Projects:
-{{#each projects}}
-- {{name}}: Next action is "{{nextAction}}"
-{{/each}}
+{{#if projects}}
+    {{#each projects}}
+    - {{name}}: Next action is "{{nextAction}}"
+    {{/each}}
+{{else}}
+    No projects.
+{{/if}}
 
 Skills:
-{{#each skills}}
-- {{area}}: The weekly goal is "{{weeklyGoal}}"
-{{/each}}
+{{#if skills}}
+    {{#each skills}}
+    - {{area}}: The weekly goal is "{{weeklyGoal}}"
+    {{/each}}
+{{else}}
+    No skills.
+{{/if}}
 
-Based on this, generate 2-3 new, concise, and actionable task descriptions. For example, if the theme is "Focus Block", suggest a task related to a project's next action or a skill's weekly goal.
+Based on the requested task type and the context, generate 2-3 new, concise, and actionable task descriptions.
+
+- If the type is 'Project-related', suggest tasks based on the project next actions.
+- If the type is 'Skill-related', suggest tasks based on the skill development goals.
+- If the type is 'LawPrep Study', suggest a specific law study task like "Review Tort Law notes for 15 mins" or "Complete 10 MCQs on Constitutional Law".
+- If the type is 'Itihas Study', suggest a specific history study task like "Read chapter on the Mughal Empire" or "Make flashcards for the Harappan Civilization".
 `,
 });
 

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2, PlusCircle } from 'lucide-react';
+import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import {
   initialTodayTasks,
@@ -26,6 +26,12 @@ import { useToast } from "@/hooks/use-toast";
 import { PomodoroTimer } from "./pomodoro-timer";
 import { AddTodayTask } from "./add-today-task";
 import { ScrollArea } from "../ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 export function TodayTab() {
@@ -91,12 +97,13 @@ export function TodayTab() {
     }
   };
 
-  const handleGenerateBlockTasks = async (blockTitle: string) => {
+  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study') => {
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
         const result = await generateBlockTasks({
             blockTitle,
+            taskType,
             existingTasks,
             projects: projects.map(({ name, nextAction }) => ({ name, nextAction })),
             skills: skills.map(({ area, weeklyGoal }) => ({ area, weeklyGoal })),
@@ -179,16 +186,37 @@ export function TodayTab() {
                           <div className="flex justify-between items-center mb-2 border-b pb-1">
                               <h3 className="font-semibold text-lg text-primary">{groupName}</h3>
                                {groupName !== "Project Next Actions" && (
-                                   <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      onClick={() => handleGenerateBlockTasks(groupName)} 
-                                      disabled={generatingBlock === groupName}
-                                      className="text-muted-foreground"
-                                  >
-                                     {generatingBlock === groupName ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                                      AI Suggest
-                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button 
+                                          size="sm" 
+                                          variant="ghost" 
+                                          disabled={generatingBlock === groupName}
+                                          className="text-muted-foreground"
+                                      >
+                                        {generatingBlock === groupName ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                                          AI Suggest
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Project-related')}>
+                                        <GanttChartSquare className="mr-2 h-4 w-4"/>
+                                        <span>Project Task</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Skill-related')}>
+                                        <BrainCircuit className="mr-2 h-4 w-4"/>
+                                        <span>Skill Task</span>
+                                      </DropdownMenuItem>
+                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'LawPrep Study')}>
+                                        <Scale className="mr-2 h-4 w-4"/>
+                                        <span>LawPrep Study</span>
+                                      </DropdownMenuItem>
+                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Itihas Study')}>
+                                        <ScrollText className="mr-2 h-4 w-4"/>
+                                        <span>Itihas Study</span>
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                )}
                           </div>
                           <div className="space-y-2">
