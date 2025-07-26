@@ -5,16 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
-
-const proseChapters = [
-    { title: "An Astrologer’s Day", author: "R.K. Narayan" },
-    { title: "On Saying \"Please\"", author: "A.G. Gardiner" },
-    { title: "The Cop and the Anthem", author: "O. Henry" },
-    { title: "Big Data – Big Insights", author: "" },
-    { title: "The New Dress", author: "Virginia Woolf" },
-    { title: "Into the Wild", author: "Parthasarathi Borah" },
-    { title: "Why We Travel", author: "Pico Iyer" },
-];
+import { hscEnglishProse } from "@/lib/hsc-data";
+import type { HscProseChapter } from "@/lib/types";
 
 const poetryChapters = [
     { title: "Song of the Open Road", author: "Walt Whitman" },
@@ -41,7 +33,11 @@ const writingSkills = [
     "Grammar & Vocabulary"
 ];
 
-export function EnglishPage() {
+interface EnglishPageProps {
+    onSelectChapter: (chapter: HscProseChapter) => void;
+}
+
+export function EnglishPage({ onSelectChapter }: EnglishPageProps) {
     return (
         <div className="space-y-6">
             <div>
@@ -64,14 +60,19 @@ export function EnglishPage() {
                             <CardDescription>Analysis and appreciation of prose texts.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {proseChapters.map((chapter) => (
-                                <Card key={chapter.title} className="flex flex-col">
+                            {hscEnglishProse.map((chapter) => (
+                                <Card key={chapter.id} className="flex flex-col">
                                     <CardHeader className="flex-grow">
                                         <CardTitle className="text-lg">{chapter.title}</CardTitle>
                                         {chapter.author && <CardDescription>by {chapter.author}</CardDescription>}
                                     </CardHeader>
                                     <CardFooter>
-                                        <Button variant="outline" className="w-full" disabled>
+                                        <Button 
+                                            variant="outline" 
+                                            className="w-full" 
+                                            onClick={() => onSelectChapter(chapter)}
+                                            disabled={!chapter.contentAvailable}
+                                        >
                                             <BookOpen className="mr-2 h-4 w-4" /> Study
                                         </Button>
                                     </CardFooter>

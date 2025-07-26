@@ -8,6 +8,8 @@ import { SanskritPage } from './pages/sanskrit-page';
 import { HindiPage } from './pages/hindi-page';
 import { EconomicsPage } from './pages/economics-page';
 import { PoliticalSciencePage } from './pages/political-science-page';
+import { ProseChapterView } from './pages/prose-chapter-view';
+import type { HscProseChapter } from '@/lib/types';
 
 interface HscAppProps {
     activePage: string;
@@ -15,13 +17,25 @@ interface HscAppProps {
 }
 
 export function HscApp({ activePage, setActivePage }: HscAppProps) {
+  const [selectedProseChapter, setSelectedProseChapter] = useState<HscProseChapter | null>(null);
+
+  const handleSelectProseChapter = (chapter: HscProseChapter) => {
+    setSelectedProseChapter(chapter);
+    setActivePage('prose-chapter');
+  };
+
+  const handleBackToEnglish = () => {
+    setSelectedProseChapter(null);
+    setActivePage('english');
+  };
+
 
   const renderContent = () => {
     switch (activePage) {
         case 'dashboard':
             return <HscDashboard setActivePage={setActivePage} />;
         case 'english':
-            return <EnglishPage />;
+            return <EnglishPage onSelectChapter={handleSelectProseChapter} />;
         case 'sanskrit':
             return <SanskritPage />;
         case 'hindi':
@@ -30,6 +44,12 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
             return <EconomicsPage />;
         case 'political-science':
             return <PoliticalSciencePage />;
+        case 'prose-chapter':
+            if (selectedProseChapter) {
+                return <ProseChapterView chapter={selectedProseChapter} onBack={handleBackToEnglish} />;
+            }
+            // Fallback to English page if no chapter is selected
+            return <EnglishPage onSelectChapter={handleSelectProseChapter} />;
         default:
              return <HscDashboard setActivePage={setActivePage} />;
     }

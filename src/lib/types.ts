@@ -1,6 +1,7 @@
 
 
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -161,6 +162,28 @@ export interface ItihasChapter {
   flashcards: LawFlashcard[];
   reels: Reel[];
 }
+
+// 7K HSC Types
+export interface HscProseChapter {
+    id: number;
+    title: string;
+    author: string;
+    contentAvailable: boolean;
+    summaries: {
+        short: string;
+        detailed: string;
+    };
+    characters: {
+        name: string;
+        sketch: string;
+    }[];
+    theme: string;
+    glossary: {
+        word: string;
+        meaning: string;
+    }[];
+}
+
 
 export type Era = {
   id: string;

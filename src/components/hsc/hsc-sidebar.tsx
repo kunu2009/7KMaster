@@ -11,6 +11,7 @@ import {
   BookText,
   TrendingUp,
   Vote,
+  Newspaper,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -86,6 +87,25 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
         <ScrollArea className="flex-1">
           <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             {menuItems.map(item => <NavLink key={item.href} item={item} />)}
+            <div className="my-2 h-px w-full bg-border" />
+             <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activePage === 'prose-chapter' ? "secondary" : "ghost"}
+                    size="icon"
+                    className="rounded-lg"
+                    aria-label="Current Chapter"
+                    disabled={activePage !== 'prose-chapter'}
+                  >
+                    <Newspaper className="size-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" sideOffset={5}>
+                  Chapter View
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </nav>
         </ScrollArea>
         <div className={`flex flex-col items-center gap-4 px-2 py-5 border-t mt-auto transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
