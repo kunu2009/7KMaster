@@ -69,6 +69,7 @@ export default function Home() {
   const [activeLawPage, setActiveLawPage] = useState('dashboard');
   const [activeItihasPage, setActiveItihasPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSpecialSidebarOpen, setIsSpecialSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
 
   const handleTabChange = (tabId: string) => {
@@ -80,6 +81,7 @@ export default function Home() {
     : navItems;
     
   const isSpecialAppView = activeTab === 'study' || activeTab === 'itihas';
+  const sidebarWidth = isSpecialAppView ? (isSpecialSidebarOpen ? 'pr-14' : 'pr-0') : (isSidebarOpen ? 'pr-14' : 'pr-0');
 
   const renderContent = () => {
     switch (activeTab) {
@@ -127,6 +129,8 @@ export default function Home() {
             activePage={activeLawPage}
             setActivePage={setActiveLawPage}
             onBack={() => setActiveTab('today')}
+            isOpen={isSpecialSidebarOpen}
+            setIsOpen={setIsSpecialSidebarOpen}
          />;
     }
     if (activeTab === 'itihas') {
@@ -134,6 +138,8 @@ export default function Home() {
             activePage={activeItihasPage}
             setActivePage={setActiveItihasPage}
             onBack={() => setActiveTab('today')}
+            isOpen={isSpecialSidebarOpen}
+            setIsOpen={setIsSpecialSidebarOpen}
          />;
     }
     return (
@@ -173,24 +179,32 @@ export default function Home() {
       </aside>
     );
   }
+  
+  const currentSidebarOpenState = isSpecialAppView ? isSpecialSidebarOpen : isSidebarOpen;
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
         {renderSidebar()}
        
-       {!isSidebarOpen && !isSpecialAppView && (
+       {!currentSidebarOpenState && (
             <Button
                 variant="ghost"
                 size="icon"
                 className="fixed top-1/2 right-2 z-20 rounded-full"
                 aria-label="Toggle Sidebar"
-                onClick={() => setIsSidebarOpen(prev => !prev)}
+                onClick={() => {
+                  if (isSpecialAppView) {
+                    setIsSpecialSidebarOpen(true);
+                  } else {
+                    setIsSidebarOpen(true);
+                  }
+                }}
             >
                 <ChevronsLeft className="size-5" />
             </Button>
         )}
 
-      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${isSidebarOpen || isSpecialAppView ? 'pr-14' : 'pr-0'}`}>
+      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${sidebarWidth}`}>
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : '7K Life'}</span>
@@ -211,7 +225,7 @@ export default function Home() {
               <ThemeToggle />
             </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6">
             {renderContent()}
         </main>
       </div>

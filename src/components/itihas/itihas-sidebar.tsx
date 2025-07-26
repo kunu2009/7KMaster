@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   ArrowLeft,
   BookCopy,
+  ChevronsRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,9 +25,11 @@ interface ItihasSidebarProps {
     activePage: string;
     setActivePage: (page: string) => void;
     onBack: () => void;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
 }
 
-export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSidebarProps) {
+export function ItihasSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpen }: ItihasSidebarProps) {
 
   const NavLink = ({ item }: { item: typeof menuItems[0] }) => (
     <TooltipProvider>
@@ -50,8 +53,8 @@ export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSideb
   );
 
   return (
-    <aside className="fixed inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
-        <div className="flex h-14 items-center justify-center border-b">
+    <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
+        <div className={`flex h-14 items-center justify-center border-b transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -72,7 +75,7 @@ export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSideb
             </TooltipProvider>
         </div>
         <ScrollArea className="flex-1">
-          <nav className="flex flex-col items-center gap-4 px-2 py-5">
+          <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             {menuItems.map(item => <NavLink key={item.href} item={item} />)}
             <div className="my-2 h-px w-full bg-border" />
              <TooltipProvider>
@@ -95,6 +98,17 @@ export function ItihasSidebar({ activePage, setActivePage, onBack }: ItihasSideb
             </TooltipProvider>
           </nav>
         </ScrollArea>
+        <div className={`flex flex-col items-center gap-4 px-2 py-5 border-t mt-auto transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-lg"
+                aria-label="Toggle Sidebar"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <ChevronsRight className="size-5" />
+            </Button>
+        </div>
     </aside>
   );
 }
