@@ -30,7 +30,6 @@ import {
   GanttChartSquare,
   BrainCircuit,
   Bot,
-  Book,
   AppWindow,
   Link,
   PenSquare,
