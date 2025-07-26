@@ -419,33 +419,57 @@ export const hscEnglishPoetry: HscPoetryChapter[] = [
         ],
         poeticDevices: {
             rhymeScheme: "The poem is written in free verse and does not have a consistent rhyme scheme or meter.",
-            repetition: "The word 'Henceforth' is repeated for emphasis."
         },
         appreciation: `The poem "Song of the Open Road" by Walt Whitman is an inspiring ode to freedom and the journey of life. The central theme is about breaking free from societal constraints and embracing a life of self-reliance and optimism. The poet uses the "open road" as a powerful metaphor for life itself, full of choices and possibilities.
 The poem is written in free verse, which complements its theme of freedom as it is not bound by a strict rhyme scheme or meter. Key figures of speech include Metaphor ('the open road'), Repetition ('Henceforth...'), and Paradox ('I myself am good-fortune'). These devices effectively convey the poet's message of empowerment and joy. The tone is uplifting and confident.
 My favorite line is "Henceforth I ask not good-fortune, I myself am good-fortune," as it's a powerful declaration of self-belief. I appreciate this poem for its timeless message about taking control of one's own destiny and finding happiness in the journey, not just the destination.`
-    }
+    },
+     {
+        id: 2,
+        title: "Indian Weavers",
+        author: "Sarojini Naidu",
+        contentAvailable: true,
+        poemText: [
+            "Weavers, weaving at break of day,",
+            "Why do you weave a garment so gay?...",
+            "Blue as the wing of a halcyon wild,",
+            "We weave the robes of a new-born child.",
+            "",
+            "Weavers, weaving at fall of night,",
+            "Why do you weave a garment so bright?...",
+            "Like the plumes of a peacock, purple and green,",
+            "We weave the marriage-veils of a queen.",
+            "",
+            "Weavers, weaving solemn and still,",
+            "What do you weave in the moonlight chill?...",
+            "White as a feather and white as a cloud,",
+            "We weave a dead man's funeral shroud."
+        ],
+        summaries: {
+            overall: "Sarojini Naidu's 'Indian Weavers' uses the craft of weaving as a metaphor for the cycle of human life. The poem is structured around three questions asked to weavers at three different times of the day. Their answers reveal that they are weaving garments for the three key stages of life: birth (child's robes), adulthood (queen's marriage-veil), and death (funeral shroud). The changing colors and moods of the stanzas reflect the journey from joyful beginnings to solemn ends.",
+            stanzaWise: `
+- **Stanza 1 (Morning):** At the beginning of the day, the weavers are creating bright, gay, blue robes for a newborn child. This represents the joyful and hopeful start of human life.
+- **Stanza 2 (Evening):** At dusk, they weave a vibrant, multi-colored marriage veil for a queen. This symbolizes the prime of life—adulthood, with its passions, celebrations, and responsibilities.
+- **Stanza 3 (Night):** In the dead of night, the weavers are silent and serious, weaving a plain white cloth for a dead man's funeral shroud. This represents the final, somber stage of life: death.`
+        },
+        centralIdea: "The central idea of the poem is that life is a journey through three distinct stages: birth, adulthood, and death. The poet beautifully connects the weavers' work at different times of the day to these stages, using colors and imagery to evoke the corresponding emotions—joy, celebration, and sorrow. It's a profound meditation on the human life cycle.",
+        figuresOfSpeech: [
+            { name: "Simile", line: "Blue as the wing of a halcyon wild", explanation: "The color of the newborn's robe is directly compared to the blue wing of a kingfisher, suggesting beauty and preciousness." },
+            { name: "Simile", line: "Like the plumes of a peacock, purple and green", explanation: "The marriage-veil's brightness and color are directly compared to a peacock's feathers, symbolizing celebration and royalty." },
+            { name: "Simile", line: "White as a feather and white as a cloud", explanation: "The funeral shroud's color is compared to a feather and a cloud, evoking feelings of lightness, ethereality, and solemnity." },
+            { name: "Metaphor", line: "The entire poem uses the weavers' work as a metaphor for the stages of human life.", explanation: "The act of weaving garments represents the unfolding of life from birth to death." }
+        ],
+        poeticDevices: {
+            rhymeScheme: "The poem follows a consistent rhyme scheme of 'aabb', 'ccdd', 'eeff'.",
+        },
+        appreciation: `Sarojini Naidu's "Indian Weavers" is a short but profound poem that beautifully captures the cycle of human life. Its central theme is the three stages of life—birth, adulthood, and death—symbolized by the garments woven at different times of the day. The poem's strength lies in its simple yet powerful imagery and symbolism.
+The poet employs a consistent 'aabb' rhyme scheme, giving the poem a lyrical, song-like quality. The primary figure of speech is the Simile, used effectively in each stanza to connect the garments to nature ("Blue as the wing of a halcyon wild," "Like the plumes of a peacock," "White as a feather"). The entire poem itself functions as a metaphor for life's journey. The changing tone, from joyful in the morning to solemn at night, perfectly reflects the progression from birth to death.
+I admire this poem for its elegant simplicity and deep philosophical message. In just twelve lines, it conveys a universal truth about human existence with grace and emotional resonance.`
+    },
+    { id: 3, title: "The Inchcape Rock", author: "Robert Southey", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "A narrative poem about the benevolent Abbot of Aberbrothok, who places a bell on the dangerous Inchcape Rock to warn sailors. The bell is maliciously cut by the pirate Sir Ralph the Rover, who later perishes on the very same rock during a storm, unable to hear the warning he destroyed. The poem is a moral lesson on the theme that those who do evil ultimately fall into their own trap.", stanzaWise: ""}, centralIdea: "The central idea is that evil deeds ultimately bring about one's own downfall. It illustrates the principle of poetic justice, where a person's malevolent actions lead to their own destruction. The poem serves as a cautionary tale against envy and malice.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "'aabb' ballad stanza" }, appreciation: "" },
+    { id: 4, title: "Have You Earned Your Tomorrow", author: "Edgar Guest", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "This didactic poem poses a series of questions to the reader, asking whether their actions throughout the day have positively impacted anyone. It urges the reader to reflect on whether they have been kind, helpful, and considerate, thereby 'earning' the right to another day. The poem suggests that a life is well-lived only if it brings comfort and hope to others.", stanzaWise: ""}, centralIdea: "The central idea is the importance of living a life of kindness, empathy, and service to others. The poem posits that the value of our day is measured not by personal gain, but by the good we do for our fellow human beings. It is a moral call to make each day count by making a positive difference in someone else's life.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "'aabb' with some variations" }, appreciation: "" },
+    { id: 5, title: "Father Returning Home", author: "Dilip Chitre", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "The poem paints a poignant portrait of an elderly father's monotonous and alienated life in a bustling modern city. It describes his dreary train journey home, his isolation from his own family, and his retreat into a world of solitude. The poem highlights the loneliness and estrangement felt by the older generation in a fast-paced, indifferent urban environment.", stanzaWise: ""}, centralIdea: "The central theme is the profound sense of alienation and isolation experienced by an individual within his own family and society. It explores the communication gap between generations and the quiet suffering of the elderly, who feel like outsiders in a world they helped build. The poem is a commentary on the dehumanizing nature of modern urban life.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "Free verse" }, appreciation: "" },
+    { id: 6, title: "Money", author: "W.H. Davies", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "The poem reflects on the poet's contrasting experiences with money. When he was rich, he had many false friends and felt anxious. Now that he is poor, he has few but real friends and feels a greater sense of happiness and freedom. The poem argues that money cannot buy true happiness and that poverty can bring a simpler, more genuine form of joy.", stanzaWise: ""}, centralIdea: "The poem's central idea is that true happiness and genuine relationships are more valuable than material wealth. It critiques the superficiality that often accompanies riches and celebrates the simple, authentic joys that can be found in a life of poverty. The theme revolves around the corrupting influence of money versus the freedom of a life without it.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "abab" }, appreciation: "" },
+    { id: 7, title: "She Walks in Beauty", author: "Lord Byron", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "This famous lyrical poem describes the beauty of a woman, comparing her to a starry night. The poet emphasizes that her beauty is a perfect balance of 'dark and bright.' He goes beyond her physical appearance, suggesting that her outer beauty is a reflection of her inner goodness, peace, and innocence. The poem is a celebration of a beauty that is both physical and spiritual.", stanzaWise: ""}, centralIdea: "The central theme is the celebration of a woman's perfect beauty, which is a harmonious blend of outer appearance and inner virtue. The poem argues that true beauty arises from a peaceful mind and an innocent heart. It is not just about physical features but about the grace and purity that radiate from within.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "ababab" }, appreciation: "" },
+    { id: 8, title: "Small Towns and Rivers", author: "Mamang Dai", contentAvailable: true, poemText: ["Content unavailable"], summaries: { overall: "The poem reflects on the relationship between nature, memory, and mortality in the context of the poet's small hometown. The river is depicted as a silent witness to life and death, holding the 'soul of the town.' The poem contrasts the permanence of nature with the transient nature of human life, filled with rituals, sorrow, and the inevitability of death. It evokes a sense of melancholy and a deep connection to one's roots.", stanzaWise: ""}, centralIdea: "The central idea is the exploration of life, death, and nature's permanence in a small town. The river symbolizes the eternal, carrying the memories and spirits of the people. The poem conveys a deep sense of place and laments the ephemeral nature of human existence against the backdrop of an enduring natural world. It is a meditation on memory, loss, and the spiritual connection between a community and its landscape.", figuresOfSpeech: [], poeticDevices: { rhymeScheme: "Free verse" }, appreciation: "" }
 ];
-
-// Placeholder for other poems
-const otherPoetryChapters = [
-    { id: 2, title: "Indian Weavers", author: "Sarojini Naidu", contentAvailable: false },
-    { id: 3, title: "The Inchcape Rock", author: "Robert Southey", contentAvailable: false },
-    { id: 4, title: "Have You Earned Your Tomorrow", author: "Edgar Guest", contentAvailable: false },
-    { id: 5, title: "Father Returning Home", author: "Dilip Chitre", contentAvailable: false },
-    { id: 6, title: "Money", author: "W.H. Davies", contentAvailable: false },
-    { id: 7, title: "She Walks in Beauty", author: "Lord Byron", contentAvailable: false },
-    { id: 8, title: "Small Towns and Rivers", author: "Mamang Dai", contentAvailable: false },
-];
-
-otherPoetryChapters.forEach(p => {
-    hscEnglishPoetry.push({
-        ...p,
-        poemText: ["Content for this poem is being prepared and will be available soon."],
-        summaries: { overall: "", stanzaWise: "" },
-        centralIdea: "",
-        figuresOfSpeech: [],
-        poeticDevices: { rhymeScheme: "" },
-        appreciation: ""
-    })
-})
