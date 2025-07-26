@@ -28,7 +28,24 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Dalliance", meaning: "A casual romantic or sexual relationship." },
             { word: "Pique", meaning: "A feeling of irritation or resentment resulting from a slight, especially to one's pride." },
             { word: "Cowrie shells", meaning: "Polished, often colorful shells used in the past as currency in parts of Africa and Asia." }
-        ]
+        ],
+        lineByLineExplanation: `**Paragraph 1-2: The Astrologer's Setup**
+The story opens by describing the astrologer's professional setup. He works daily under a tamarind tree in a busy town path, surrounded by various vendors. His equipment is simple: a dozen cowrie shells, charts, and a notebook. This setup, combined with his appearance (saffron turban, sacred ash), creates a powerful, mystical image for his clients, despite his complete lack of actual astrological knowledge. The lighting from the neighboring shops creates an enchanting atmosphere that enhances his mystique.
+
+**Paragraph 3-5: The Astrologer's Method**
+The author reveals that the astrologer's success comes from experience and shrewd guesswork, not star-reading. He left his village years ago without a plan and fell into this profession by chance. He listens to his clients for ten minutes, allowing them to provide enough information for him to offer vague but satisfying advice. He is a master psychologist, understanding the common troubles of humanity: marriage, money, and relationships.
+
+**Paragraph 6-10: The Arrival of Guru Nayak**
+As the astrologer is about to pack up, a new client, Guru Nayak, appears. He is portrayed as aggressive and challenging. He scoffs at the astrologer and makes a bet: if the astrologer can give a satisfactory answer, he will pay well; if not, the astrologer must return his money with interest. This sets up the central conflict. The astrologer, seeing a challenge, accepts.
+
+**Paragraph 11-15: The Recognition**
+The astrologer begins his usual routine, but as he looks at the man's face in the dim light of a match, he has a moment of shock and recognition. He tries to back out of the deal, but the stranger holds him to it. This moment is the turning point; the astrologer realizes this stranger is connected to his hidden past.
+
+**Paragraph 16-20: The "Divination"**
+Forced to continue, the astrologer uses his secret knowledge. He "divines" that the stranger was once stabbed with a knife and left for dead in a well. He correctly names the man, Guru Nayak, further astonishing him. The astrologer then fabricates a story that the attacker was crushed under a lorry and is now dead, bringing a sense of closure to Guru Nayak's quest for revenge. He warns Nayak to stay away from his village to avoid future danger.
+
+**Paragraph 21-25: The Confession and Relief**
+Guru Nayak, completely convinced, pays the astrologer and leaves. The astrologer returns home and, in a moment of honesty with his wife, reveals the truth. He confesses that he thought he had murdered a man years ago in a drunken fight. Seeing Guru Nayak alive has lifted a great weight of guilt from his conscience. He can now sleep peacefully, free from the fear of being a murderer.`
     },
     {
         id: 2,
@@ -56,7 +73,24 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Retaliate", meaning: "Make an attack or assault in return for a similar attack." },
             { word: "Morose", meaning: "Sullen and ill-tempered." },
             { word: "Uncouth", meaning: "Lacking good manners, refinement, or grace." }
-        ]
+        ],
+        lineByLineExplanation: `**Paragraph 1: The Lift-man Incident**
+Gardiner introduces the central anecdote: a lift-man in London threw a passenger out for refusing to say "Please." The author acknowledges that while the passenger was rude, the lift-man's violent reaction was legally wrong. This sets up the core distinction between legal offenses and social discourtesies.
+
+**Paragraph 2: Law vs. Manners**
+The author explains that the law does not compel us to be polite. There is no legal penalty for being rude, haughty, or boorish. The law protects us from direct physical harm (assault, battery), but it cannot regulate our social behavior, tone of voice, or facial expressions. Allowing legal retaliation for rudeness would lead to chaos.
+
+**Paragraph 3: The Ripple Effect of Discourtesy**
+While bad manners aren't a crime, Gardiner argues they are a serious social problem. If the lift-man had been wronged, he likely would have passed on his bad mood to his wife, creating a ripple effect of negativity. Discourtesy is infectious and can "poison the stream" of daily life.
+
+**Paragraph 4: The Power of Courtesy**
+In contrast, good manners are also infectious. Small courtesies like "Please" and "Thank you" are the "little courtesies" that act as social lubricants. They are the "oil" that makes the "machine of life" run smoothly and sweetly. They help create a cooperative and friendly atmosphere.
+
+**Paragraph 5: The Cheerful Bus Conductor**
+Gardiner provides a positive example: a good-natured bus conductor. This conductor maintains his cheerfulness and spreads it to his passengers, making their journey more pleasant. He treats everyone with kindness and good humor, even when dealing with minor problems like someone tripping. He acts as a source of "sunshine" in the daily grind.
+
+**Paragraph 6: Conclusion**
+The author concludes that while the law is necessary to prevent major aggressions, it is the small, everyday civilities that truly define a civilized society. We must rely on voluntary politeness to make life pleasant. The lift-man's mistake was in resorting to physical force for a social slight, a battle that can only be won with grace and kindness.`
     },
     {
         id: 3,
@@ -80,7 +114,29 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Penitentiary", meaning: "A prison for people convicted of serious crimes." },
             { word: "Harangue", meaning: "To lecture (someone) at length in an aggressive and critical manner." },
             { word: "Epiphany", meaning: "A moment of sudden and great revelation or realization." }
-        ]
+        ],
+        lineByLineExplanation: `**Paragraph 1-2: Soapy's Winter Plan**
+The story introduces Soapy, a homeless man in Madison Square. As winter approaches, he knows he needs to find shelter. His goal is not a trip to Florida or the Mediterranean but three months of food and lodging in the prison on Blackwell's Island. This has been his winter resort for years.
+
+**Paragraph 3-7: The First Three Attempts**
+Soapy begins his mission to get arrested.
+1.  **The Luxury Cafe:** He tries to enter a fancy cafe, planning to order a meal and then get arrested for not paying. However, the head waiter notices his shabby shoes and torn trousers and turns him away.
+2.  **The Plate-Glass Window:** Soapy throws a stone through a shop window. He stands still, waiting for the cop to arrest him. Ironically, the cop refuses to believe that the person who committed the crime would wait around and instead chases an innocent man who was running away.
+3.  **The Second Restaurant:** He enters a less pretentious restaurant, eats a meal, and then declares he has no money. Instead of calling the police, two waiters simply throw him out onto the pavement.
+
+**Paragraph 8-10: More Failed Attempts**
+Soapy's frustration grows.
+4.  **Disorderly Conduct:** He pretends to be drunk, yelling and dancing on the street. A policeman observes him but assumes he is a harmless Yale student celebrating a college victory and lets him go.
+5.  **Harassing a Woman:** He approaches a well-dressed woman, hoping to be arrested for harassment. The woman, however, turns out to be a prostitute who welcomes his advance, foiling his plan again.
+
+**Paragraph 11-12: The Umbrella Incident**
+Soapy sees a man with a silk umbrella at a cigar store. He grabs it and walks off. The man follows, but when Soapy challenges him to call a cop, the man admits he found the umbrella himself and retreats. Soapy's final attempt at crime fails spectacularly.
+
+**Paragraph 13-15: The Epiphany at the Church**
+Disgusted with his luck, Soapy drifts towards a quiet old church. He hears a church organ playing an anthem, a piece of music that reminds him of his past life filled with family, ambition, and clean living. A sudden and powerful change comes over him. He realizes the mess he has made of his life and resolves to reform. He decides he will find a job the next day and become "somebody in the world."
+
+**Paragraph 16-17: The Final Irony**
+As Soapy stands there, filled with this new hope and purpose, a policeman approaches, asks what he's doing, and arrests him for loitering. The next morning, the magistrate sentences him to "three months on the Island"—the very fate he had tried so hard to achieve, but which he now no longer desires.`
     },
     {
         id: 4,
@@ -99,7 +155,30 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Logistics", meaning: "The detailed coordination of a complex operation involving many people, facilities, or supplies." },
             { word: "E-commerce", meaning: "Commercial transactions conducted electronically on the Internet." },
             { word: "Insights", meaning: "A deep understanding of a person or thing." }
-        ]
+        ],
+        lineByLineExplanation: `**Introduction: What is Big Data?**
+The text defines Big Data as the huge amount of data organizations collect, which can be analyzed to reveal patterns, trends, and associations, especially relating to human behavior. It explains that our online activities—social media, shopping, GPS—all contribute to this data explosion, measured in petabytes or exabytes. The key takeaway is that data analysis, or "insights," is what makes Big Data valuable.
+
+**Section 1: Uses in Location Tracking & Transportation**
+Big Data is fundamental to services like GPS and Google Maps. By tracking our locations and speeds, these systems provide real-time traffic data, calculate optimal routes, and predict travel times. This helps in logistics, allowing companies to track goods and reduce transportation risks.
+
+**Section 2: Uses in the Healthcare Industry**
+The healthcare sector uses Big Data to maintain digital patient records, making care more efficient. Wearable devices (like smartwatches) generate health data that can predict health issues. It also helps in identifying disease outbreak patterns (epidemics) and allows for evidence-based medicine, where treatments are based on vast datasets of patient outcomes.
+
+**Section 3: Uses in the Education Industry**
+In education, Big Data allows for customized learning experiences. By analyzing student data (like course choices and test results), institutions can understand student needs, identify at-risk students, and design more effective curricula. This leads to a better learning environment and improved student outcomes.
+
+**Section 4: Uses in Banking, Finance, and Trading**
+This section details how financial institutions use Big Data. It's crucial for fraud detection by identifying unusual patterns in transactions. It's also used for risk analysis in insurance and lending. In trading, algorithms use Big Data to analyze market trends and make automated trading decisions.
+
+**Section 5: Uses in Sports Analytics**
+Modern sports heavily rely on Big Data. Sensors on equipment and video analytics help track every aspect of player performance, from a bowler's speed to a batsman's shot selection. This data is used to improve player skills, formulate team strategies, and enhance the viewing experience for fans.
+
+**Section 6: Uses in Advertising and Media**
+Big Data is the engine of targeted advertising. Companies like Facebook, Google, and Amazon analyze user data (likes, searches, purchases) to show highly relevant ads. This increases the effectiveness of advertising campaigns. Similarly, streaming services like Netflix analyze viewing data to recommend shows and even produce original content they predict will be popular.
+
+**Conclusion: The Power of Insights**
+The chapter concludes by reinforcing that Big Data is beneficial to everyone, from large corporations to individuals. It has the power to solve problems, improve efficiency, and drive innovation across all sectors of life.`
     },
     {
         id: 5,
@@ -123,7 +202,24 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Self-deprecation", meaning: "Modesty about or criticism of oneself." },
             { word: "Platitude", meaning: "A remark or statement, especially one with a moral content, that has been used too often to be interesting or thoughtful." },
             { word: "Alienation", meaning: "The state or experience of being isolated from a group or an activity to which one should belong or in which one should be involved." }
-        ]
+        ],
+        lineByLineExplanation: `**The Arrival and First Doubt**
+Mabel arrives at Mrs. Dalloway's party. Her first thought upon seeing herself in a mirror is one of profound self-doubt: "No. It was not 'right'." This immediately establishes her internal conflict. She feels her new yellow dress is inappropriate and old-fashioned compared to the other guests' attire.
+
+**The "Fly in the Saucer" Metaphor**
+Her insecurity deepens into a powerful metaphor. She sees herself and all of humanity as flies trying to crawl out of a saucer of milk—struggling, making things messy, and ultimately failing to reach the "brim." This image represents her feeling of helplessness, social awkwardness, and the futility of her efforts to fit in.
+
+**Internal Monologue and Social Interactions**
+The narrative follows Mabel's stream of consciousness as she interacts with guests. Externally, she is polite and makes small talk with people like Rose Shaw. Internally, however, she is in torment, imagining they are all judging her. She feels her conversations are hollow and insincere. Every compliment she receives about her dress, she interprets as pity or mockery.
+
+**Memories and Insecurities**
+Mabel's thoughts drift back to her past, her childhood, her "obscure" family, and her marriage. She remembers the process of choosing the dress pattern from an old fashion magazine and her sessions with the dressmaker, Miss Milan. At the time, she felt creative and original, but now, in the context of the party, she sees her choice as pathetic and out of touch. This reveals that her insecurity is rooted in her perception of her social and economic class.
+
+**Fantasies of Escape**
+Overwhelmed by her anxiety, Mabel fantasizes about escaping her current self. She imagines a new life where she can be her "real" self—someone who reads books, lives in the country, and is free from the pressure of social gatherings. This desire for a different life is a coping mechanism for her present misery.
+
+**The Departure**
+Unable to bear the self-inflicted psychological torture any longer, Mabel decides to leave the party. She says a quick, awkward goodbye to Mrs. Dalloway, still feeling like a failure. As she leaves, she repeats the words, "Lies, lies, lies!" This signifies her feeling that her entire social performance, and perhaps her entire life, is built on a foundation of pretense and insincerity. Her final thought is about her own "cowardice," as she runs away from the situation rather than confronting her feelings.`
     },
     {
         id: 6,
@@ -147,7 +243,24 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Avifauna", meaning: "The birds of a particular region, habitat, or geological period." },
             { word: "Languor", meaning: "The state or feeling, often pleasant, of tiredness or inertia." },
             { word: "Sanctum sanctorum", meaning: "A very private or sacred place." }
-        ]
+        ],
+        lineByLineExplanation: `**Part I: Lost in the Jungle**
+
+**Setting the Scene:** The author narrates his experience working as a naturalist in Navegaon National Park. He is stationed in a village called Umbarzara, living a solitary life in a basic room, which allows him to be close to nature. His daily routine involves exploring the jungle, observing wildlife, and learning from the local villagers.
+
+**A Typical Day:** He describes a typical afternoon where he goes into the forest. He is deeply absorbed in observing the sights and sounds of the jungle—the chirping of birds, the rustling of leaves, the calls of different animals. This section highlights his deep connection and familiarity with the forest environment.
+
+**Getting Lost:** As evening approaches, he ventures too far into the jungle while following a trail. He loses his bearings and realizes he is lost. The narrative builds tension as the sun sets and the jungle transforms from a place of beauty to one of potential danger. He describes his feelings of anxiety and the "numbing" of his senses as he tries to find his way back.
+
+**Part II: The Encounter**
+
+**Signs of a Predator:** While desperately trying to find a path, he hears the alarm calls of a langur, followed by other animals. As a naturalist, he immediately understands that these calls signal the presence of a large predator like a leopard or tiger. His fear intensifies.
+
+**Face to Face with the Leopard:** He follows the sounds cautiously. Suddenly, he sees a leopard on a rock nearby. The author describes the animal in detail—its color, its muscular body, and its intense gaze. He freezes, filled with a mix of terror and awe. There is a tense moment where man and beast stare at each other.
+
+**The Leopard's Retreat:** The leopard, after a few moments, seems to lose interest. It snarls, turns, and disappears back into the wilderness. The author is left shaken but unharmed.
+
+**Reflection and Realization:** The encounter has a profound effect on him. He realizes the raw power and unpredictability of nature. He understands that in the jungle, he is just a "puny" and insignificant creature. The experience deepens his respect for the wild and reinforces his understanding that humans are merely visitors in this domain. He eventually finds his way back, carrying with him the unforgettable memory of the encounter.`
     },
     {
         id: 7,
@@ -166,7 +279,24 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Introspection", meaning: "The examination or observation of one's own mental and emotional processes." },
             { word: "Abstract", meaning: "Existing in thought or as an idea but not having a physical or concrete existence." },
             { word: "Paradox", meaning: "A seemingly absurd or self-contradictory statement or proposition that when investigated or explained may prove to be well founded or true." }
-        ]
+        ],
+        lineByLineExplanation: `**Introduction: Beyond Simple Movement**
+Iyer starts by establishing that real travel is more than just motion. While we can move around physically, true travel is about a change in perspective. He argues the first question is not where we are going, but *why*.
+
+**Travel to Lose Ourselves**
+The first major point is a paradox: we travel to lose ourselves. By leaving behind our familiar identity—our job, our social roles, our daily routines—we become anonymous. This anonymity is liberating. It allows us to become a "blank slate" and see the world without the filter of our own preconceived notions.
+
+**Travel to Find Ourselves**
+The other side of the paradox is that in losing ourselves, we find ourselves. When we are stripped of our usual context, we are forced to confront who we really are. We rely on our inner resources. Travel also helps us see our own life from a distance, allowing us to appreciate what we have or realize what we need to change.
+
+**The World as a Source of Wonder**
+Iyer argues that travel makes us "younger" by restoring a sense of wonder. In a foreign place, everything is new and strange. Simple tasks like buying a stamp or asking for directions become adventures. This heightened state of awareness is what makes travel so enriching. We are forced to pay attention in a way we rarely do at home.
+
+**Bringing a New Perspective Home**
+The ultimate goal of travel, according to Iyer, is not to stay in a foreign place forever but to bring a transformed self back home. We return with new ideas, a better understanding of the world, and a renewed appreciation for our own life. The "foreign" perspectives we gain help us see our own "provincial" or narrow viewpoints.
+
+**The Inner Journey**
+Iyer concludes by emphasizing that the real journey is always internal. The outer world is just a mirror or a catalyst for what happens inside us. Travel is a "strategy for renewing our vision." The most important discoveries we make are not on a map, but within our own minds and hearts.`
     },
     {
         id: 8,
@@ -190,6 +320,23 @@ export const hscEnglishProse: HscProseChapter[] = [
             { word: "Holistic", meaning: "Characterized by the belief that the parts of something are intimately interconnected and explicable only by reference to the whole." },
             { word: "Inferiority Complex", meaning: "An unrealistic feeling of general inadequacy caused by actual or supposed inferiority in one sphere, sometimes marked by aggressive behavior in compensation." },
             { word: "Prolific", meaning: "(Of an artist, author, or composer) producing many works." }
-        ]
+        ],
+        lineByLineExplanation: `**Part I: Overcoming Inferiority**
+The author begins by describing his background. He was a successful student in his Marathi-medium school but developed a severe inferiority complex upon joining IIT Bombay. He felt his English was poor, his vocabulary weak, and his general knowledge limited compared to his peers from more privileged backgrounds. This created a feeling of depression and a desire to run away.
+
+**Part II: The Thirst for Knowledge**
+Godbole decides to fight back. He realizes that the key to overcoming his complex is not just academic success but a broader quest for knowledge. He develops a "thirst for knowledge" and begins to read voraciously on a wide range of subjects outside of his engineering curriculum, including literature, philosophy, economics, and art. This helps him build confidence and a more rounded personality.
+
+**Part III: The Importance of Humanities**
+He argues that studying science and technology is not enough. True excellence requires an understanding of the arts, literature, and social sciences. This holistic approach helps one understand the world and human nature more deeply. He gives examples of how he delved into music, painting, and literature, which enriched his life and thinking.
+
+**Part IV: Professional Success**
+Godbole narrates his successful career in the IT industry. He joins Patni Computer Systems (PCS) and quickly rises through the ranks, becoming a General Manager at a young age. He credits his success to his problem-solving skills, hard work, and the broad perspective he gained from his diverse studies. He emphasizes that there is no shortcut to the top; it requires dedication and continuous learning.
+
+**Part V: A New Voyage as an Author**
+After a long and successful corporate career, he embarks on a new "voyage" as a writer. He begins writing books in Marathi on a variety of subjects, from science and technology to music and economics. This new phase of his life is a continuation of his lifelong passion for learning and sharing knowledge.
+
+**Conclusion: The Never-Ending Journey**
+The author concludes that his life has been a continuous journey or "voyage" towards excellence. He stresses that excellence is not a destination but a process. It is about having a thirst for knowledge, working hard, and constantly striving to be better. This spirit of curiosity and perseverance is the central message of his story.`
     }
 ];

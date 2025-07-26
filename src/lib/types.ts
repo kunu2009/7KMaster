@@ -2,6 +2,7 @@
 
 
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -182,6 +183,7 @@ export interface HscProseChapter {
         word: string;
         meaning: string;
     }[];
+    lineByLineExplanation?: string;
 }
 
 

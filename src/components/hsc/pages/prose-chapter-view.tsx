@@ -4,7 +4,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookText, Users, Lightbulb, ListOrdered, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookText, Users, Lightbulb, ListOrdered, GraduationCap, FileText } from "lucide-react";
 import type { HscProseChapter } from "@/lib/types";
 
 interface ProseChapterViewProps {
@@ -29,6 +29,7 @@ export function ProseChapterView({ chapter, onBack }: ProseChapterViewProps) {
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="summary"><BookText className="mr-2 h-4 w-4"/>Summary</TabsTrigger>
+          <TabsTrigger value="explanation"><FileText className="mr-2 h-4 w-4"/>Explanation</TabsTrigger>
           <TabsTrigger value="characters"><Users className="mr-2 h-4 w-4"/>Characters</TabsTrigger>
           <TabsTrigger value="theme"><Lightbulb className="mr-2 h-4 w-4"/>Theme</TabsTrigger>
           <TabsTrigger value="glossary"><GraduationCap className="mr-2 h-4 w-4"/>Glossary</TabsTrigger>
@@ -48,6 +49,16 @@ export function ProseChapterView({ chapter, onBack }: ProseChapterViewProps) {
                     <h3 className="font-semibold mb-2">Detailed Summary</h3>
                     <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{chapter.summaries.detailed}</p>
                 </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="explanation" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Line-by-Line / Paragraph Explanation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{chapter.lineByLineExplanation}</p>
             </CardContent>
           </Card>
         </TabsContent>
