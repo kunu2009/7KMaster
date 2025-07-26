@@ -13,7 +13,7 @@ import {z} from 'genkit';
 
 const GenerateBlockTasksInputSchema = z.object({
   blockTitle: z.string().describe("The title or theme of the time block (e.g., 'Focus Block', 'Admin')."),
-  taskType: z.enum(['Project-related', 'Skill-related', 'LawPrep Study', 'Itihas Study', 'HSC Study']).describe("The specific type of task to generate."),
+  taskType: z.enum(['Project-related', 'Skill-related', 'LawPrep Study', 'Itihas Study', 'HSC English', 'HSC Sanskrit', 'HSC Hindi', 'HSC Economics', 'HSC Political Science']).describe("The specific type of task to generate."),
   existingTasks: z.array(z.string()).describe("A list of tasks already in this time block."),
   projects: z.array(z.object({
     name: z.string(),
@@ -75,7 +75,11 @@ Based on the requested task type and the context, generate 2-3 new, concise, and
 - If the type is 'Skill-related', suggest tasks based on the skill development goals.
 - If the type is 'LawPrep Study', suggest a specific law study task like "Review Tort Law notes for 15 mins" or "Complete 10 MCQs on Constitutional Law".
 - If the type is 'Itihas Study', suggest a specific history study task like "Read chapter on the Mughal Empire" or "Make flashcards for the Harappan Civilization".
-- If the type is 'HSC Study', suggest a specific 12th Std study task like "Solve 2 exercises for HSC English" or "Revise the summary of 'The Inchcape Rock'".
+- If the type is 'HSC English', suggest a specific English study task like "Summarize the poem 'The Inchcape Rock'" or "Practice writing a counter-view on a given topic".
+- If the type is 'HSC Sanskrit', suggest a task like "Translate 5 verses from a chapter" or "Revise grammar rules for Sandhi".
+- If the type is 'HSC Hindi', suggest a task like "Write a summary of a prose chapter" or "Practice 'Vakya Shuddhi'".
+- If the type is 'HSC Economics', suggest a task like "Explain the Law of Demand with a diagram" or "Revise features of Microeconomics".
+- If the type is 'HSC Political Science', suggest a task like "Analyze the role of the UN" or "Summarize the key events of the Cold War".
 `,
 });
 

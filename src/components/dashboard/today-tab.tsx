@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy } from 'lucide-react';
+import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import {
   initialTodayTasks,
@@ -31,6 +31,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu"
 
 
@@ -97,7 +101,7 @@ export function TodayTab() {
     }
   };
 
-  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study' | 'HSC Study') => {
+  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study' | 'HSC English' | 'HSC Sanskrit' | 'HSC Hindi' | 'HSC Economics' | 'HSC Political Science') => {
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
@@ -215,10 +219,21 @@ export function TodayTab() {
                                         <ScrollText className="mr-2 h-4 w-4"/>
                                         <span>Itihas Study</span>
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Study')}>
-                                        <BookCopy className="mr-2 h-4 w-4"/>
-                                        <span>HSC Study</span>
-                                      </DropdownMenuItem>
+                                      <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            <BookCopy className="mr-2 h-4 w-4"/>
+                                            <span>HSC Study</span>
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC English')}><EnglishIcon className="mr-2 h-4 w-4"/>English</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Sanskrit')}><Languages className="mr-2 h-4 w-4"/>Sanskrit</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Hindi')}><Languages className="mr-2 h-4 w-4"/>Hindi</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Economics')}><TrendingUp className="mr-2 h-4 w-4"/>Economics</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Political Science')}><Vote className="mr-2 h-4 w-4"/>Political Science</DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                      </DropdownMenuSub>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                )}
