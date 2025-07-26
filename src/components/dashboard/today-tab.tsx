@@ -19,9 +19,10 @@ import {
   initialProjects,
   initialSkills,
 } from "@/lib/data";
+import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
 import type { TodayTask, Project, Skill, AggregatedTodo } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
-import { generateBlockTasks } from "@/ai/flows/generate-block-tasks-flow";
+import { generateBlockTasks, GenerateBlockTasksInput } from "@/ai/flows/generate-block-tasks-flow";
 import { useToast } from "@/hooks/use-toast";
 import { PomodoroTimer } from "./pomodoro-timer";
 import { AddTodayTask } from "./add-today-task";
@@ -101,17 +102,25 @@ export function TodayTab() {
     }
   };
 
-  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study' | 'HSC English' | 'HSC Sanskrit' | 'HSC Hindi' | 'HSC Economics' | 'HSC Political Science') => {
+  const handleGenerateBlockTasks = async (taskType: GenerateBlockTasksInput['taskType'], blockTitle: string) => {
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
-        const result = await generateBlockTasks({
+        
+        const input: GenerateBlockTasksInput = {
             blockTitle,
             taskType,
             existingTasks,
             projects: projects.map(({ name, nextAction }) => ({ name, nextAction })),
             skills: skills.map(({ area, weeklyGoal }) => ({ area, weeklyGoal })),
-        });
+        };
+        
+        if (taskType === 'HSC English') {
+            input.hscEnglish = [...hscEnglishProse.map(p => p.title), ...hscEnglishPoetry.map(p => p.title)];
+        }
+        // TODO: Add context for other HSC subjects when data is available
+        
+        const result = await generateBlockTasks(input);
 
         if (result.tasks && result.tasks.length > 0) {
             const newTasks: TodayTask[] = result.tasks.map(taskText => ({
@@ -203,19 +212,19 @@ export function TodayTab() {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Project-related')}>
+                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks('Project-related', groupName)}>
                                         <GanttChartSquare className="mr-2 h-4 w-4"/>
                                         <span>Project Task</span>
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Skill-related')}>
+                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks('Skill-related', groupName)}>
                                         <BrainCircuit className="mr-2 h-4 w-4"/>
                                         <span>Skill Task</span>
                                       </DropdownMenuItem>
-                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'LawPrep Study')}>
+                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks('LawPrep Study', groupName)}>
                                         <Scale className="mr-2 h-4 w-4"/>
                                         <span>LawPrep Study</span>
                                       </DropdownMenuItem>
-                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Itihas Study')}>
+                                       <DropdownMenuItem onClick={() => handleGenerateBlockTasks('Itihas Study', groupName)}>
                                         <ScrollText className="mr-2 h-4 w-4"/>
                                         <span>Itihas Study</span>
                                       </DropdownMenuItem>
@@ -226,11 +235,11 @@ export function TodayTab() {
                                         </DropdownMenuSubTrigger>
                                         <DropdownMenuPortal>
                                             <DropdownMenuSubContent>
-                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC English')}><EnglishIcon className="mr-2 h-4 w-4"/>English</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Sanskrit')}><Languages className="mr-2 h-4 w-4"/>Sanskrit</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Hindi')}><Languages className="mr-2 h-4 w-4"/>Hindi</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Economics')}><TrendingUp className="mr-2 h-4 w-4"/>Economics</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Political Science')}><Vote className="mr-2 h-4 w-4"/>Political Science</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks('HSC English', groupName)}><EnglishIcon className="mr-2 h-4 w-4"/>English</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks('HSC Sanskrit', groupName)}><Languages className="mr-2 h-4 w-4"/>Sanskrit</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks('HSC Hindi', groupName)}><Languages className="mr-2 h-4 w-4"/>Hindi</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks('HSC Economics', groupName)}><TrendingUp className="mr-2 h-4 w-4"/>Economics</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleGenerateBlockTasks('HSC Political Science', groupName)}><Vote className="mr-2 h-4 w-4"/>Political Science</DropdownMenuItem>
                                             </DropdownMenuSubContent>
                                         </DropdownMenuPortal>
                                       </DropdownMenuSub>

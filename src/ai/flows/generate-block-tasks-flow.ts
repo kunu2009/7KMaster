@@ -23,6 +23,11 @@ const GenerateBlockTasksInputSchema = z.object({
     area: z.string(),
     weeklyGoal: z.string(),
   })).describe('A list of skills the user is developing for context.'),
+   hscEnglish: z.array(z.string()).optional().describe("A list of HSC English chapter and poem titles."),
+   hscSanskrit: z.array(z.string()).optional().describe("A list of HSC Sanskrit chapter and poem titles."),
+   hscHindi: z.array(z.string()).optional().describe("A list of HSC Hindi chapter and poem titles."),
+   hscEconomics: z.array(z.string()).optional().describe("A list of HSC Economics chapter titles."),
+   hscPoliticalScience: z.array(z.string()).optional().describe("A list of HSC Political Science chapter titles."),
 });
 export type GenerateBlockTasksInput = z.infer<typeof GenerateBlockTasksInputSchema>;
 
@@ -69,17 +74,34 @@ Skills:
     No skills.
 {{/if}}
 
+{{#if hscEnglish}}
+HSC English Syllabus: {{#each hscEnglish}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if hscSanskrit}}
+HSC Sanskrit Syllabus: {{#each hscSanskrit}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if hscHindi}}
+HSC Hindi Syllabus: {{#each hscHindi}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if hscEconomics}}
+HSC Economics Syllabus: {{#each hscEconomics}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if hscPoliticalScience}}
+HSC Political Science Syllabus: {{#each hscPoliticalScience}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+
+
 Based on the requested task type and the context, generate 2-3 new, concise, and actionable task descriptions.
 
 - If the type is 'Project-related', suggest tasks based on the project next actions.
 - If the type is 'Skill-related', suggest tasks based on the skill development goals.
 - If the type is 'LawPrep Study', suggest a specific law study task like "Review Tort Law notes for 15 mins" or "Complete 10 MCQs on Constitutional Law".
 - If the type is 'Itihas Study', suggest a specific history study task like "Read chapter on the Mughal Empire" or "Make flashcards for the Harappan Civilization".
-- If the type is 'HSC English', suggest a specific English study task like "Summarize the poem 'The Inchcape Rock'" or "Practice writing a counter-view on a given topic".
-- If the type is 'HSC Sanskrit', suggest a task like "Translate 5 verses from a chapter" or "Revise grammar rules for Sandhi".
-- If the type is 'HSC Hindi', suggest a task like "Write a summary of a prose chapter" or "Practice 'Vakya Shuddhi'".
-- If the type is 'HSC Economics', suggest a task like "Explain the Law of Demand with a diagram" or "Revise features of Microeconomics".
-- If the type is 'HSC Political Science', suggest a task like "Analyze the role of the UN" or "Summarize the key events of the Cold War".
+- If the type is 'HSC English', suggest a specific English study task related to one of the provided syllabus chapters. For example, "Summarize the poem 'The Inchcape Rock'" or "Practice writing a counter-view on a given topic based on 'The New Dress'".
+- If the type is 'HSC Sanskrit', suggest a task like "Translate 5 verses from a specific chapter" or "Revise grammar rules for Sandhi".
+- If the type is 'HSC Hindi', suggest a task like "Write a summary of a prose chapter" or "Practice 'Vakya Shuddhi' based on a chapter".
+- If the type is 'HSC Economics', suggest a task like "Explain the Law of Demand with a diagram" or "Revise features of Microeconomics based on the provided syllabus".
+- If the type is 'HSC Political Science', suggest a task like "Analyze the role of the UN" or "Summarize the key events of the Cold War based on the provided syllabus".
 `,
 });
 

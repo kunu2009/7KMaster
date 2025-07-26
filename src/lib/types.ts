@@ -1,5 +1,6 @@
 
 
+
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
