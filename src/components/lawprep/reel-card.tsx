@@ -15,7 +15,7 @@ export function ReelCard({ reel }: ReelCardProps) {
   const LucideIcon = icons[reel.icon as keyof typeof icons] || AlertTriangle;
 
   return (
-    <div className="h-full w-full snap-start flex items-center justify-center p-4 md:p-8">
+    <div className="h-full w-full snap-start flex items-center justify-center p-4 sm:p-8">
       <Card className={cn(
         "w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl",
         "bg-gradient-to-br from-primary/10 via-background to-background",
@@ -31,7 +31,7 @@ export function ReelCard({ reel }: ReelCardProps) {
           </p>
         </CardContent>
         <div className="text-center text-muted-foreground text-xs">
-          LawPrep Sprint
+          7K Universe
         </div>
       </Card>
     </div>
