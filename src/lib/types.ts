@@ -184,6 +184,15 @@ export interface HscProseChapter {
         meaning: string;
     }[];
     lineByLineExplanation?: string;
+    qa?: {
+        seenPassages: {
+            passage: string;
+            questions: { question: string; answer: string; }[];
+        }[];
+        shortQuestions: { question: string; answer: string; }[];
+        longQuestions: { question: string; answer: string; }[];
+        grammarQuestions: { question: string; answer: string; }[];
+    };
 }
 
 

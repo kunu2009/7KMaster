@@ -45,7 +45,54 @@ The astrologer begins his usual routine, but as he looks at the man's face in th
 Forced to continue, the astrologer uses his secret knowledge. He "divines" that the stranger was once stabbed with a knife and left for dead in a well. He correctly names the man, Guru Nayak, further astonishing him. The astrologer then fabricates a story that the attacker was crushed under a lorry and is now dead, bringing a sense of closure to Guru Nayak's quest for revenge. He warns Nayak to stay away from his village to avoid future danger.
 
 **Paragraph 21-25: The Confession and Relief**
-Guru Nayak, completely convinced, pays the astrologer and leaves. The astrologer returns home and, in a moment of honesty with his wife, reveals the truth. He confesses that he thought he had murdered a man years ago in a drunken fight. Seeing Guru Nayak alive has lifted a great weight of guilt from his conscience. He can now sleep peacefully, free from the fear of being a murderer.`
+Guru Nayak, completely convinced, pays the astrologer and leaves. The astrologer returns home and, in a moment of honesty with his wife, reveals the truth. He confesses that he thought he had murdered a man years ago in a drunken fight. Seeing Guru Nayak alive has lifted a great weight of guilt from his conscience. He can now sleep peacefully, free from the fear of being a murderer.`,
+        qa: {
+            seenPassages: [
+                {
+                    passage: "He had a working analysis of mankind’s troubles: marriage, money, and the tangles of human ties. Long practice had sharpened his perception. Within five minutes he understood what was wrong. He charged three pies per question, never opened his mouth till the other had spoken for at least ten minutes, which provided him enough stuff for a dozen answers and advices.",
+                    questions: [
+                        {
+                            question: "What was the astrologer's method for understanding his clients' problems?",
+                            answer: "The astrologer's method was to let the client speak for at least ten minutes. This gave him enough information about their life and troubles to provide a dozen convincing answers and pieces of advice. He relied on long practice and perception, not astrology."
+                        },
+                        {
+                            question: "What were the common troubles of mankind according to the astrologer?",
+                            answer: "According to the astrologer, the common troubles of mankind were marriage, money, and the complexities of human relationships."
+                        },
+                         {
+                            question: "What does the phrase 'sharpened his perception' mean in this context?",
+                            answer: "It means that through continuous practice over a long time, his ability to observe, understand, and make shrewd judgments about people had become very keen and accurate."
+                        }
+                    ]
+                }
+            ],
+            shortQuestions: [
+                {
+                    question: "Why did the astrologer leave his village?",
+                    answer: "He left his village because he had stabbed a man in a drunken quarrel and, believing he had killed him, fled to escape the consequences."
+                },
+                {
+                    question: "How did the astrologer give Guru Nayak a sense of closure?",
+                    answer: "He convinced Guru Nayak that the man who attacked him was dead, having been crushed under a lorry. This ended Nayak's quest for revenge."
+                }
+            ],
+            longQuestions: [
+                {
+                    question: "Describe the role of irony in 'An Astrologer's Day'.",
+                    answer: "Irony is central to the story. The greatest irony is that the astrologer, a fake, gives his most accurate and life-altering prediction to the very man he once tried to kill. He saves his own life by telling a lie (that the attacker is dead) which is based on a profound truth (he *is* the attacker). Furthermore, the client, Guru Nayak, seeks truth and revenge but leaves satisfied with a complete fabrication. The final irony is that the astrologer's relief comes not from his successful deception, but from the accidental discovery that his victim is alive, freeing him from a lifetime of guilt."
+                }
+            ],
+            grammarQuestions: [
+                {
+                    question: "He charged three pies per question. (Rewrite using the past perfect continuous tense)",
+                    answer: "He had been charging three pies per question."
+                },
+                {
+                    question: "Long practice had sharpened his perception. (Change the voice)",
+                    answer: "His perception had been sharpened by long practice."
+                }
+            ]
+        }
     },
     {
         id: 2,
