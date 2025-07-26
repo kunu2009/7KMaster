@@ -24,6 +24,7 @@ import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
 import { generateBlockTasks } from "@/ai/flows/generate-block-tasks-flow";
 import { useToast } from "@/hooks/use-toast";
 import { PomodoroTimer } from "./pomodoro-timer";
+import { AddTodayTask } from "./add-today-task";
 import { ScrollArea } from "../ui/scroll-area";
 
 
@@ -65,6 +66,10 @@ export function TodayTab() {
         task.id === id ? { ...task, done: !task.done } : task
       )
     );
+  };
+  
+  const handleAddTask = (newTask: TodayTask) => {
+    setTasks(prev => [...prev, newTask]);
   };
   
   const handleGeneratePlan = async () => {
@@ -232,7 +237,8 @@ export function TodayTab() {
               )}
             </Card>
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
+            <AddTodayTask onAddTask={handleAddTask} />
             <PomodoroTimer focusedTask={focusedTask} onPomodoroComplete={handlePomodoroComplete} />
         </div>
     </div>
