@@ -16,6 +16,7 @@ const poetryChapters = [
     { title: "Father Returning Home", author: "Dilip Chitre" },
     { title: "Money", author: "W.H. Davies" },
     { title: "She Walks in Beauty", author: "Lord Byron" },
+    { title: "Small Towns and Rivers", author: "Mamang Dai" },
 ];
 
 const writingSkills = [

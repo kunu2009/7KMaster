@@ -1,8 +1,4 @@
 
-
-
-
-
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 
 export type AggregatedTodo = {
@@ -193,6 +189,30 @@ export interface HscProseChapter {
         longQuestions: { question: string; answer: string; }[];
         grammarQuestions: { question: string; answer: string; }[];
     };
+}
+
+export interface HscPoetryChapter {
+    id: number;
+    title: string;
+    author: string;
+    contentAvailable: boolean;
+    poemText: string;
+    summaries: {
+        overall: string;
+        stanzaWise: string;
+    };
+    centralIdea: string;
+    figuresOfSpeech: {
+        name: string;
+        line: string;
+        explanation: string;
+    }[];
+    poeticDevices: {
+        rhymeScheme: string;
+        alliteration?: string;
+        repetition?: string;
+    };
+    appreciation: string;
 }
 
 
