@@ -11,8 +11,8 @@ export function LawReels() {
           Scroll through quick, memorable legal facts and concepts.
         </p>
       </div>
-      <div className="flex-1 relative">
-        <div className="absolute inset-0 h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg border bg-muted/20">
+      <div className="flex-1 relative -m-4 sm:-m-6">
+        <div className="absolute inset-0 h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg">
           {reels.map((reel) => (
             <ReelCard key={reel.id} reel={reel} />
           ))}
@@ -21,3 +21,4 @@ export function LawReels() {
     </div>
   );
 }
+

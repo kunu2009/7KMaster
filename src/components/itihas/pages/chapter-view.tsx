@@ -83,8 +83,8 @@ export function ItihasChapterView({ chapter }: ItihasChapterViewProps) {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="reels" className="mt-4">
-           <div className="h-[calc(100vh-15rem)] w-full overflow-y-auto snap-y snap-mandatory rounded-lg border bg-muted/20">
+        <TabsContent value="reels" className="mt-4 -m-4 sm:-m-6">
+           <div className="h-[calc(100vh-13rem)] w-full overflow-y-auto snap-y snap-mandatory rounded-lg">
               {chapter.reels.map((reel) => (
                 <ReelCard key={reel.id} reel={reel} />
               ))}
