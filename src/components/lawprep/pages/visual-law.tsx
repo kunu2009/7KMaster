@@ -37,7 +37,7 @@ export function LawVisual() {
       try {
         const response = await generateVisualLaw({ topic: selectedTopic });
         if (response && response.imageUrl && response.description) {
-          const htmlDescription = await marked(response.description);
+          const htmlDescription = await marked.parse(response.description);
           setGeneratedVisual({ ...response, description: htmlDescription });
         } else {
           throw new Error('Invalid response from AI.');

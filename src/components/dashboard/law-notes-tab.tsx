@@ -44,7 +44,7 @@ export function LawNotesTab() {
         <p className="text-muted-foreground">Select a topic from the dropdown to see detailed reference notes.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[280px_1fr]">
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-[280px_1fr]">
         <div className="flex flex-col gap-4">
            <h3 className="text-lg font-semibold">Select Topic</h3>
            <Select onValueChange={handleTopicChange} defaultValue={selectedTopic}>

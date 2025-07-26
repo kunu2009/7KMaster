@@ -27,7 +27,7 @@ export function LawMoodStudy() {
       try {
         const response = await suggestStudyActivity({ mood: moodPrompt });
         if (response && response.suggestion) {
-          const html = await marked(response.suggestion);
+          const html = await marked.parse(response.suggestion);
           setSuggestion(html);
         } else {
           throw new Error("Invalid response from AI.");

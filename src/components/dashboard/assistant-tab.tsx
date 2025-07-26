@@ -295,7 +295,7 @@ export function AssistantTab() {
             <CollapsibleContent className="space-y-4 pt-2">
                 <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Smart Prompts</Label>
-                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
                         <Button variant="outline" size="sm" onClick={() => handleSmartPrompt("Summarize my week's progress and identify potential wins and blockers.")} disabled={isLoading}>
                             <Sparkles className="mr-2 h-4 w-4" /> Summarize Week
                         </Button>

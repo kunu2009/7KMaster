@@ -20,16 +20,16 @@ export function LawCareer() {
 
       <Accordion type="single" collapsible className="w-full space-y-4">
         {careerRoadmaps.map((path) => (
-          <AccordionItem key={path.id} value={path.id} className="border rounded-lg px-6 bg-card">
-            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+          <AccordionItem key={path.id} value={path.id} className="border rounded-lg px-4 sm:px-6 bg-card">
+            <AccordionTrigger className="text-lg font-semibold hover:no-underline text-left">
               {path.title}
             </AccordionTrigger>
             <AccordionContent className="pt-2">
               <p className="text-muted-foreground mb-6">{path.description}</p>
-              <div className="space-y-6 border-l-2 border-primary pl-6">
+              <div className="space-y-6 border-l-2 border-primary pl-4 sm:pl-6">
                 {path.steps.map((step, index) => (
                   <div key={index} className="relative">
-                    <div className="absolute -left-[34px] top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <div className="absolute -left-[26px] sm:-left-[34px] top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <CheckCircle2 className="h-5 w-5" />
                     </div>
                     <h4 className="font-semibold text-md mb-1">{step.title}</h4>

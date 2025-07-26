@@ -13,6 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { caseSimulations } from "@/lib/law-data";
 import type { CaseSimulation } from "@/lib/types";
+import { marked } from "marked";
+
 
 interface Message {
   role: "user" | "assistant";
@@ -81,6 +83,11 @@ export function LawCourtroomSim() {
       }
     });
   };
+  
+  const parseContent = (content: string) => {
+      const html = marked.parse(content, { gfm: true, breaks: true });
+      return { __html: html };
+  }
 
   if (!selectedCase) {
     return (
@@ -89,7 +96,7 @@ export function LawCourtroomSim() {
           <h1 className="text-2xl font-bold tracking-tight">Courtroom Simulation</h1>
           <p className="text-muted-foreground">Select a case to begin your mock trial against our AI Judge.</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
           {caseSimulations.map((simCase) => (
             <Card key={simCase.id} className="hover:border-primary transition-colors">
               <CardHeader>
@@ -114,17 +121,17 @@ export function LawCourtroomSim() {
         <p className="text-muted-foreground">The court is in session. Present your arguments to the AI Judge.</p>
       </div>
       <Card className="flex flex-col flex-1">
-        <CardContent className="flex flex-col flex-1 p-4 gap-4">
+        <CardContent className="flex flex-col flex-1 p-2 sm:p-4 gap-4">
           <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
             <div className="space-y-6">
               {messages.map((message, index) => (
-                <div key={index} className={cn("flex items-start gap-4", message.role === "user" ? "justify-end" : "")}>
+                <div key={index} className={cn("flex items-start gap-2 sm:gap-4", message.role === "user" ? "justify-end" : "")}>
                   {message.role === "assistant" && (
                     <Avatar className="h-8 w-8"><AvatarFallback><Scale size={20}/></AvatarFallback></Avatar>
                   )}
-                  <div className={cn("max-w-xl rounded-lg px-4 py-3 text-sm", message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted")}>
-                    {message.content}
-                  </div>
+                  <div className={cn("max-w-xl rounded-lg px-4 py-3 text-sm prose dark:prose-invert prose-p:my-0", message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted")}
+                       dangerouslySetInnerHTML={parseContent(message.content)}
+                  />
                   {message.role === "user" && (
                     <Avatar className="h-8 w-8"><AvatarFallback><User size={20}/></AvatarFallback></Avatar>
                   )}

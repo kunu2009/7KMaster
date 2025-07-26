@@ -22,7 +22,7 @@ export function LawPlanner() {
         <h1 className="text-2xl font-bold tracking-tight">Study Planner</h1>
         <p className="text-muted-foreground">Organize your study schedule and set reminders.</p>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-[400px_1fr]">
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-[auto_1fr]">
         <Card className="flex flex-col">
            <CardHeader>
             <CardTitle>Your Calendar</CardTitle>
@@ -35,7 +35,7 @@ export function LawPlanner() {
                 onSelect={setSelectedDate}
                 modifiers={{ scheduled: eventDates }}
                 modifiersClassNames={{ scheduled: 'bg-primary/20 rounded-full' }}
-                className="rounded-md border"
+                className="rounded-md border p-0 sm:p-3"
              />
           </CardContent>
         </Card>

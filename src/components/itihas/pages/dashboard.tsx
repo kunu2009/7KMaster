@@ -21,7 +21,7 @@ export function ItihasDashboard({ onSelectChapter }: ItihasDashboardProps) {
                 {itihasChapters.map((chapter) => (
                     <Card key={chapter.id} className="flex flex-col hover:shadow-lg transition-shadow">
                         <CardHeader>
-                            <CardTitle>Chapter {chapter.id}: {chapter.title}</CardTitle>
+                            <CardTitle className="text-lg">Chapter {chapter.id}: {chapter.title}</CardTitle>
                             <CardDescription>{chapter.description}</CardDescription>
                         </CardHeader>
                         <CardContent className="flex-grow">
