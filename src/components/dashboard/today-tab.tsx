@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText } from 'lucide-react';
+import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import {
   initialTodayTasks,
@@ -97,7 +97,7 @@ export function TodayTab() {
     }
   };
 
-  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study') => {
+  const handleGenerateBlockTasks = async (blockTitle: string, taskType: 'Project-related' | 'Skill-related' | 'LawPrep Study' | 'Itihas Study' | 'HSC Study') => {
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
@@ -214,6 +214,10 @@ export function TodayTab() {
                                        <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'Itihas Study')}>
                                         <ScrollText className="mr-2 h-4 w-4"/>
                                         <span>Itihas Study</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleGenerateBlockTasks(groupName, 'HSC Study')}>
+                                        <BookCopy className="mr-2 h-4 w-4"/>
+                                        <span>HSC Study</span>
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
