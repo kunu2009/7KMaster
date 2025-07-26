@@ -12,13 +12,14 @@ export function LawReels() {
         </p>
       </div>
       <div className="flex-1 relative -m-4 sm:-m-6">
-        <div className="absolute inset-0 h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg">
-          {reels.map((reel) => (
-            <ReelCard key={reel.id} reel={reel} />
-          ))}
+        <div className="absolute inset-0 h-full w-full">
+            <div className="h-full w-full overflow-y-auto snap-y snap-mandatory rounded-lg">
+                {reels.map((reel) => (
+                    <ReelCard key={reel.id} reel={reel} />
+                ))}
+            </div>
         </div>
       </div>
     </div>
   );
 }
-
