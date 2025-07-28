@@ -10,8 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { eachDayOfInterval, format, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
 import { ChevronLeft, ChevronRight, Plus, Sparkles, TrendingUp } from 'lucide-react';
+import { NewHabitDialog } from './new-habit-dialog';
+import * as Icons from 'lucide-react';
 
-// TODO: Add dialogs for adding/editing habits
 
 export function HabitTrackerTab() {
   const [habits, setHabits] = useLocalStorage<Habit[]>('habits', initialHabits);
@@ -19,6 +20,10 @@ export function HabitTrackerTab() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const weekDays = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) }), [currentDate]);
+
+  const addHabit = (newHabit: Omit<Habit, 'id'>) => {
+    setHabits(prev => [...prev, { ...newHabit, id: `${Date.now()}` }]);
+  };
 
   const toggleHabit = (habitId: string, date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
@@ -97,6 +102,11 @@ export function HabitTrackerTab() {
       newDate.setDate(newDate.getDate() + amount);
       setCurrentDate(newDate);
   }
+  
+  const LucideIcon = ({ name }: { name: string }) => {
+    const Icon = (Icons as any)[name];
+    return Icon ? <Icon className="h-5 w-5" /> : null;
+  };
 
   return (
     <Card>
@@ -106,9 +116,7 @@ export function HabitTrackerTab() {
                 <CardTitle>Habit Tracker</CardTitle>
                 <CardDescription>Monitor your daily habits and streaks.</CardDescription>
             </div>
-             <Button size="sm" variant="outline" disabled>
-                <Plus className="mr-2 h-4 w-4" /> New Habit
-            </Button>
+             <NewHabitDialog onAddHabit={addHabit} />
         </div>
         <div className="flex items-center justify-center gap-4 pt-4">
             <Button variant="ghost" size="icon" onClick={() => changeWeek('prev')}>
@@ -143,7 +151,10 @@ export function HabitTrackerTab() {
                 <tbody>
                     {habits.map(habit => (
                         <tr key={habit.id} className="border-b">
-                            <td className="p-2 font-medium">{habit.name}</td>
+                            <td className="p-2 font-medium flex items-center gap-2">
+                                <LucideIcon name={habit.icon} />
+                                {habit.name}
+                            </td>
                             {weekDays.map(day => (
                                 <td key={day.toISOString()} className="p-2 text-center">
                                     <Checkbox
