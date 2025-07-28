@@ -36,9 +36,6 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('Activity');
   const { toast } = useToast();
-  
-  // Moved inside the component to prevent module-level execution errors.
-  const iconList = Object.keys(Icons).filter(key => !['createReactComponent', 'icons', 'LucideIcon', 'default'].includes(key));
 
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -105,7 +102,9 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
                 </SelectTrigger>
                 <SelectContent>
                     <ScrollArea className="h-60">
-                        {iconList.map(iconName => (
+                        {Object.keys(Icons)
+                            .filter(key => !['createReactComponent', 'icons', 'LucideIcon', 'default'].includes(key))
+                            .map(iconName => (
                             <SelectItem key={iconName} value={iconName}>
                                 <div className="flex items-center gap-2">
                                     <LucideIcon name={iconName} />
