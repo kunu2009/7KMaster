@@ -27,8 +27,6 @@ import { useToast } from "@/hooks/use-toast";
 import * as Icons from 'lucide-react';
 import { ScrollArea } from "../ui/scroll-area";
 
-const iconList = Object.keys(Icons).filter(key => !['createReactComponent', 'icons', 'LucideIcon'].includes(key));
-
 interface NewHabitDialogProps {
   onAddHabit: (habit: Omit<Habit, 'id'>) => void;
 }
@@ -38,6 +36,9 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('Activity');
   const { toast } = useToast();
+  
+  // Moved inside the component to prevent module-level execution errors.
+  const iconList = Object.keys(Icons).filter(key => !['createReactComponent', 'icons', 'LucideIcon', 'default'].includes(key));
 
   const handleSubmit = () => {
     if (!name.trim()) {
