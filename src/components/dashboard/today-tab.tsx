@@ -249,26 +249,27 @@ export function TodayTab() {
                           </div>
                           <div className="space-y-2">
                             {groupedTasks[groupName].map((task) => (
-                              <div key={task.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50">
-                                <Checkbox
-                                  id={task.id}
-                                  checked={task.completed}
-                                  onCheckedChange={() => handleToggleTask(task.id, task.source)}
-                                  disabled={task.id.startsWith('proj-')}
-                                />
-                                <label
-                                  htmlFor={task.id}
-                                  className={`flex-1 text-sm ${
-                                    task.completed ? "line-through text-muted-foreground" : ""
-                                  }`}
-                                >
-                                  {task.text}
-                                </label>
+                              <div key={task.id} className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
+                                <div className="flex items-center gap-3">
+                                  <Checkbox
+                                    id={task.id}
+                                    checked={task.completed}
+                                    onCheckedChange={() => handleToggleTask(task.id, task.source)}
+                                    disabled={task.id.startsWith('proj-')}
+                                  />
+                                  <label
+                                    htmlFor={task.id}
+                                    className={`text-sm ${
+                                      task.completed ? "line-through text-muted-foreground" : ""
+                                    }`}
+                                  >
+                                    {task.text}
+                                  </label>
+                                </div>
                                  <Button 
                                     size="sm" 
                                     variant={focusedTask?.id === task.id ? "default" : "ghost"}
                                     onClick={() => setFocusedTask(task)}
-                                    className="ml-auto"
                                 >
                                     Focus
                                 </Button>
