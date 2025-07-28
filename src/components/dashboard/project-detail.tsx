@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { Project, Todo, WorkLogEntry, Attachment } from '@/lib/types';
+import type { Project, Todo, WorkLogEntry, Attachment, ProjectStatus } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 
 interface ProjectDetailProps {
@@ -207,13 +208,32 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                 <h3 className="font-semibold text-lg">Edit Project Details</h3>
                  <div className="space-y-4">
-                    <div>
-                        <Label htmlFor="next-action">Next Action</Label>
-                        <Input
-                            id="next-action"
-                            value={editedProject.nextAction}
-                            onChange={(e) => setEditedProject({ ...editedProject, nextAction: e.target.value })}
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="next-action">Next Action</Label>
+                            <Input
+                                id="next-action"
+                                value={editedProject.nextAction}
+                                onChange={(e) => setEditedProject({ ...editedProject, nextAction: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="status">Status</Label>
+                            <Select 
+                                value={editedProject.status} 
+                                onValueChange={(value: ProjectStatus) => setEditedProject({ ...editedProject, status: value })}
+                            >
+                                <SelectTrigger id="status">
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Concept">Concept</SelectItem>
+                                    <SelectItem value="Not Started">Not Started</SelectItem>
+                                    <SelectItem value="In Progress">In Progress</SelectItem>
+                                    <SelectItem value="Completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                      <AlertDialog>
                       <AlertDialogTrigger asChild>
