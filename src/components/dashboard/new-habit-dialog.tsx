@@ -31,6 +31,19 @@ interface NewHabitDialogProps {
   onAddHabit: (habit: Omit<Habit, 'id'>) => void;
 }
 
+// A curated list of icons to avoid dynamic import issues.
+const iconList = [
+    "Activity", "AlarmClock", "Apple", "Award", "Bed", "Bike", "BookOpen", "BrainCircuit",
+    "Briefcase", "Brush", "Calendar", "Camera", "CheckCircle", "ClipboardCheck", "Clock",
+    "Cloud", "Coffee", "CreditCard", "Dumbbell", "Edit", "Eye", "Feather", "Film", "Flame",
+    "Flower", "Folder", "Footprints", "Gamepad2", "GitFork", "Globe", "GraduationCap",
+    "Guitar", "HandHeart", "Headphones", "Heart", "Home", "Image", "Leaf", "Lightbulb",
+    "Mail", "MapPin", "MessageCircle", "Mic", "Moon", "MousePointer", "Music", "PenSquare",
+    "Phone", "Plane", "Puzzle", "Recycle", "Rocket", "Run", "Save", "School", "Scissors",
+    "Settings", "Shield", "ShoppingBag", "Smile", "Sparkles", "Star", "Sunrise", "Sunset",
+    "Target", "Trophy", "Users", "Video", "Wallet", "Watch", "Wind", "Zap"
+];
+
 export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -102,9 +115,7 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
                 </SelectTrigger>
                 <SelectContent>
                     <ScrollArea className="h-60">
-                        {Object.keys(Icons)
-                            .filter(key => !['createReactComponent', 'icons', 'LucideIcon', 'default'].includes(key))
-                            .map(iconName => (
+                        {iconList.map(iconName => (
                             <SelectItem key={iconName} value={iconName}>
                                 <div className="flex items-center gap-2">
                                     <LucideIcon name={iconName} />
@@ -124,3 +135,4 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
     </Dialog>
   );
 }
+
