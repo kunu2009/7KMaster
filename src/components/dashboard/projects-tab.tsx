@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useMemo } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
@@ -10,6 +11,9 @@ import { NewProjectDialog } from "./new-project-dialog";
 import { ProjectDetail } from "./project-detail";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ArrowUpDown } from "lucide-react";
+
 
 const statusColors: Record<ProjectStatus, string> = {
   "In Progress": "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -17,6 +21,8 @@ const statusColors: Record<ProjectStatus, string> = {
   "Concept": "bg-purple-500/20 text-purple-500 border-purple-500/30",
   "Completed": "bg-green-500/20 text-green-500 border-green-500/30",
 };
+
+type SortOption = 'lastWorked' | 'name_asc' | 'name_desc' | 'status';
 
 interface ProjectsTabProps {
   selectedProject: Project | null;
@@ -29,6 +35,7 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
     initialProjects
   );
   const { toast } = useToast();
+  const [sortBy, setSortBy] = useLocalStorage<SortOption>('projectSortOrder', 'lastWorked');
 
   const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
     const fullProject = {
@@ -60,6 +67,29 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
   const handleBackToList = () => {
     onSelectProject(null);
   }
+  
+  const sortedProjects = useMemo(() => {
+    const sortableProjects = [...projects];
+    switch (sortBy) {
+        case 'lastWorked':
+            return sortableProjects.sort((a, b) => {
+                const dateA = new Date(`${a.lastWorked}, ${new Date().getFullYear()}`).getTime();
+                const dateB = new Date(`${b.lastWorked}, ${new Date().getFullYear()}`).getTime();
+                if (isNaN(dateA) || isNaN(dateB)) return 0;
+                return dateB - dateA; // Newest first
+            });
+        case 'name_asc':
+            return sortableProjects.sort((a, b) => a.name.localeCompare(b.name));
+        case 'name_desc':
+            return sortableProjects.sort((a, b) => b.name.localeCompare(a.name));
+        case 'status':
+            const statusOrder: ProjectStatus[] = ['In Progress', 'Not Started', 'Concept', 'Completed'];
+            return sortableProjects.sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+        default:
+            return sortableProjects;
+    }
+  }, [projects, sortBy]);
+
 
   if (selectedProject) {
     // Find the latest version of the project from the list to pass down
@@ -87,12 +117,30 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
               Tracking progress on your suite of applications. Click a project to see details.
             </CardDescription>
           </div>
-          <NewProjectDialog onAddProject={addProject} />
+           <div className="flex items-center gap-2">
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <ArrowUpDown className="mr-2 h-4 w-4" />
+                  Sort By
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuRadioGroup value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+                    <DropdownMenuRadioItem value="lastWorked">Last Worked (Newest)</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="name_asc">Name (A-Z)</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="name_desc">Name (Z-A)</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="status">Status</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <NewProjectDialog onAddProject={addProject} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
+          {sortedProjects.map((project) => (
             <Card key={project.id} className="flex flex-col">
               <CardHeader>
                 <div className="flex justify-between items-start">
