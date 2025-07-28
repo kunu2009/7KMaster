@@ -9,8 +9,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { eachDayOfInterval, format, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
-import { ChevronLeft, ChevronRight, Plus, Sparkles, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Sparkles, TrendingUp, Edit, Trash2 } from 'lucide-react';
 import { NewHabitDialog } from './new-habit-dialog';
+import { EditHabitDialog } from './edit-habit-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import * as Icons from 'lucide-react';
 
 
@@ -23,6 +35,18 @@ export function HabitTrackerTab() {
 
   const addHabit = (newHabit: Omit<Habit, 'id'>) => {
     setHabits(prev => [...prev, { ...newHabit, id: `${Date.now()}` }]);
+  };
+  
+  const updateHabit = (updatedHabit: Habit) => {
+    setHabits(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+  };
+  
+  const deleteHabit = (habitId: string) => {
+    setHabits(prev => prev.filter(h => h.id !== habitId));
+    // Also clean up logs for the deleted habit
+    const newLogs = { ...habitLogs };
+    delete newLogs[habitId];
+    setHabitLogs(newLogs);
   };
 
   const toggleHabit = (habitId: string, date: Date) => {
@@ -132,7 +156,7 @@ export function HabitTrackerTab() {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[600px]">
+            <table className="w-full border-collapse min-w-[700px]">
                 <thead>
                     <tr className="bg-muted/50">
                         <th className="p-2 text-left font-semibold text-sm w-1/3 sm:w-1/4">Habit</th>
@@ -146,6 +170,7 @@ export function HabitTrackerTab() {
                         ))}
                         <th className="p-2 text-center font-semibold text-sm">Streak</th>
                         <th className="p-2 text-center font-semibold text-sm">Weekly</th>
+                        <th className="p-2 text-center font-semibold text-sm">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -175,6 +200,30 @@ export function HabitTrackerTab() {
                                 <div className="flex items-center justify-center gap-1">
                                     <TrendingUp className="h-4 w-4 text-green-500"/>
                                     <span>{getWeeklyProgress(habit.id)}%</span>
+                                </div>
+                            </td>
+                             <td className="p-2 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                    <EditHabitDialog habit={habit} onUpdateHabit={updateHabit} />
+                                     <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will permanently delete the "{habit.name}" habit and all its logs. This action cannot be undone.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => deleteHabit(habit.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </td>
                         </tr>
