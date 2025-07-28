@@ -25,6 +25,7 @@ export type Attachment = { id: string; name: string; url: string; };
 export type Project = {
     id: string;
     name: string;
+    description: string;
     status: ProjectStatus;
     lastWorked: string;
     nextAction: string;

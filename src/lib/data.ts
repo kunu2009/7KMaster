@@ -15,10 +15,10 @@ export const initialTimeBlocks: TimeBlock[] = [
 export const initialTodayTasks: TodayTask[] = [];
 
 export const initialProjects: Project[] = [
-  { id: '1', name: '7K Life', status: 'In Progress', lastWorked: 'July 20', nextAction: 'Add rewards system', todos: [{id: 't1', text: 'Design database schema', completed: true}, {id: 't2', text: 'Implement auth flow', completed: false}], workLog: [{id: 'w1', date: 'July 20', description: 'Finished DB schema design.'}], attachments: [{id: 'a1', name: 'Initial Mockups', url: 'https://www.figma.com'}] },
-  { id: '2', name: '7K Studio', status: 'Not Started', lastWorked: '–', nextAction: 'Sketch video UI', todos: [], workLog: [], attachments: [] },
-  { id: '3', name: 'Stan AI', status: 'Concept', lastWorked: 'July 19', nextAction: 'Integrate Gemini API', todos: [], workLog: [], attachments: [] },
-  { id: '4', name: '7K Game', status: 'Not Started', lastWorked: '–', nextAction: 'Choose engine (Godot?)', todos: [], workLog: [], attachments: [] },
+  { id: '1', name: '7K Life', description: 'A personal dashboard to manage all aspects of life, from projects and skills to daily habits and reflections.', status: 'In Progress', lastWorked: 'July 20', nextAction: 'Add rewards system', todos: [{id: 't1', text: 'Design database schema', completed: true}, {id: 't2', text: 'Implement auth flow', completed: false}], workLog: [{id: 'w1', date: 'July 20', description: 'Finished DB schema design.'}], attachments: [{id: 'a1', name: 'Initial Mockups', url: 'https://www.figma.com'}] },
+  { id: '2', name: '7K Studio', description: 'A creative studio application for generating and editing multimedia content using AI.', status: 'Not Started', lastWorked: '–', nextAction: 'Sketch video UI', todos: [], workLog: [], attachments: [] },
+  { id: '3', name: 'Stan AI', description: 'An AI assistant project focused on integrating large language models for conversational interfaces.', status: 'Concept', lastWorked: 'July 19', nextAction: 'Integrate Gemini API', todos: [], workLog: [], attachments: [] },
+  { id: '4', name: '7K Game', description: 'A game development project, exploring either Godot or another engine for a simple 2D game.', status: 'Not Started', lastWorked: '–', nextAction: 'Choose engine (Godot?)', todos: [], workLog: [], attachments: [] },
 ];
 
 export const initialSkills: Skill[] = [

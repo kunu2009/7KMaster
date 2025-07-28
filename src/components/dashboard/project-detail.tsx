@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -96,7 +97,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
     try {
         const response = await generateProjectTodos({
             projectName: project.name,
-            projectContext: project.nextAction,
+            projectContext: `${project.description} The next immediate action is: ${project.nextAction}`,
             numberOfTodos: 5,
         });
 
@@ -204,10 +205,19 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {isEditing && (
+        {isEditing ? (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                 <h3 className="font-semibold text-lg">Edit Project Details</h3>
                  <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            id="description"
+                            value={editedProject.description}
+                            onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })}
+                            placeholder="What is this project about?"
+                        />
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <Label htmlFor="next-action">Next Action</Label>
@@ -255,6 +265,11 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
                       </AlertDialogContent>
                     </AlertDialog>
                 </div>
+            </div>
+        ) : (
+             <div className="space-y-2">
+                <h3 className="font-semibold text-lg">Description</h3>
+                <p className="text-sm text-muted-foreground">{currentProject.description || "No description provided."}</p>
             </div>
         )}
 

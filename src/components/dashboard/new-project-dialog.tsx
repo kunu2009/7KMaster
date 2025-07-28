@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -30,15 +31,17 @@ interface NewProjectDialogProps {
 export function NewProjectDialog({ onAddProject }: NewProjectDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectStatus>('Concept');
   const [nextAction, setNextAction] = useState('');
 
   const handleSubmit = () => {
       if(name && nextAction) {
-        onAddProject({ name, status, nextAction, todos: [], workLog: [] });
+        onAddProject({ name, description, status, nextAction, todos: [], workLog: [] });
         setOpen(false);
         // Reset fields
         setName('');
+        setDescription('');
         setStatus('Concept');
         setNextAction('');
       }
@@ -65,6 +68,18 @@ export function NewProjectDialog({ onAddProject }: NewProjectDialogProps) {
               Name
             </Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" placeholder="Project name" />
+          </div>
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="description" className="text-right pt-2">
+                Description
+            </Label>
+            <Textarea 
+                id="description" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                className="col-span-3" 
+                placeholder="Briefly describe the project's goal."
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">
