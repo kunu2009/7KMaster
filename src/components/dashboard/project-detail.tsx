@@ -269,65 +269,55 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             </div>
           <div className="space-y-2">
             {(currentProject.todos || []).map(todo => (
-              <div key={todo.id} className="flex items-center gap-3">
+              <div key={todo.id} className="group flex items-center gap-3">
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
                   onCheckedChange={() => handleToggleTodo(todo.id)}
                 />
-                {isEditing ? (
-                  <Input 
-                    value={todo.text}
-                    onChange={(e) => handleEditTodo(todo.id, e.target.value)}
-                    className="flex-1 h-9"
-                  />
-                ) : (
-                  <label htmlFor={`todo-${todo.id}`} className={`flex-1 text-sm ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {todo.text}
-                  </label>
-                )}
-                {isEditing && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                         <Button variant="ghost" size="icon" className="shrink-0">
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                         </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete this to-do item.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteTodo(todo.id)}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                )}
+                <Input 
+                  value={todo.text}
+                  onChange={(e) => handleEditTodo(todo.id, e.target.value)}
+                  className={`flex-1 h-9 border-0 shadow-none focus-visible:ring-0 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
+                />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="shrink-0 opacity-50 group-hover:opacity-100">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this to-do item.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteTodo(todo.id)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               </div>
             ))}
           </div>
-          {isEditing && (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                value={newTodo}
-                onChange={(e) => setNewTodo(e.target.value)}
-                placeholder="Add a new to-do item..."
-                onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
-              />
-              <Button onClick={handleAddTodo}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
-            </div>
-          )}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              placeholder="Add a new to-do item..."
+              onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
+            />
+            <Button onClick={handleAddTodo}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
+          </div>
         </div>
         
         {/* Attachments */}
         <div className="space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-2">
             <h3 className="font-semibold text-lg">Attachments</h3>
-            {isEditing && <AddAttachmentDialog onAddAttachment={handleAddAttachment} />}
+            <AddAttachmentDialog onAddAttachment={handleAddAttachment} />
           </div>
           <div className="space-y-2">
             {(currentProject.attachments || []).map(attachment => (
