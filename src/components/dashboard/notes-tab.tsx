@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialNotes } from "@/lib/data";
 import type { Note, NoteBlock } from "@/lib/types";
@@ -11,12 +10,16 @@ import { NewNoteDialog } from "./new-note-dialog";
 import { NoteDetail } from "./note-detail";
 import { useToast } from "@/hooks/use-toast";
 
-export function NotesTab() {
+interface NotesTabProps {
+  selectedNote: Note | null;
+  onSelectNote: (note: Note | null) => void;
+}
+
+export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
   const [notes, setNotes] = useLocalStorage<Note[]>(
     "notes",
     initialNotes
   );
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const { toast } = useToast();
 
   const addNote = (newNote: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content'>) => {
@@ -29,29 +32,25 @@ export function NotesTab() {
       modifiedAt: createdDate,
     };
     setNotes(prev => [fullNote, ...prev]);
-    setSelectedNote(fullNote); // Automatically open the new note
+    onSelectNote(fullNote); // Automatically open the new note
   }
 
   const handleUpdateNote = (updatedNote: Note) => {
     setNotes(prevNotes => prevNotes.map(n => n.id === updatedNote.id ? updatedNote : n));
-    setSelectedNote(updatedNote);
+    onSelectNote(updatedNote);
   };
   
   const handleDeleteNote = (noteId: string) => {
     setNotes(prev => prev.filter(n => n.id !== noteId));
-    setSelectedNote(null);
+    onSelectNote(null);
     toast({
         title: "Note Deleted",
         description: "The note has been successfully removed.",
     });
   }
 
-  const handleSelectNote = (note: Note) => {
-    setSelectedNote(note);
-  }
-
   const handleBackToList = () => {
-    setSelectedNote(null);
+    onSelectNote(null);
   }
   
   const getNotePreview = (content: NoteBlock[]) => {
@@ -66,10 +65,14 @@ export function NotesTab() {
     return "No content yet...";
   }
 
-
   if (selectedNote) {
+    const currentNote = notes.find(n => n.id === selectedNote.id);
+     if (!currentNote) {
+        handleBackToList();
+        return null;
+    }
     return <NoteDetail 
-              note={selectedNote} 
+              note={currentNote} 
               onUpdateNote={handleUpdateNote} 
               onDeleteNote={handleDeleteNote}
               onBack={handleBackToList} 
@@ -98,7 +101,7 @@ export function NotesTab() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {notes.sort((a,b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime()).map((note) => (
-              <Card key={note.id} className="flex flex-col cursor-pointer hover:border-primary" onClick={() => handleSelectNote(note)}>
+              <Card key={note.id} className="flex flex-col cursor-pointer hover:border-primary" onClick={() => onSelectNote(note)}>
                 <CardHeader>
                   <CardTitle className="text-lg truncate">{note.title}</CardTitle>
                 </CardHeader>

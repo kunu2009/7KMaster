@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
@@ -19,50 +18,59 @@ const statusColors: Record<ProjectStatus, string> = {
   "Completed": "bg-green-500/20 text-green-500 border-green-500/30",
 };
 
-export function ProjectsTab() {
+interface ProjectsTabProps {
+  selectedProject: Project | null;
+  onSelectProject: (project: Project | null) => void;
+}
+
+export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabProps) {
   const [projects, setProjects] = useLocalStorage<Project[]>(
     "projects",
     initialProjects
   );
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { toast } = useToast();
 
   const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
-    setProjects(prev => [...prev, {
+    const fullProject = {
       ...newProject,
       id: `${Date.now()}`,
       lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
       todos: [],
       workLog: [],
       attachments: [],
-    }]);
+    };
+    setProjects(prev => [...prev, fullProject]);
+    onSelectProject(fullProject); // Automatically open the new project
   }
 
   const handleUpdateProject = (updatedProject: Project) => {
     setProjects(prevProjects => prevProjects.map(p => p.id === updatedProject.id ? updatedProject : p));
-    setSelectedProject(updatedProject);
+    onSelectProject(updatedProject);
   };
   
   const handleDeleteProject = (projectId: string) => {
     setProjects(prev => prev.filter(p => p.id !== projectId));
-    setSelectedProject(null);
+    onSelectProject(null);
     toast({
         title: "Project Deleted",
         description: "The project has been successfully removed.",
     });
   }
 
-  const handleSelectProject = (project: Project) => {
-    setSelectedProject(project);
-  }
-
   const handleBackToList = () => {
-    setSelectedProject(null);
+    onSelectProject(null);
   }
 
   if (selectedProject) {
+    // Find the latest version of the project from the list to pass down
+    const currentProject = projects.find(p => p.id === selectedProject.id);
+    if (!currentProject) {
+        // This can happen if the project was deleted from another tab/window
+        handleBackToList();
+        return null;
+    }
     return <ProjectDetail 
-              project={selectedProject} 
+              project={currentProject} 
               onUpdateProject={handleUpdateProject} 
               onDeleteProject={handleDeleteProject}
               onBack={handleBackToList} 
@@ -100,7 +108,7 @@ export function ProjectsTab() {
                  <p className="text-sm text-muted-foreground">{project.nextAction}</p>
               </CardContent>
               <CardFooter>
-                 <Button onClick={() => handleSelectProject(project)} className="w-full" variant="outline">View Details</Button>
+                 <Button onClick={() => onSelectProject(project)} className="w-full" variant="outline">View Details</Button>
               </CardFooter>
             </Card>
           ))}

@@ -20,6 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AppsTab } from "@/components/dashboard/apps-tab";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { Project, Note } from "@/lib/types";
 import {
   Tooltip,
   TooltipContent,
@@ -76,9 +77,20 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSpecialSidebarOpen, setIsSpecialSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
+  
+  // Lifted state
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   const handleTabChange = (tabId: string) => {
-      setActiveTab(tabId);
+    // Reset detail views when switching main tabs unless navigating to a related tab
+    if (activeTab === 'projects' && tabId !== 'projects') {
+      // Don't reset if just switching away
+    }
+    if (activeTab === 'notes' && tabId !== 'notes') {
+        // Don't reset
+    }
+    setActiveTab(tabId);
   }
 
   const displayedNavItems = focusMode
@@ -92,7 +104,7 @@ export default function Home() {
     switch (activeTab) {
       case 'today': return <TodayTab />;
       case 'assistant': return <AssistantTab />;
-      case 'projects': return <ProjectsTab />;
+      case 'projects': return <ProjectsTab selectedProject={selectedProject} onSelectProject={setSelectedProject} />;
       case 'skills': return <SkillsTab />;
       case 'habits': return <HabitTrackerTab />;
       case 'journal': return <JournalTab />;
@@ -101,7 +113,7 @@ export default function Home() {
       case 'hsc': return <HscApp activePage={activeHscPage} setActivePage={setActiveHscPage} />;
       case 'research': return <ResearchTab />;
       case 'progress': return <ProgressTab />;
-      case 'notes': return <NotesTab />;
+      case 'notes': return <NotesTab selectedNote={selectedNote} onSelectNote={setSelectedNote} />;
       case 'apps': return <AppsTab />;
       case 'web-links': return <WebLinksTab />;
       default: return <TodayTab />;
