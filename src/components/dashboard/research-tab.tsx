@@ -1,15 +1,17 @@
+
 "use client"
 
 import { useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialResearchItems } from "@/lib/data";
-import type { ResearchItem, ResearchType } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { ResearchItem, ResearchType, Todo } from "@/lib/types";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Trash2, Paperclip, Edit } from "lucide-react";
 import { NewResearchItemDialog } from "./new-research-item-dialog";
 import { EditResearchItemDialog } from "./edit-research-item-dialog";
+import { ResearchItemDetail } from "./research-item-detail";
 
 const typeColors: Record<ResearchType, string> = {
   Tool: "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -25,21 +27,42 @@ export function ResearchTab() {
     initialResearchItems
   );
   const [filter, setFilter] = useState<ResearchType | 'All'>('All');
+  const [selectedItem, setSelectedItem] = useState<ResearchItem | null>(null);
 
-  const addItem = (newItem: Omit<ResearchItem, 'id'>) => {
-    setItems(prev => [...prev, { ...newItem, id: `${Date.now()}` }]);
+  const addItem = (newItem: Omit<ResearchItem, 'id' | 'todos'>) => {
+    setItems(prev => [...prev, { ...newItem, id: `${Date.now()}`, todos: [] }]);
   };
   
   const updateItem = (updatedItem: ResearchItem) => {
     setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+    if (selectedItem && selectedItem.id === updatedItem.id) {
+        setSelectedItem(updatedItem);
+    }
   };
   
   const deleteItem = (itemId: string) => {
     setItems(prev => prev.filter(item => item.id !== itemId));
+    if (selectedItem && selectedItem.id === itemId) {
+        setSelectedItem(null);
+    }
   };
 
   const filteredItems = filter === 'All' ? items : items.filter(item => item.type === filter);
   const allTypes: ResearchType[] = ['Tool', 'Website', 'Article', 'Video', 'Course'];
+
+  if(selectedItem) {
+      const currentItem = items.find(i => i.id === selectedItem.id);
+      if (!currentItem) {
+        setSelectedItem(null);
+        return null;
+      }
+      return <ResearchItemDetail 
+                item={currentItem} 
+                onUpdateItem={updateItem} 
+                onDeleteItem={deleteItem}
+                onBack={() => setSelectedItem(null)} 
+            />
+  }
 
   return (
     <Card>
@@ -87,7 +110,7 @@ export function ResearchTab() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-grow space-y-2">
-                <p className="text-sm text-muted-foreground">{item.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
                  {item.attachment && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                     <Paperclip className="h-4 w-4" />
@@ -95,19 +118,9 @@ export function ResearchTab() {
                   </div>
                 )}
               </CardContent>
-              <div className="p-4 pt-0 mt-auto flex justify-between items-center">
-                <a href={item.url} target="_blank" rel="noopener noreferrer">
-                  <Button variant="link" className="p-0 h-auto">
-                    Visit <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </a>
-                 <div className="flex items-center gap-1">
-                    <EditResearchItemDialog item={item} onUpdateItem={updateItem} />
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => deleteItem(item.id)}>
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                </div>
-              </div>
+              <CardFooter className="flex justify-end">
+                  <Button onClick={() => setSelectedItem(item)} className="w-full" variant="outline">View Details</Button>
+              </CardFooter>
             </Card>
           ))}
         </div>

@@ -47,6 +47,7 @@ export type ResearchItem = {
     url: string;
     description: string;
     attachment?: string;
+    todos: Todo[];
 };
 
 export type NoteBlock = {

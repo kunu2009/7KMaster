@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -25,7 +26,7 @@ import { PlusCircle } from "lucide-react";
 import type { ResearchItem, ResearchType } from "@/lib/types";
 
 interface NewResearchItemDialogProps {
-    onAddItem: (item: Omit<ResearchItem, 'id'>) => void;
+    onAddItem: (item: Omit<ResearchItem, 'id' | 'todos'>) => void;
 }
 
 export function NewResearchItemDialog({ onAddItem }: NewResearchItemDialogProps) {

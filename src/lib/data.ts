@@ -36,9 +36,9 @@ export const initialSelfSpace: SelfSpaceItem[] = [
 ];
 
 export const initialResearchItems: ResearchItem[] = [
-    { id: '1', name: 'Genkit', type: 'Tool', url: 'https://firebase.google.com/docs/genkit', description: 'The GenAI stack for building AI-powered features and applications.' },
-    { id: '2', name: 'Shadcn UI', type: 'Website', url: 'https://ui.shadcn.com/', description: 'Beautifully designed components that you can copy and paste into your apps.' },
-    { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.' },
+    { id: '1', name: 'Genkit', type: 'Tool', url: 'https://firebase.google.com/docs/genkit', description: 'The GenAI stack for building AI-powered features and applications.', todos: [] },
+    { id: '2', name: 'Shadcn UI', type: 'Website', url: 'https://ui.shadcn.com/', description: 'Beautifully designed components that you can copy and paste into your apps.', todos: [] },
+    { id: '3', name: 'Vercel AI SDK', type: 'Tool', url: 'https://sdk.vercel.ai/', description: 'An open-source library for building AI-powered user interfaces.', todos: [] },
 ];
 
 export const initialNotes: Note[] = [
