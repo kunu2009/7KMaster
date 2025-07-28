@@ -1,5 +1,6 @@
 
 
+export type TimeBlock = { id: string; name: string };
 
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
 

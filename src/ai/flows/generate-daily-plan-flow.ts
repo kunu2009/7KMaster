@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { Project, Skill } from '@/lib/types';
+import type { Project, Skill, TimeBlock } from '@/lib/types';
 
 
 const GenerateDailyPlanInputSchema = z.object({
@@ -22,13 +22,17 @@ const GenerateDailyPlanInputSchema = z.object({
     area: z.string(),
     weeklyGoal: z.string(),
   })).describe('A list of skills the user is developing.'),
+  timeBlocks: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+  })).optional().describe("A list of the user's custom time blocks for their schedule."),
 });
 export type GenerateDailyPlanInput = z.infer<typeof GenerateDailyPlanInputSchema>;
 
 
 const TaskSchema = z.object({
     id: z.string().describe('A unique ID for the task, can be a simple number string like "1".'),
-    timeBlock: z.string().describe("The suggested time for the task (e.g., '08:00 - 08:30', '10:00 - 12:00')."),
+    timeBlock: z.string().describe("The suggested time for the task (e.g., '08:00 - 08:30', '10:00 - 12:00'). This must be one of the time blocks provided in the input."),
     task: z.string().describe('A description of the task to be completed.'),
     done: z.boolean().describe('Whether the task is completed. Default to false.'),
 });
@@ -47,15 +51,23 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateDailyPlanInputSchema},
   output: {schema: GenerateDailyPlanOutputSchema},
   prompt: `You are a productivity assistant. Your goal is to create a simple, actionable daily plan with exactly 7 tasks for the user, presented in chronological order.
-The plan should be time-blocked. Each task needs a specific start and end time. The plan should feel balanced, with focus work, breaks, and personal/study tasks.
+The plan must be time-blocked using the user's provided time blocks. Each task needs a specific time block assigned to it from the list below. The plan should feel balanced, with focus work, breaks, and personal/study tasks.
 
-The plan should include:
-1.  A short morning routine task.
-2.  Two long focus blocks (e.g., 1.5-2 hours) dedicated to specific projects or skills.
-3.  A shorter skill practice session or a dedicated study session for 'LawPrep', 'Itihas', or 'HSC' topics.
-4.  A mid-day break or administrative task.
-5.  An afternoon wrap-up task.
-6.  An evening task for review or wind-down.
+User's Custom Time Blocks:
+{{#if timeBlocks}}
+    {{#each timeBlocks}}
+    - {{name}}
+    {{/each}}
+{{else}}
+    - 08:00 - 09:00 Morning Routine
+    - 09:00 - 11:00 Focus Block 1
+    - 11:30 - 12:30 Skill Practice
+    - 13:30 - 14:30 Admin & Breaks
+    - 15:00 - 17:00 Focus Block 2
+    - 17:00 - 17:30 Afternoon Wrap-up
+    - 20:00 - 21:00 Evening Review
+{{/if}}
+
 
 Here are the user's projects and skills:
 
@@ -72,7 +84,7 @@ Skills:
 Incorporate at least one study-related task from Law (e.g., "Review Constitution notes"), History (e.g., "Read Chapter on the Renaissance"), or HSC Board studies (e.g., "HSC English: Read 'The Inchcape Rock'").
 
 Based on this, generate a new list of 7 tasks. The tasks should be specific and actionable. For example, instead of 'Work on Project X', say 'Project: 7K Life - Add rewards system'.
-Ensure the output is a JSON object with a "tasks" array, where each task has an id, a specific timeBlock (e.g., '09:00 - 11:00'), a task description, and done (default to false).
+Ensure the output is a JSON object with a "tasks" array, where each task has an id, a specific timeBlock from the user's list, a task description, and done (default to false).
 `,
 });
 

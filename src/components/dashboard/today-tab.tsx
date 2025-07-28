@@ -12,21 +12,23 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon } from 'lucide-react';
+import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon, Settings, Trash2 } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import {
   initialTodayTasks,
   initialProjects,
   initialSkills,
+  initialTimeBlocks,
 } from "@/lib/data";
 import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
-import type { TodayTask, Project, Skill, AggregatedTodo } from "@/lib/types";
+import type { TodayTask, Project, Skill, AggregatedTodo, TimeBlock } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
 import { generateBlockTasks, GenerateBlockTasksInput } from "@/ai/flows/generate-block-tasks-flow";
 import { useToast } from "@/hooks/use-toast";
 import { PomodoroTimer } from "./pomodoro-timer";
 import { AddTodayTask } from "./add-today-task";
 import { ScrollArea } from "../ui/scroll-area";
+import { ManageTimeBlocksDialog } from "./manage-time-blocks-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,12 +39,25 @@ import {
   DropdownMenuSubContent,
   DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 export function TodayTab() {
   const [tasks, setTasks] = useLocalStorage<TodayTask[]>("todayTasks", initialTodayTasks);
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
+  const [timeBlocks, setTimeBlocks] = useLocalStorage<TimeBlock[]>("timeBlocks", initialTimeBlocks);
+
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
   const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
@@ -68,7 +83,7 @@ export function TodayTab() {
     return [...dailyPlanTasks, ...projectNextActions];
   }, [tasks, projects]);
   
-  const handleToggleTask = (id: string, source: string) => {
+  const handleToggleTask = (id: string) => {
     // Only daily plan tasks can be toggled
     if (id.startsWith('proj-')) return;
     
@@ -79,6 +94,11 @@ export function TodayTab() {
     );
   };
   
+  const handleDeleteTask = (id: string) => {
+    setTasks(tasks.filter(task => task.id !== id));
+    toast({ title: 'Task Removed', description: 'The task has been deleted from your daily plan.' });
+  }
+
   const handleAddTask = (newTask: TodayTask) => {
     setTasks(prev => [...prev, newTask]);
   };
@@ -89,6 +109,7 @@ export function TodayTab() {
       const result = await generateDailyPlan({ 
         projects: projects.map(({ name, nextAction }) => ({ name, nextAction })),
         skills: skills.map(({ area, weeklyGoal }) => ({ area, weeklyGoal })),
+        timeBlocks: timeBlocks,
       });
       if (result.tasks) {
         setTasks(result.tasks);
@@ -146,7 +167,7 @@ export function TodayTab() {
      if (task.id.startsWith('proj-')) {
          toast({title: "Pomodoro Complete!", description: `Great focus session on "${task.text}"!`})
      } else {
-        handleToggleTask(task.id, task.source);
+        handleToggleTask(task.id);
         toast({title: "Pomodoro Complete!", description: `Task "${task.text}" marked as done.`})
      }
   }
@@ -165,7 +186,13 @@ export function TodayTab() {
   const sortedGroups = useMemo(() => {
       const allGroups = Object.keys(groupedTasks);
       const projectActionsGroup = allGroups.filter(g => g === "Project Next Actions");
-      const timeBlockGroups = allGroups.filter(g => g !== "Project Next Actions").sort();
+      const timeBlockGroups = allGroups
+        .filter(g => g !== "Project Next Actions")
+        .sort((a, b) => {
+            const timeA = a.split(' ')[0];
+            const timeB = b.split(' ')[0];
+            return timeA.localeCompare(timeB);
+        });
       return [...timeBlockGroups, ...projectActionsGroup];
   }, [groupedTasks]);
 
@@ -182,12 +209,15 @@ export function TodayTab() {
                         Your aggregated tasks for today from all sources.
                       </CardDescription>
                     </div>
-                    {tasks.length === 0 && (
-                        <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan}>
-                            {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                            AI Generate Daily Plan
-                        </Button>
-                    )}
+                    <div className="flex gap-2">
+                      <ManageTimeBlocksDialog timeBlocks={timeBlocks} setTimeBlocks={setTimeBlocks} />
+                      {tasks.length === 0 && (
+                          <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan}>
+                              {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                              AI Generate Daily Plan
+                          </Button>
+                      )}
+                    </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -249,12 +279,12 @@ export function TodayTab() {
                           </div>
                           <div className="space-y-2">
                             {groupedTasks[groupName].map((task) => (
-                              <div key={task.id} className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
+                              <div key={task.id} className="group flex flex-wrap items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
                                 <div className="flex items-center gap-3">
                                   <Checkbox
                                     id={task.id}
                                     checked={task.completed}
-                                    onCheckedChange={() => handleToggleTask(task.id, task.source)}
+                                    onCheckedChange={() => handleToggleTask(task.id)}
                                     disabled={task.id.startsWith('proj-')}
                                   />
                                   <label
@@ -266,13 +296,36 @@ export function TodayTab() {
                                     {task.text}
                                   </label>
                                 </div>
-                                 <Button 
-                                    size="sm" 
-                                    variant={focusedTask?.id === task.id ? "default" : "ghost"}
-                                    onClick={() => setFocusedTask(task)}
-                                >
-                                    Focus
-                                </Button>
+                                <div className="flex items-center gap-1">
+                                  <Button 
+                                      size="sm" 
+                                      variant={focusedTask?.id === task.id ? "default" : "ghost"}
+                                      onClick={() => setFocusedTask(task)}
+                                  >
+                                      Focus
+                                  </Button>
+                                  {!task.id.startsWith('proj-') && (
+                                     <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive">
+                                              <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                              <AlertDialogDescription>
+                                                  This action cannot be undone. This will permanently delete this task.
+                                              </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                              <AlertDialogAction onClick={() => handleDeleteTask(task.id)}>Delete</AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                  )}
+                                </div>
                               </div>
                             ))}
                           </div>

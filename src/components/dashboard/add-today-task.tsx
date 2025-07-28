@@ -21,18 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusCircle } from "lucide-react";
-import type { TodayTask } from "@/lib/types";
+import type { TodayTask, TimeBlock } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-
-const timeBlocks = [
-    "08:00 - 08:30 Morning Routine",
-    "09:00 - 11:00 Focus Block 1",
-    "11:30 - 12:30 Skill Practice",
-    "13:30 - 14:30 Admin & Breaks",
-    "15:00 - 17:00 Focus Block 2",
-    "17:00 - 17:30 Afternoon Wrap-up",
-    "20:00 - 21:00 Evening Review",
-];
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { initialTimeBlocks } from "@/lib/data";
 
 interface AddTodayTaskProps {
     onAddTask: (task: TodayTask) => void;
@@ -41,6 +33,7 @@ interface AddTodayTaskProps {
 export function AddTodayTask({ onAddTask }: AddTodayTaskProps) {
   const [task, setTask] = useState("");
   const [timeBlock, setTimeBlock] = useState("");
+  const [timeBlocks] = useLocalStorage<TimeBlock[]>("timeBlocks", initialTimeBlocks);
   const { toast } = useToast();
 
   const handleAddTask = () => {
@@ -95,7 +88,7 @@ export function AddTodayTask({ onAddTask }: AddTodayTaskProps) {
                 </SelectTrigger>
                 <SelectContent>
                     {timeBlocks.map(block => (
-                         <SelectItem key={block} value={block}>{block}</SelectItem>
+                         <SelectItem key={block.id} value={block.name}>{block.name}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
