@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { mcqs, lawNotes } from '@/lib/law-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 export function LawSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +72,8 @@ export function LawSearch() {
                   <h2 className="text-xl font-semibold mb-4">Matching Notes</h2>
                   <div className="space-y-4">
                     {searchResults.notes.map(note => (
-                         <Card key={note.topic} className="hover:border-primary transition-colors">
+                       <Link href="/notes" key={note.topic} className="block">
+                         <Card className="hover:border-primary transition-colors">
                            <CardHeader>
                              <CardTitle className="flex items-center justify-between">
                                {note.topic}
@@ -82,6 +84,7 @@ export function LawSearch() {
                              <p className="text-muted-foreground line-clamp-2">{note.content}</p>
                            </CardContent>
                          </Card>
+                       </Link>
                     ))}
                   </div>
                 </section>
@@ -91,7 +94,8 @@ export function LawSearch() {
                   <h2 className="text-xl font-semibold mb-4">Matching MCQs</h2>
                   <div className="space-y-4">
                     {searchResults.mcqs.map(mcq => (
-                         <Card key={mcq.id} className="hover:border-primary transition-colors">
+                       <Link href="/mcqs" key={mcq.id} className="block">
+                         <Card className="hover:border-primary transition-colors">
                            <CardHeader>
                              <CardTitle className="flex items-center justify-between text-base">
                                {mcq.question}
@@ -99,6 +103,7 @@ export function LawSearch() {
                              </CardTitle>
                            </CardHeader>
                          </Card>
+                       </Link>
                     ))}
                   </div>
                 </section>
