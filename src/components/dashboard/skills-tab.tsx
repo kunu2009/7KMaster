@@ -28,6 +28,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { motion } from 'framer-motion';
+import { EmptyState } from './empty-state';
 
 export function SkillsTab() {
   const [skills, setSkills] = useLocalStorage<Skill[]>(
@@ -131,62 +133,70 @@ export function SkillsTab() {
                 </Alert>
             </div>
         )}
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {displayedSkills.map((skill) => (
-            <Card key={skill.id} className={`flex flex-col ${focusMode && focusSkillIds.includes(skill.id) ? 'border-primary shadow-lg' : ''}`}>
-                <CardHeader>
-                    <div className='flex justify-between items-start gap-2'>
-                        <CardTitle className="text-lg">{skill.area}</CardTitle>
-                        <Badge variant="outline">{skill.level}</Badge>
-                    </div>
-                    <CardDescription>{skill.weeklyGoal}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-4">
-                     <div className="space-y-2">
-                        <Progress value={(skill.progress / skill.maxProgress) * 100} />
-                        <p className="text-right text-sm text-muted-foreground">{skill.progress} / {skill.maxProgress}</p>
-                     </div>
-                </CardContent>
-                <CardFooter className="flex flex-wrap justify-between items-center gap-2">
-                  <div className='flex gap-1'>
-                     <EditSkillDialog skill={skill} onUpdateSkill={updateSkill} />
-                      <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                  <Trash2 className="h-4 w-4" />
-                              </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                              <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                      This will permanently delete the "{skill.area}" skill. This action cannot be undone.
-                                  </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deleteSkill(skill.id)}>Delete</AlertDialogAction>
-                              </AlertDialogFooter>
-                          </AlertDialogContent>
-                      </AlertDialog>
-                  </div>
-                   <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, -1)} disabled={skill.progress <= 0}>
-                          <Minus className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, 1)} disabled={skill.progress >= skill.maxProgress}>
-                          <Plus className="h-4 w-4" />
-                      </Button>
-                   </div>
-                </CardFooter>
-            </Card>
-          ))}
-        </div>
-
-        {skills.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-                <p>No skills added yet. Click "New Skill" to start tracking your progress!</p>
+        
+        {skills.length === 0 ? (
+            <EmptyState 
+                title="No Skills Added"
+                subtitle="Start your growth journey by adding a new skill to track."
+            />
+        ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {displayedSkills.map((skill, index) => (
+                <motion.div
+                    key={skill.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                    <Card className={`flex flex-col h-full hover:shadow-md transition-shadow ${focusMode && focusSkillIds.includes(skill.id) ? 'border-primary shadow-lg' : ''}`}>
+                        <CardHeader>
+                            <div className='flex justify-between items-start gap-2'>
+                                <CardTitle className="text-lg">{skill.area}</CardTitle>
+                                <Badge variant="outline">{skill.level}</Badge>
+                            </div>
+                            <CardDescription>{skill.weeklyGoal}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex-grow space-y-4">
+                            <div className="space-y-2">
+                                <Progress value={(skill.progress / skill.maxProgress) * 100} />
+                                <p className="text-right text-sm text-muted-foreground">{skill.progress} / {skill.maxProgress}</p>
+                            </div>
+                        </CardContent>
+                        <CardFooter className="flex flex-wrap justify-between items-center gap-2">
+                        <div className='flex gap-1'>
+                            <EditSkillDialog skill={skill} onUpdateSkill={updateSkill} />
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This will permanently delete the "{skill.area}" skill. This action cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => deleteSkill(skill.id)}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, -1)} disabled={skill.progress <= 0}>
+                                <Minus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateProgress(skill.id, 1)} disabled={skill.progress >= skill.maxProgress}>
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        </CardFooter>
+                    </Card>
+                </motion.div>
+            ))}
             </div>
         )}
       </CardContent>

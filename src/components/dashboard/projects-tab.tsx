@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
+import { motion } from "framer-motion";
+import { EmptyState } from "./empty-state";
 
 
 const statusColors: Record<ProjectStatus, string> = {
@@ -139,28 +141,42 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sortedProjects.map((project) => (
-            <Card key={project.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{project.name}</CardTitle>
-                    <Badge variant="outline" className={`${statusColors[project.status]} whitespace-nowrap`}>
-                        {project.status}
-                    </Badge>
-                </div>
-                 <CardDescription>Last worked: {project.lastWorked}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                 <p className="text-sm font-medium">Next Action:</p>
-                 <p className="text-sm text-muted-foreground">{project.nextAction}</p>
-              </CardContent>
-              <CardFooter>
-                 <Button onClick={() => onSelectProject(project)} className="w-full" variant="outline">View Details</Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+        {sortedProjects.length === 0 ? (
+          <EmptyState 
+            title="No Projects Yet"
+            subtitle="Start your next big thing by adding a new project."
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {sortedProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <Card className="flex flex-col h-full hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{project.name}</CardTitle>
+                        <Badge variant="outline" className={`${statusColors[project.status]} whitespace-nowrap`}>
+                            {project.status}
+                        </Badge>
+                    </div>
+                    <CardDescription>Last worked: {project.lastWorked}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-sm font-medium">Next Action:</p>
+                    <p className="text-sm text-muted-foreground">{project.nextAction}</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button onClick={() => onSelectProject(project)} className="w-full" variant="outline">View Details</Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

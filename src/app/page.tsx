@@ -210,7 +210,19 @@ export default function Home() {
   const currentSidebarOpenState = isSpecialAppView ? isSpecialSidebarOpen : isSidebarOpen;
 
   return (
-    <div className="flex min-h-screen w-full bg-muted/40">
+    <div className="flex min-h-screen w-full bg-muted/40 relative">
+      <div className="absolute top-0 right-0 -z-10 opacity-5 dark:opacity-10">
+          <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: 'hsl(var(--primary))'}} />
+                <stop offset="100%" style={{stopColor: 'hsl(var(--accent))'}} />
+              </linearGradient>
+            </defs>
+            <path fill="url(#blobGradient)" d="M569.5,-202.9C699.2,-90.3,738.9,103.1,661.1,228.4C583.3,353.7,388,410.9,219,444.2C50.1,477.5,-92.4,486.9,-224.2,429.2C-356,371.5,-477,246.7,-536.5,94.2C-596,-58.3,-594,-238.4,-496.2,-338.9C-398.4,-439.4,-204.8,-460.3,-41.8,-424.1C121.2,-387.9,349.9,-295.5,569.5,-202.9Z" transform="translate(600 400) scale(1.5)" />
+          </svg>
+      </div>
+
         {renderSidebar()}
        
        {!currentSidebarOpenState && (
@@ -232,7 +244,7 @@ export default function Home() {
         )}
 
       <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${sidebarWidth}`}>
-         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 sm:px-6">
             <div className="flex-1 text-center font-bold text-xl">
              <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
             </div>
