@@ -81,8 +81,12 @@ export default function Home() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   const handleTabChange = (tabId: string) => {
-    if (activeTab === 'projects' && tabId !== 'projects') {}
-    if (activeTab === 'notes' && tabId !== 'notes') {}
+    if (activeTab === 'projects' && tabId !== 'projects' && selectedProject) {
+        setSelectedProject(null);
+    }
+    if (activeTab === 'notes' && tabId !== 'notes' && selectedNote) {
+        setSelectedNote(null);
+    }
     setActiveTab(tabId);
   }
 
@@ -165,8 +169,8 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-        <main className="flex flex-col flex-1 gap-4 p-4 sm:p-6 min-w-0 pr-14">
-            <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 -mx-4 sm:-mx-6">
+        <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
+            <header className="sticky top-0 z-30 flex h-14 flex-wrap items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 -mx-4 sm:-mx-6">
                 <div className="flex-1 text-center font-bold text-xl">
                     <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
                 </div>
@@ -188,9 +192,7 @@ export default function Home() {
                 {renderContent()}
             </div>
         </main>
-        <div className="fixed inset-y-0 right-0 z-20">
-            <DesktopSidebar />
-        </div>
+        <DesktopSidebar />
     </div>
   );
 }
