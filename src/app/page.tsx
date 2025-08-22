@@ -134,7 +134,7 @@ export default function Home() {
   );
   
   const DesktopSidebar = () => (
-    <aside className="fixed inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
+    <aside className="inset-y-0 right-0 z-10 flex w-14 flex-col border-l bg-background">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
         <div className="flex h-14 w-14 items-center justify-center rounded-lg text-muted-foreground">
              <svg
@@ -164,39 +164,33 @@ export default function Home() {
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <div className="flex flex-1">
-        <main className="flex-1 overflow-auto p-4 pr-16 sm:p-6 sm:pr-20">
-            <div className="flex flex-col sm:gap-4">
-                <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-                    <div className="flex-1 text-center font-bold text-xl">
-                        <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-                        <div className="flex items-center space-x-2">
-                            <Switch 
-                                id="focus-mode" 
-                                checked={focusMode}
-                                onCheckedChange={setFocusMode}
-                            />
-                            <Label htmlFor="focus-mode" className="flex items-center gap-1 text-sm">
-                                <Zap className="h-4 w-4" />
-                                <span className="hidden sm:inline">Focus</span>
-                            </Label>
-                        </div>
-                    </div>
-                </header>
-                <div className="flex-1 overflow-auto">
-                    {renderContent()}
+    <div className="flex min-h-screen w-full bg-muted/40">
+        <main className="flex flex-col flex-1 gap-4 p-4 sm:p-6 min-w-0 pr-14">
+            <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 -mx-4 sm:-mx-6">
+                <div className="flex-1 text-center font-bold text-xl">
+                    <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
                 </div>
+                <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+                    <div className="flex items-center space-x-2">
+                        <Switch 
+                            id="focus-mode" 
+                            checked={focusMode}
+                            onCheckedChange={setFocusMode}
+                        />
+                        <Label htmlFor="focus-mode" className="flex items-center gap-1 text-sm">
+                            <Zap className="h-4 w-4" />
+                            <span className="hidden sm:inline">Focus</span>
+                        </Label>
+                    </div>
+                </div>
+            </header>
+            <div className="flex-1 overflow-auto">
+                {renderContent()}
             </div>
         </main>
-        <DesktopSidebar />
-      </div>
+        <div className="fixed inset-y-0 right-0 z-20">
+            <DesktopSidebar />
+        </div>
     </div>
   );
 }
-
-    
-
-    
