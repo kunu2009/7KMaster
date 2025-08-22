@@ -28,6 +28,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
   GanttChartSquare,
   BrainCircuit,
   Bot,
@@ -45,6 +50,7 @@ import {
   Scale,
   ScrollText,
   BookCopy,
+  PanelLeft,
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 import { ItihasSidebar } from "@/components/itihas/itihas-sidebar";
@@ -83,13 +89,8 @@ export default function Home() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   const handleTabChange = (tabId: string) => {
-    // Reset detail views when switching main tabs unless navigating to a related tab
-    if (activeTab === 'projects' && tabId !== 'projects') {
-      // Don't reset if just switching away
-    }
-    if (activeTab === 'notes' && tabId !== 'notes') {
-        // Don't reset
-    }
+    if (activeTab === 'projects' && tabId !== 'projects') {}
+    if (activeTab === 'notes' && tabId !== 'notes') {}
     setActiveTab(tabId);
   }
 
@@ -98,7 +99,6 @@ export default function Home() {
     : navItems;
     
   const isSpecialAppView = activeTab === 'study' || activeTab === 'itihas' || activeTab === 'hsc';
-  const sidebarWidth = isSpecialAppView ? (isSpecialSidebarOpen ? 'pr-14' : 'pr-0') : (isSidebarOpen ? 'pr-14' : 'pr-0');
 
   const renderContent = () => {
     switch (activeTab) {
@@ -134,121 +134,88 @@ export default function Home() {
             <item.icon className="size-5" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="left" sideOffset={5}>
+        <TooltipContent side="right" sideOffset={5}>
           {item.label}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
   
-  const renderSidebar = () => {
-    if (activeTab === 'study') {
-        return <LawPrepSidebar 
-            activePage={activeLawPage}
-            setActivePage={setActiveLawPage}
-            onBack={() => setActiveTab('today')}
-            isOpen={isSpecialSidebarOpen}
-            setIsOpen={setIsSpecialSidebarOpen}
-         />;
-    }
-    if (activeTab === 'itihas') {
-        return <ItihasSidebar 
-            activePage={activeItihasPage}
-            setActivePage={setActiveItihasPage}
-            onBack={() => setActiveTab('today')}
-            isOpen={isSpecialSidebarOpen}
-            setIsOpen={setIsSpecialSidebarOpen}
-         />;
-    }
-    if (activeTab === 'hsc') {
-        return <HscSidebar 
-            activePage={activeHscPage}
-            setActivePage={setActiveHscPage}
-            onBack={() => setActiveTab('today')}
-            isOpen={isSpecialSidebarOpen}
-            setIsOpen={setIsSpecialSidebarOpen}
-         />;
-    }
-    return (
-        <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isSidebarOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
-            <ScrollArea className="flex-1">
-                <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className="flex items-center gap-2 mb-2">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6 text-primary"
-                        >
-                            <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
-                        </svg>
-                    </div>
-                    <div className="flex flex-col items-center gap-4">
-                        {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
-                    </div>
-                </nav>
-            </ScrollArea>
-            <div className={`flex flex-col items-center gap-4 px-2 py-5 border-t mt-auto transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-lg"
-                    aria-label="Toggle Sidebar"
-                    onClick={() => setIsSidebarOpen(prev => !prev)}
-                >
-                    <ChevronsRight className="size-5" />
-                </Button>
-            </div>
-      </aside>
-    );
-  }
-  
-  const currentSidebarOpenState = isSpecialAppView ? isSpecialSidebarOpen : isSidebarOpen;
+  const DesktopSidebar = () => (
+    <aside className={`fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex`}>
+      <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg text-muted-foreground">
+             <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-primary"
+            >
+                <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+            </svg>
+            <span className="sr-only">7K Life</span>
+        </div>
+        {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
+      </nav>
+      <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+        <ThemeToggle />
+      </nav>
+    </aside>
+  );
 
   return (
-    <div className="flex min-h-screen w-full bg-muted/40 relative">
-      <div className="absolute top-0 right-0 -z-10 opacity-5 dark:opacity-10">
-          <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{stopColor: 'hsl(var(--primary))'}} />
-                <stop offset="100%" style={{stopColor: 'hsl(var(--accent))'}} />
-              </linearGradient>
-            </defs>
-            <path fill="url(#blobGradient)" d="M569.5,-202.9C699.2,-90.3,738.9,103.1,661.1,228.4C583.3,353.7,388,410.9,219,444.2C50.1,477.5,-92.4,486.9,-224.2,429.2C-356,371.5,-477,246.7,-536.5,94.2C-596,-58.3,-594,-238.4,-496.2,-338.9C-398.4,-439.4,-204.8,-460.3,-41.8,-424.1C121.2,-387.9,349.9,-295.5,569.5,-202.9Z" transform="translate(600 400) scale(1.5)" />
-          </svg>
-      </div>
-
-        {renderSidebar()}
-       
-       {!currentSidebarOpenState && (
-            <Button
-                variant="ghost"
-                size="icon"
-                className="fixed top-1/2 right-2 z-20 rounded-full"
-                aria-label="Toggle Sidebar"
-                onClick={() => {
-                  if (isSpecialAppView) {
-                    setIsSpecialSidebarOpen(true);
-                  } else {
-                    setIsSidebarOpen(true);
-                  }
-                }}
-            >
-                <ChevronsLeft className="size-5" />
-            </Button>
-        )}
-
-      <div className={`flex flex-1 flex-col gap-4 py-4 transition-all duration-300 ${sidebarWidth}`}>
-         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 sm:px-6">
-            <div className="flex-1 text-center font-bold text-xl">
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <DesktopSidebar />
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+           <Sheet>
+            <SheetTrigger asChild>
+              <Button size="icon" variant="outline" className="sm:hidden">
+                <PanelLeft className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs">
+              <nav className="grid gap-6 text-lg font-medium">
+                <div className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                    >
+                        <path d="M4 18.5A2.5 2.5 0 0 1 6.5 21a2.5 2.5 0 0 1 0-5 .5.5 0 0 1 .5.5V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 1 1 0-5 .5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V6.5a.5.5 0 0 1 .5-.5 2.5 2.5 0 0 1 5 0 .5.5 0 0 1 .5.5V8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3.5A2.5 2.5 0 0 0 17.5 1 2.5 2.5 0 0 0 15 3.5a.5.5 0 0 1-.5.5H13a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5 2.5 2.5 0 1 0 0 5 .5.5 0 0 1-.5-.5V12a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5A2.5 2.5 0 0 1 4 18.5Z"/>
+                    </svg>
+                    <span className="sr-only">7K Life</span>
+                </div>
+                 {displayedNavItems.map(item => (
+                    <Button
+                        key={item.id}
+                        variant={activeTab === item.id ? "secondary" : "ghost"}
+                        onClick={() => handleTabChange(item.id)}
+                        className="flex items-center gap-4 px-2.5"
+                    >
+                        <item.icon className="h-5 w-5" />
+                        {item.label}
+                    </Button>
+                 ))}
+                  <div className="mt-auto">
+                    <ThemeToggle />
+                  </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
+           <div className="flex-1 text-center font-bold text-xl">
              <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
             </div>
-
             <div className="flex items-center gap-2 sm:gap-4 ml-auto">
               <div className="flex items-center space-x-2">
                 <Switch 
@@ -261,7 +228,6 @@ export default function Home() {
                     <span className="hidden sm:inline">Focus</span>
                 </Label>
               </div>
-              <ThemeToggle />
             </div>
         </header>
         <main className="flex-1 overflow-auto p-4 sm:p-6">
