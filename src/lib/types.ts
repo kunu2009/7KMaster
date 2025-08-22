@@ -1,5 +1,6 @@
 
 
+
 export type TimeBlock = { id: string; name: string };
 
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
@@ -32,6 +33,7 @@ export type Project = {
     todos: Todo[];
     workLog: WorkLogEntry[];
     attachments: Attachment[];
+    userId?: string;
 };
 
 export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number };

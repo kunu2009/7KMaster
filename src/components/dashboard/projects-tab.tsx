@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
@@ -12,9 +12,12 @@ import { ProjectDetail } from "./project-detail";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { EmptyState } from "./empty-state";
+import { useAuth } from "@/context/auth-context";
+import { collection, addDoc, onSnapshot, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 
 const statusColors: Record<ProjectStatus, string> = {
@@ -32,38 +35,84 @@ interface ProjectsTabProps {
 }
 
 export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabProps) {
-  const [projects, setProjects] = useLocalStorage<Project[]>(
-    "projects",
-    initialProjects
-  );
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
   const { toast } = useToast();
   const [sortBy, setSortBy] = useLocalStorage<SortOption>('projectSortOrder', 'lastWorked');
 
-  const addProject = (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
+  useEffect(() => {
+    if (!user) {
+        setIsLoading(false);
+        setProjects([]); // Clear projects if user logs out
+        return;
+    };
+    
+    setIsLoading(true);
+    const q = query(collection(db, "projects"), where("userId", "==", user.uid));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const userProjects: Project[] = [];
+        querySnapshot.forEach((doc) => {
+            userProjects.push({ id: doc.id, ...doc.data() } as Project);
+        });
+        setProjects(userProjects);
+        setIsLoading(false);
+    }, (error) => {
+        console.error("Error fetching projects: ", error);
+        toast({ title: "Error", description: "Could not fetch your projects.", variant: "destructive"});
+        setIsLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on component unmount
+  }, [user, toast]);
+
+  const addProject = async (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
+    if (!user) {
+        toast({ title: "Not Authenticated", description: "You must be logged in to add a project.", variant: "destructive" });
+        return;
+    }
     const fullProject = {
       ...newProject,
-      id: `${Date.now()}`,
+      userId: user.uid,
       lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
       todos: [],
       workLog: [],
       attachments: [],
     };
-    setProjects(prev => [...prev, fullProject]);
-    onSelectProject(fullProject); // Automatically open the new project
+    try {
+        const docRef = await addDoc(collection(db, "projects"), fullProject);
+        const newProjectWithId = { ...fullProject, id: docRef.id };
+        onSelectProject(newProjectWithId);
+    } catch(e) {
+        console.error("Error adding document: ", e);
+        toast({ title: "Error", description: "Could not save your new project.", variant: "destructive" });
+    }
   }
 
-  const handleUpdateProject = (updatedProject: Project) => {
-    setProjects(prevProjects => prevProjects.map(p => p.id === updatedProject.id ? updatedProject : p));
-    onSelectProject(updatedProject);
+  const handleUpdateProject = async (updatedProject: Project) => {
+    const { id, ...projectData } = updatedProject;
+     try {
+        await updateDoc(doc(db, "projects", id), projectData);
+        onSelectProject(updatedProject);
+     } catch (e) {
+        console.error("Error updating document: ", e);
+        toast({ title: "Error", description: "Could not update the project.", variant: "destructive" });
+     }
   };
   
-  const handleDeleteProject = (projectId: string) => {
-    setProjects(prev => prev.filter(p => p.id !== projectId));
-    onSelectProject(null);
-    toast({
-        title: "Project Deleted",
-        description: "The project has been successfully removed.",
-    });
+  const handleDeleteProject = async (projectId: string) => {
+     try {
+        await deleteDoc(doc(db, "projects", projectId));
+        onSelectProject(null);
+        toast({
+            title: "Project Deleted",
+            description: "The project has been successfully removed.",
+        });
+     } catch (e) {
+        console.error("Error deleting document: ", e);
+        toast({ title: "Error", description: "Could not delete the project.", variant: "destructive" });
+     }
   }
 
   const handleBackToList = () => {
@@ -141,7 +190,11 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
         </div>
       </CardHeader>
       <CardContent>
-        {sortedProjects.length === 0 ? (
+        {isLoading ? (
+            <div className="flex justify-center items-center h-48">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        ) : sortedProjects.length === 0 ? (
           <EmptyState 
             title="No Projects Yet"
             subtitle="Start your next big thing by adding a new project."
