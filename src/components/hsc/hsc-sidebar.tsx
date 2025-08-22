@@ -92,11 +92,11 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={activePage === 'prose-chapter' ? "secondary" : "ghost"}
+                    variant={activePage === 'prose-chapter' || activePage === 'poetry-chapter' ? "secondary" : "ghost"}
                     size="icon"
                     className="rounded-lg"
                     aria-label="Current Chapter"
-                    disabled={activePage !== 'prose-chapter'}
+                    disabled={activePage !== 'prose-chapter' && activePage !== 'poetry-chapter'}
                   >
                     <Newspaper className="size-5" />
                   </Button>
@@ -122,3 +122,5 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
     </aside>
   );
 }
+
+    

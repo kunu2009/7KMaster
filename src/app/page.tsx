@@ -134,7 +134,7 @@ export default function Home() {
             <item.icon className="size-5" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right" sideOffset={5}>
+        <TooltipContent side="left" sideOffset={5}>
           {item.label}
         </TooltipContent>
       </Tooltip>
@@ -142,7 +142,7 @@ export default function Home() {
   );
   
   const DesktopSidebar = () => (
-    <aside className={`fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex`}>
+    <aside className={`fixed inset-y-0 right-0 z-10 hidden w-14 flex-col border-l bg-background sm:flex`}>
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
         <div className="flex h-14 w-14 items-center justify-center rounded-lg text-muted-foreground">
              <svg
@@ -170,7 +170,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <DesktopSidebar />
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pr-14">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
            <Sheet>
             <SheetTrigger asChild>
@@ -237,3 +237,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
