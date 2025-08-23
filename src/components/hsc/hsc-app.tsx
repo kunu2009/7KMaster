@@ -31,10 +31,10 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
     setActivePage('poetry-chapter');
   };
 
-  const handleBackToEnglish = () => {
+  const handleBackToSubject = (subject: 'english' | 'sanskrit') => {
     setSelectedProseChapter(null);
     setSelectedPoetryChapter(null);
-    setActivePage('english');
+    setActivePage(subject);
   };
 
 
@@ -45,7 +45,7 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
         case 'english':
             return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'sanskrit':
-            return <SanskritPage />;
+            return <SanskritPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'hindi':
             return <HindiPage />;
         case 'economics':
@@ -54,13 +54,15 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
             return <PoliticalSciencePage />;
         case 'prose-chapter':
             if (selectedProseChapter) {
-                return <ProseChapterView chapter={selectedProseChapter} onBack={handleBackToEnglish} />;
+                return <ProseChapterView chapter={selectedProseChapter} onBack={() => handleBackToSubject(selectedProseChapter.author === "भोजप्रबन्धः" || selectedProseChapter.author === "छत्रपतिशिवाजीमहाराजः" ? 'sanskrit' : 'english')} />;
             }
+            // Fallback to the most likely subject page
             return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'poetry-chapter':
             if (selectedPoetryChapter) {
-                return <PoetryChapterView poem={selectedPoetryChapter} onBack={handleBackToEnglish} />;
+                return <PoetryChapterView poem={selectedPoetryChapter} onBack={() => handleBackToSubject(selectedPoetryChapter.author.includes("भर्तृहरि") ? 'sanskrit' : 'english')} />;
             }
+             // Fallback to the most likely subject page
             return <EnglishPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         default:
              return <HscDashboard setActivePage={setActivePage} />;

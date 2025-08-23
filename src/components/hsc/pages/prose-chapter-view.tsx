@@ -19,6 +19,10 @@ interface ProseChapterViewProps {
 }
 
 export function ProseChapterView({ chapter, onBack }: ProseChapterViewProps) {
+  const lineExplanation = chapter.lineByLineExplanation
+    ? chapter.lineByLineExplanation.replace(/\n/g, '<br />')
+    : 'Line by line explanation will be available soon.';
+
   return (
     <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -60,18 +64,16 @@ export function ProseChapterView({ chapter, onBack }: ProseChapterViewProps) {
           </Card>
         </TabsContent>
         
-        {chapter.lineByLineExplanation && (
-            <TabsContent value="explanation" className="mt-4">
-            <Card>
-                <CardHeader>
-                <CardTitle>Line-by-Line / Paragraph Explanation</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                <div className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: chapter.lineByLineExplanation.replace(/\n/g, '<br />') }}/>
-                </CardContent>
-            </Card>
-            </TabsContent>
-        )}
+        <TabsContent value="explanation" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Line-by-Line / Paragraph Explanation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: lineExplanation }}/>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="characters" className="mt-4">
           <Card>
