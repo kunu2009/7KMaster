@@ -31,7 +31,7 @@ export function ItihasApp({ activePage, setActivePage }: ItihasAppProps) {
             return <ItihasDashboard onSelectChapter={handleSelectChapter} />;
         case 'chapter':
             if (selectedChapter) {
-                return <ItihasChapterView chapter={selectedChapter} />;
+                return <ItihasChapterView chapter={selectedChapter} onBack={handleBackToDashboard}/>;
             }
             return <ItihasDashboard onSelectChapter={handleSelectChapter} />; // Fallback
         case 'planner':
@@ -41,11 +41,7 @@ export function ItihasApp({ activePage, setActivePage }: ItihasAppProps) {
     }
   };
 
-  return (
-    <div className="h-full w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-      <div className="flex-1 flex flex-col">
-         <main className="flex-1 overflow-auto p-4 sm:p-6">{renderContent()}</main>
-      </div>
-    </div>
-  );
+  return <div className="h-full">{renderContent()}</div>;
 }
+
+    

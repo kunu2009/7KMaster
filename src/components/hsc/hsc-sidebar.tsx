@@ -63,8 +63,8 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
   );
 
   return (
-    <aside className={`fixed inset-y-0 right-0 z-10 flex flex-col border-l bg-background transition-all duration-300 ${isOpen ? 'w-14' : 'w-0 overflow-hidden'}`}>
-        <div className={`flex h-14 items-center justify-center border-b transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+    <aside className={`flex-shrink-0 border-l bg-background flex-col h-screen transition-all duration-300 ${isOpen ? 'w-14 flex' : 'w-0 hidden'}`}>
+        <div className={`flex h-14 items-center justify-center border-b`}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -85,7 +85,7 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
             </TooltipProvider>
         </div>
         <ScrollArea className="flex-1">
-          <nav className={`flex flex-col items-center gap-4 px-2 py-5 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+          <nav className={`flex flex-col items-center gap-4 px-2 py-5`}>
             {menuItems.map(item => <NavLink key={item.href} item={item} />)}
             <div className="my-2 h-px w-full bg-border" />
              <TooltipProvider>
@@ -108,17 +108,6 @@ export function HscSidebar({ activePage, setActivePage, onBack, isOpen, setIsOpe
             </TooltipProvider>
           </nav>
         </ScrollArea>
-        <div className={`flex flex-col items-center gap-4 px-2 py-5 border-t mt-auto transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
-            <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-lg"
-                aria-label="Toggle Sidebar"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <ChevronsRight className="size-5" />
-            </Button>
-        </div>
     </aside>
   );
 }

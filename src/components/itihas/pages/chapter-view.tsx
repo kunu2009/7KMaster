@@ -5,7 +5,8 @@ import { useState } from 'react';
 import type { ItihasChapter } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { McqCard } from '@/components/lawprep/pages/mcq-card';
 import { LawFlashcard } from '@/components/lawprep/law-flashcard';
 import { ReelCard } from '@/components/lawprep/reel-card';
@@ -19,15 +20,22 @@ import {
 
 interface ItihasChapterViewProps {
   chapter: ItihasChapter;
+  onBack: () => void;
 }
 
-export function ItihasChapterView({ chapter }: ItihasChapterViewProps) {
+export function ItihasChapterView({ chapter, onBack }: ItihasChapterViewProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Chapter {chapter.id}: {chapter.title}</h1>
-        <p className="text-muted-foreground">{chapter.description}</p>
-      </div>
+       <div className="flex items-center gap-4">
+             <Button variant="outline" size="icon" className="h-8 w-8" onClick={onBack}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Back</span>
+             </Button>
+            <div>
+                <h1 className="text-2xl font-bold tracking-tight">Chapter {chapter.id}: {chapter.title}</h1>
+                <p className="text-muted-foreground">{chapter.description}</p>
+            </div>
+        </div>
 
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
@@ -107,3 +115,5 @@ export function ItihasChapterView({ chapter }: ItihasChapterViewProps) {
     </div>
   );
 }
+
+    

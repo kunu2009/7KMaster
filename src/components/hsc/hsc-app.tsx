@@ -67,11 +67,7 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
     }
   };
 
-  return (
-    <div className="h-full w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-      <div className="flex-1 flex flex-col">
-         <main className="flex-1 overflow-auto p-4 sm:p-6">{renderContent()}</main>
-      </div>
-    </div>
-  );
+  return <div className="h-full">{renderContent()}</div>;
 }
+
+    

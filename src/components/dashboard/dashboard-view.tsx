@@ -44,6 +44,9 @@ import {
   ScrollText,
   BookCopy,
   LogOut,
+  ArrowLeft,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react";
 import { LawPrepSidebar } from "@/components/lawprep/law-prep-sidebar";
 import { ItihasSidebar } from "@/components/itihas/itihas-sidebar";
@@ -75,7 +78,6 @@ export function DashboardView() {
   const [activeItihasPage, setActiveItihasPage] = useState('dashboard');
   const [activeHscPage, setActiveHscPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isSpecialSidebarOpen, setIsSpecialSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const { logout } = useAuth();
   
@@ -188,34 +190,48 @@ export function DashboardView() {
     </aside>
   );
 
+  const renderSidebar = () => {
+    switch (activeTab) {
+      case 'study':
+        return <LawPrepSidebar activePage={activeLawPage} setActivePage={setActiveLawPage} onBack={() => setActiveTab('today')} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />;
+      case 'itihas':
+        return <ItihasSidebar activePage={activeItihasPage} setActivePage={setActiveItihasPage} onBack={() => setActiveTab('today')} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />;
+      case 'hsc':
+        return <HscSidebar activePage={activeHscPage} setActivePage={setActiveHscPage} onBack={() => setActiveTab('today')} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />;
+      default:
+        return <DesktopSidebar />;
+    }
+  }
+
+
   return (
-    <div className="flex justify-center min-h-screen w-full bg-muted/40">
-        <div className="flex w-full max-w-screen-xl">
-            <main className="flex-1 flex flex-col gap-4 p-4 sm:p-6 min-w-0">
-                <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b bg-background sm:static sm:h-auto sm:border-0 sm:bg-transparent -mx-4 sm:-mx-6 px-4 sm:px-6">
-                    <div className="flex-1 text-center font-bold text-xl min-w-0 truncate">
-                        <span>{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                        <div className="flex items-center space-x-2">
-                            <Switch 
-                                id="focus-mode" 
-                                checked={focusMode}
-                                onCheckedChange={setFocusMode}
-                            />
-                            <Label htmlFor="focus-mode" className="flex items-center gap-1 text-sm">
-                                <Zap className="h-4 w-4" />
-                                <span className="hidden sm:inline">Focus</span>
-                            </Label>
-                        </div>
-                    </div>
-                </header>
-                <div className="flex-1 overflow-auto">
-                    {renderContent()}
+    <div className="flex min-h-screen w-full bg-muted/40">
+        <div className="flex-1 flex flex-col">
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+                <div className="flex-1">
+                    <h1 className="font-semibold text-lg">{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</h1>
                 </div>
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex items-center space-x-2">
+                        <Switch 
+                            id="focus-mode" 
+                            checked={focusMode}
+                            onCheckedChange={setFocusMode}
+                        />
+                        <Label htmlFor="focus-mode" className="flex items-center gap-1 text-sm">
+                            <Zap className="h-4 w-4" />
+                            <span className="hidden sm:inline">Focus</span>
+                        </Label>
+                    </div>
+                </div>
+            </header>
+            <main className="flex-1 overflow-auto p-4 sm:p-6">
+                {renderContent()}
             </main>
-            <DesktopSidebar />
         </div>
+        {renderSidebar()}
     </div>
   );
 }
+
+    
