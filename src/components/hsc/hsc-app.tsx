@@ -47,7 +47,7 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
         case 'sanskrit':
             return <SanskritPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'hindi':
-            return <HindiPage />;
+            return <HindiPage onSelectProseChapter={handleSelectProseChapter} onSelectPoetryChapter={handleSelectPoetryChapter} />;
         case 'economics':
             return <EconomicsPage />;
         case 'political-science':
@@ -57,6 +57,8 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
                  let subject: 'english' | 'sanskrit' | 'hindi' = 'english';
                  if (selectedProseChapter.author === "भोजप्रबन्धः" || selectedProseChapter.author === "छत्रपतिशिवाजीमहाराजः") {
                     subject = 'sanskrit';
+                 } else if (["महादेवी वर्मा", "सुदर्शन", "कन्हैयालाल मिश्र 'प्रभाकर'", "आशारानी व्होरा", "डॉ. कृष्ण कुमार मिश्र", "डॉ. रोट जाकिर"].includes(selectedProseChapter.author)) {
+                    subject = 'hindi';
                  }
                 return <ProseChapterView chapter={selectedProseChapter} onBack={() => handleBackToSubject(subject)} />;
             }
@@ -67,6 +69,8 @@ export function HscApp({ activePage, setActivePage }: HscAppProps) {
                  let subject: 'english' | 'sanskrit' | 'hindi' = 'english';
                  if (selectedPoetryChapter.author.includes("भर्तृहरि")) {
                      subject = 'sanskrit';
+                 } else if (["त्रिलोचन", "डॉ. जगदीश गुप्त", "गुरु नानक", "वृंद", "डॉ. मुकेश गौतम", "कैलाश सेंगर", "अमीताभ बच्चन", "डॉ. धर्मवीर भारती"].includes(selectedPoetryChapter.author)) {
+                    subject = 'hindi';
                  }
                 return <PoetryChapterView poem={selectedPoetryChapter} onBack={() => handleBackToSubject(subject)} />;
             }

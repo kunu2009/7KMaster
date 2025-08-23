@@ -9,14 +9,21 @@ import { hscHindiProse, hscHindiPoetry } from "@/lib/hsc-hindi-data";
 import type { HscProseChapter, HscPoetryChapter } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
-export function HindiPage() {
+interface HindiPageProps {
+    onSelectProseChapter: (chapter: HscProseChapter) => void;
+    onSelectPoetryChapter: (poem: HscPoetryChapter) => void;
+}
+
+export function HindiPage({ onSelectProseChapter, onSelectPoetryChapter }: HindiPageProps) {
     const { toast } = useToast();
 
-    const handleStudyClick = () => {
-        toast({
-            title: "Coming Soon!",
-            description: "Detailed study materials for this chapter will be available shortly.",
-        });
+    const handleStudyClick = (contentAvailable: boolean) => {
+        if (!contentAvailable) {
+            toast({
+                title: "Coming Soon!",
+                description: "Detailed study materials for this chapter will be available shortly.",
+            });
+        }
     };
 
     return (
@@ -49,8 +56,7 @@ export function HindiPage() {
                                         <Button 
                                             variant="outline" 
                                             className="w-full" 
-                                            onClick={handleStudyClick}
-                                            disabled={!chapter.contentAvailable}
+                                            onClick={() => chapter.contentAvailable ? onSelectProseChapter(chapter) : handleStudyClick(false)}
                                         >
                                             <BookOpen className="mr-2 h-4 w-4" /> 
                                             {chapter.contentAvailable ? "Study" : "Coming Soon"}
@@ -77,8 +83,8 @@ export function HindiPage() {
                                         <Button 
                                             variant="outline" 
                                             className="w-full" 
-                                            onClick={handleStudyClick}
-                                            disabled={!poem.contentAvailable}>
+                                            onClick={() => poem.contentAvailable ? onSelectPoetryChapter(poem) : handleStudyClick(false)}
+                                            >
                                             <BookOpen className="mr-2 h-4 w-4" /> 
                                             {poem.contentAvailable ? "Study" : "Coming Soon"}
                                         </Button>
