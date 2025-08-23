@@ -17,11 +17,11 @@ interface HindiPageProps {
 export function HindiPage({ onSelectProseChapter, onSelectPoetryChapter }: HindiPageProps) {
     const { toast } = useToast();
 
-    const handleStudyClick = (contentAvailable: boolean) => {
+    const handleStudyClick = (contentAvailable: boolean, title: string) => {
         if (!contentAvailable) {
             toast({
                 title: "Coming Soon!",
-                description: "Detailed study materials for this chapter will be available shortly.",
+                description: `Detailed study materials for "${title}" will be available shortly.`,
             });
         }
     };
@@ -56,7 +56,7 @@ export function HindiPage({ onSelectProseChapter, onSelectPoetryChapter }: Hindi
                                         <Button 
                                             variant="outline" 
                                             className="w-full" 
-                                            onClick={() => chapter.contentAvailable ? onSelectProseChapter(chapter) : handleStudyClick(false)}
+                                            onClick={() => chapter.contentAvailable ? onSelectProseChapter(chapter) : handleStudyClick(false, chapter.title)}
                                         >
                                             <BookOpen className="mr-2 h-4 w-4" /> 
                                             {chapter.contentAvailable ? "Study" : "Coming Soon"}
@@ -83,7 +83,7 @@ export function HindiPage({ onSelectProseChapter, onSelectPoetryChapter }: Hindi
                                         <Button 
                                             variant="outline" 
                                             className="w-full" 
-                                            onClick={() => poem.contentAvailable ? onSelectPoetryChapter(poem) : handleStudyClick(false)}
+                                            onClick={() => poem.contentAvailable ? onSelectPoetryChapter(poem) : handleStudyClick(false, poem.title)}
                                             >
                                             <BookOpen className="mr-2 h-4 w-4" /> 
                                             {poem.contentAvailable ? "Study" : "Coming Soon"}
