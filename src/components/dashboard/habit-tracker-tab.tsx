@@ -67,40 +67,41 @@ export function HabitTrackerTab() {
   };
   
   const getStreak = (habitId: string): number => {
-    const logs = habitLogs[habitId] || [];
+    const logs = (habitLogs[habitId] || []).map(d => new Date(d)).sort((a, b) => b.getTime() - a.getTime());
     if (logs.length === 0) return 0;
-    
+  
     let streak = 0;
     let today = new Date();
-
-    const sortedLogs = logs.map(d => new Date(d)).sort((a,b) => b.getTime() - a.getTime());
-
-    // Check if today is completed
-    if (sortedLogs.some(d => isSameDay(d, today))) {
-        streak++;
-    } else {
-        // if not completed today, check if yesterday was completed
-        today.setDate(today.getDate() - 1);
-        if(!sortedLogs.some(d => isSameDay(d, today))) {
-            return 0; // Streak is broken if yesterday wasn't completed
-        }
-        streak++;
+    today.setHours(0, 0, 0, 0); // Normalize today's date
+  
+    // Check if today or yesterday is the latest log
+    const latestLog = new Date(logs[0]);
+    latestLog.setHours(0, 0, 0, 0);
+  
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(Math.abs((today.getTime() - latestLog.getTime()) / oneDay));
+  
+    if (diffDays > 1) {
+      // Streak is broken if the last log was more than a day ago
+      return 0;
     }
-
-    // Continue checking for consecutive days
-    for (let i = 1; i < sortedLogs.length; i++) {
-        const expectedDate = new Date(today);
-        expectedDate.setDate(expectedDate.getDate() - 1);
-        
-        const actualDate = sortedLogs.find(d => isSameDay(d, expectedDate));
-
-        if (actualDate) {
-            streak++;
-            today = actualDate;
-        } else {
-            break; // Streak broken
-        }
+  
+    let currentDate = latestLog;
+    for (const log of logs) {
+      const logDate = new Date(log);
+      logDate.setHours(0, 0, 0, 0);
+  
+      const dayDiff = Math.round((currentDate.getTime() - logDate.getTime()) / oneDay);
+  
+      if (dayDiff === 0) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else if (dayDiff > 0) {
+        // Break in streak
+        break;
+      }
     }
+  
     return streak;
   };
 

@@ -135,4 +135,3 @@ export function NewHabitDialog({ onAddHabit }: NewHabitDialogProps) {
     </Dialog>
   );
 }
-

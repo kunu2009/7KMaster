@@ -23,7 +23,7 @@ import {
 import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
 import type { TodayTask, Project, Skill, AggregatedTodo, TimeBlock } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
-import { generateBlockTasks, GenerateBlockTasksInput } from "@/ai/flows/generate-block-tasks-flow";
+import { generateBlockTasks, type GenerateBlockTasksInput } from "@/ai/flows/generate-block-tasks-flow";
 import { useToast } from "@/hooks/use-toast";
 import { PomodoroTimer } from "./pomodoro-timer";
 import { AddTodayTask } from "./add-today-task";
@@ -54,7 +54,7 @@ import {
 
 export function TodayTab() {
   const [tasks, setTasks] = useLocalStorage<TodayTask[]>("todayTasks", initialTodayTasks);
-  const [projects, setProjects] = useLocalStorage<Project[]>("projects", initialProjects);
+  const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
   const [timeBlocks, setTimeBlocks] = useLocalStorage<TimeBlock[]>("timeBlocks", initialTimeBlocks);
 
@@ -184,17 +184,16 @@ export function TodayTab() {
   }, [aggregatedTasks]);
 
   const sortedGroups = useMemo(() => {
-      const allGroups = Object.keys(groupedTasks);
-      const projectActionsGroup = allGroups.filter(g => g === "Project Next Actions");
-      const timeBlockGroups = allGroups
-        .filter(g => g !== "Project Next Actions")
-        .sort((a, b) => {
-            const timeA = a.split(' ')[0];
-            const timeB = b.split(' ')[0];
-            return timeA.localeCompare(timeB);
-        });
-      return [...timeBlockGroups, ...projectActionsGroup];
-  }, [groupedTasks]);
+    const projectActionsGroup = "Project Next Actions";
+    const timeBlockGroups = timeBlocks
+        .map(tb => tb.name)
+        .filter(name => groupedTasks[name]);
+
+    const otherGroups = Object.keys(groupedTasks)
+        .filter(g => g !== projectActionsGroup && !timeBlocks.some(tb => tb.name === g));
+        
+    return [...timeBlockGroups, ...otherGroups, ...(groupedTasks[projectActionsGroup] ? [projectActionsGroup] : [])];
+  }, [groupedTasks, timeBlocks]);
 
 
   return (
