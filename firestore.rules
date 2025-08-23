@@ -1,0 +1,14 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read and write their own projects.
+    // The project document must have a userId field that
+    // matches the UID of the authenticated user.
+    match /projects/{projectId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}
