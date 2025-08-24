@@ -1,8 +1,10 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
+    // Helper function to check ownership
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
@@ -13,48 +15,47 @@ service cloud.firestore {
     }
 
     match /skills/{skillId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
-      allow update, delete: if isOwner(resource.data.userId);
     }
-    
+
     match /notes/{noteId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
-    
+
     match /todayTasks/{taskId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
 
     match /timeBlocks/{blockId} {
-       allow read, update, delete: if isOwner(resource.data.userId);
-       allow create: if isOwner(request.resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
-
+    
     match /habits/{habitId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
     
     match /habitLogs/{logId} {
-      allow read, update, delete: if isOwner(resource.data.userId);
-      allow create: if isOwner(request.resource.data.userId);
-    }
-    
-    match /selfSpace/{itemId} {
        allow read, update, delete: if isOwner(resource.data.userId);
        allow create: if isOwner(request.resource.data.userId);
     }
-    
-    match /researchItems/{itemId} {
+
+    match /selfSpace/{itemId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
 
+    match /researchItems/{itemId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+    }
+    
     match /userMetrics/{userId} {
-       allow read, write: if isOwner(userId);
+      allow read, write: if isOwner(userId);
     }
   }
 }
