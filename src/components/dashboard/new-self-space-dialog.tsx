@@ -81,7 +81,7 @@ export function NewSelfSpaceDialog({ onAddItem }: NewSelfSpaceDialogProps) {
       if (imageFile && !imageUrl) { // Only convert if no URL is already set (from AI or previous upload)
         finalImageUrl = await fileToDataUri(imageFile);
       }
-      onAddItem({ area, status, goal, imageUrl: finalImageUrl });
+      onAddItem({ area, status, goal, imageUrl: finalImageUrl || null });
       setOpen(false);
       // Reset fields
       setArea('');
