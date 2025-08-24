@@ -1,60 +1,66 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-  
+    
+    // Checks if the requesting user is the owner of the document.
+    // For reads/updates, it checks the existing data.
+    // For creates, it checks the incoming data.
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
-  
-    // Projects: Users can only read/write their own projects.
+    
     match /projects/{projectId} {
-      allow read, write: if isOwner(resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
     
-    // Skills: Users can only read/write their own skills.
     match /skills/{skillId} {
-      allow read, write: if isOwner(resource.data.userId) || (request.method == 'read' && resource.data.userId == null);
-    }
-    
-    // Habits: Users can only read/write their own habits.
-    match /habits/{habitId} {
-        allow read, write: if isOwner(resource.data.userId);
+      // Allow reading older docs without userId for backward compatibility
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || !('userId' in resource.data));
+      allow update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
 
-    // HabitLogs: Users can only read/write their own habit logs.
-    match /habitLogs/{logId} {
-        allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // TodayTasks: Users can only read/write their own tasks.
-    match /todayTasks/{taskId} {
-        allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // TimeBlocks: Users can only read/write their own time blocks.
-    match /timeBlocks/{blockId} {
-        allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // Notes: Users can only read/write their own notes.
     match /notes/{noteId} {
-        allow read, write: if isOwner(resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+    }
+
+    match /todayTasks/{taskId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+    }
+
+    match /timeBlocks/{blockId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+    }
+
+    match /habits/{habitId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+    }
+
+    match /habitLogs/{logId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
     
-    // SelfSpace (Journal): Users can only read/write their own entries.
     match /selfSpace/{itemId} {
-        allow read, write: if isOwner(resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
     
-    // ResearchItems: Users can only read/write their own items.
     match /researchItems/{itemId} {
-        allow read, write: if isOwner(resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
     
-    // UserMetrics (for streak, etc.): Users can only access their own document.
-    match /userMetrics/{userId} {
-        allow read, write: if isOwner(userId);
+     match /userMetrics/{userId} {
+      // This collection uses the userId as the documentId
+      allow read, write: if isOwner(userId);
     }
   }
 }
