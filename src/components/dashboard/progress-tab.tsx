@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Rocket, Trophy, Archive, TrendingUp } from "lucide-react";
 import { useAuth } from '@/context/auth-context';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import type { TodayTask } from '@/lib/types';
 
 
@@ -54,8 +54,8 @@ export function ProgressTab() {
     if (!user) return;
     
     // Listen to tasks
-    const tasksQuery = require('firebase/firestore').query(
-        require('firebase/firestore').collection(db, 'todayTasks'), 
+    const tasksQuery = query(
+        collection(db, 'todayTasks'), 
         where('userId', '==', user.uid)
     );
     const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
@@ -86,8 +86,8 @@ export function ProgressTab() {
         const data: Record<string, any[]> = {};
         
         for (const collectionName of collectionsToExport) {
-            const q = require('firebase/firestore').query(collection(db, collectionName), where('userId', '==', user.uid));
-            const querySnapshot = await require('firebase/firestore').getDocs(q);
+            const q = query(collection(db, collectionName), where('userId', '==', user.uid));
+            const querySnapshot = await getDocs(q);
             data[collectionName] = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
         }
       
