@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { initialNotes } from "@/lib/data";
+import { useState, useEffect, useMemo } from 'react';
 import type { Note, NoteBlock } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { NewNoteDialog } from "./new-note-dialog";
 import { NoteDetail } from "./note-detail";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/context/auth-context';
-import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
@@ -32,7 +31,8 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
       return;
     }
     setIsLoading(true);
-    const q = query(collection(db, "notes"), where("userId", "==", user.uid), orderBy("modifiedAt", "desc"));
+    // Remove orderBy from the query to avoid needing a composite index
+    const q = query(collection(db, "notes"), where("userId", "==", user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Note));
       setNotes(userNotes);
@@ -44,6 +44,10 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
     });
     return () => unsubscribe();
   }, [user, toast]);
+
+  const sortedNotes = useMemo(() => {
+    return [...notes].sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime());
+  }, [notes]);
 
   const addNote = async (newNoteData: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content' | 'userId'>) => {
     if (!user) return;
@@ -139,14 +143,14 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
           <div className="flex justify-center items-center h-48">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        ) : notes.length === 0 ? (
+        ) : sortedNotes.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <p>You haven't created any notes yet.</p>
             <p>Click "New Note" to get started.</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {notes.map((note) => (
+            {sortedNotes.map((note) => (
               <Card key={note.id} className="flex flex-col cursor-pointer hover:border-primary" onClick={() => onSelectNote(note)}>
                 <CardHeader>
                   <CardTitle className="text-lg truncate">{note.title}</CardTitle>
