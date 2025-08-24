@@ -1,46 +1,60 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
     match /projects/{projectId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
+
     match /skills/{skillId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(request.resource.data.userId);
+      allow update, delete: if isOwner(resource.data.userId);
     }
+    
     match /notes/{noteId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
+    
     match /todayTasks/{taskId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
-     match /timeBlocks/{blockId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+    match /timeBlocks/{blockId} {
+       allow read, update, delete: if isOwner(resource.data.userId);
+       allow create: if isOwner(request.resource.data.userId);
     }
+
     match /habits/{habitId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
-     match /habitLogs/{logId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    
+    match /habitLogs/{logId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
+    
     match /selfSpace/{itemId} {
-        allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow read, update, delete: if isOwner(resource.data.userId);
+       allow create: if isOwner(request.resource.data.userId);
     }
+    
     match /researchItems/{itemId} {
-        allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
     }
-     match /userMetrics/{userId} {
-      allow read, write: if request.auth != null && userId == request.auth.uid;
+
+    match /userMetrics/{userId} {
+       allow read, write: if isOwner(userId);
     }
   }
 }
