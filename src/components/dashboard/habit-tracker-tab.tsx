@@ -2,8 +2,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { initialHabits } from '@/lib/data';
 import type { Habit, HabitLog } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +24,7 @@ import {
 import * as Icons from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 
@@ -104,11 +102,8 @@ export function HabitTrackerTab() {
         const batch = writeBatch(db);
         batch.delete(doc(db, 'habits', habitId));
         
-        // Find and delete the corresponding log document
         const logsQuery = query(collection(db, 'habitLogs'), where('habitId', '==', habitId), where('userId', '==', user.uid));
-        // This assumes one log doc per habit per user, which should be the case.
-        // In a real app, you might need to handle multiple log docs if the logic allowed it.
-        const logDocs = await require('firebase/firestore').getDocs(logsQuery);
+        const logDocs = await getDocs(logsQuery);
         logDocs.forEach(logDoc => batch.delete(logDoc.ref));
         
         await batch.commit();
@@ -135,9 +130,8 @@ export function HabitTrackerTab() {
     
     try {
         const logsQuery = query(collection(db, 'habitLogs'), where('habitId', '==', habitId), where('userId', '==', user.uid));
-        const logDocs = await require('firebase/firestore').getDocs(logsQuery);
+        const logDocs = await getDocs(logsQuery);
         if (logDocs.empty) {
-            // This case should be rare if addHabit works correctly
             await addDoc(collection(db, 'habitLogs'), { habitId, userId: user.uid, dates: newLogs });
         } else {
             const logDocRef = logDocs.docs[0].ref;
