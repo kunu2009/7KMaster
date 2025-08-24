@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Wand2, Loader, Edit, Trash2 } from "lucide-react";
+import { Minus, Plus, Wand2, Loader, Loader2, Edit, Trash2 } from "lucide-react";
 import { NewSkillDialog } from './new-skill-dialog';
 import { EditSkillDialog } from './edit-skill-dialog';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
