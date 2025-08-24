@@ -8,49 +8,50 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
-    // Projects: Only the owner can read/write their projects
+    // Projects: Allow users to read and write their own projects
     match /projects/{projectId} {
       allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Skills: Only the owner can read/write their skills
+    // Skills: Allow users to read and write their own skills
+    // Added backwards compatibility for skills that might not have a userId yet.
     match /skills/{skillId} {
-      allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // Notes: Only the owner can read/write their notes
-    match /notes/{noteId} {
-      allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // Today's Tasks: Only the owner can read/write their tasks
-    match /todayTasks/{taskId} {
-      allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // Time Blocks: Only the owner can read/write their time blocks
-    match /timeBlocks/{blockId} {
-      allow read, write: if isOwner(resource.data.userId);
+      allow read: if request.auth != null && 
+                    (resource.data.userId == request.auth.uid || !('userId' in resource.data));
+      allow write: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
-    // Habits: Only the owner can read/write their habits
-    match /habits/{habitId} {
+    // Notes: Allow users to read and write their own notes
+    match /notes/{noteId} {
+       allow read, write: if isOwner(resource.data.userId);
+    }
+
+    // Today's Tasks: Allow users to manage their own daily tasks
+     match /todayTasks/{taskId} {
        allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Habit Logs: Only the owner can read/write their habit logs
-    match /habitLogs/{logId} {
-      allow read, write: if isOwner(resource.data.userId);
-    }
-    
-    // Journal (Self & Space): Only the owner can read/write their entries
-    match /selfSpace/{itemId} {
-      allow read, write: if isOwner(resource.data.userId);
+    // Time Blocks: Allow users to manage their own time blocks
+     match /timeBlocks/{blockId} {
+       allow read, write: if isOwner(resource.data.userId);
     }
 
-    // Research Items: Only the owner can read/write their research items
-    match /researchItems/{itemId} {
-      allow read, write: if isOwner(resource.data.userId);
+    // Habits & Logs: Allow users to manage their own habits
+     match /habits/{habitId} {
+       allow read, write: if isOwner(resource.data.userId);
+    }
+     match /habitLogs/{logId} {
+       allow read, write: if isOwner(resource.data.userId);
+    }
+    
+    // Research Items: Allow users to manage their own research items
+     match /researchItems/{itemId} {
+       allow read, write: if isOwner(resource.data.userId);
+    }
+    
+    // Self & Space (Journal): Allow users to manage their own journal entries
+     match /selfSpace/{itemId} {
+       allow read, write: if isOwner(resource.data.userId);
     }
   }
 }
