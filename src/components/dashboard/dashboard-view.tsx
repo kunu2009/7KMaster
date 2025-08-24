@@ -144,7 +144,7 @@ export function DashboardView() {
   
   const DesktopSidebar = () => (
     <aside className="w-14 flex-shrink-0 border-l bg-background flex flex-col">
-      <nav className="flex flex-col items-center gap-4 px-2 sm:py-5 flex-grow">
+      <nav className="flex flex-col items-center gap-4 sm:py-5 flex-grow">
         <div className="flex h-14 w-14 items-center justify-center rounded-lg text-muted-foreground shrink-0">
              <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +161,7 @@ export function DashboardView() {
             <span className="sr-only">7K Life</span>
         </div>
         <ScrollArea className="flex-1 w-full">
-            <div className="flex flex-col items-center gap-4 px-2">
+            <div className="flex flex-col items-center gap-4">
                 {displayedNavItems.map(item => <NavLink key={item.id} item={item} />)}
             </div>
         </ScrollArea>
