@@ -67,7 +67,7 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
     return () => unsubscribe(); // Cleanup listener on component unmount
   }, [user, toast]);
 
-  const addProject = async (newProject: Omit<Project, 'id' | 'lastWorked'>) => {
+  const addProject = async (newProject: Omit<Project, 'id' | 'lastWorked' | 'attachments'>) => {
     if (!user) {
         toast({ title: "Not Authenticated", description: "You must be logged in to add a project.", variant: "destructive" });
         return;
@@ -84,6 +84,7 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
         const docRef = await addDoc(collection(db, "projects"), fullProject);
         const newProjectWithId = { ...fullProject, id: docRef.id };
         onSelectProject(newProjectWithId);
+        toast({ title: "Project Added", description: `"${fullProject.name}" has been created.`});
     } catch(e) {
         console.error("Error adding document: ", e);
         toast({ title: "Error", description: "Could not save your new project.", variant: "destructive" });

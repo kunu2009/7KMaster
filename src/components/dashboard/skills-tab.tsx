@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { initialSkills } from "@/lib/data";
 import type { Skill } from "@/lib/types";
@@ -30,21 +30,55 @@ import {
 } from "@/components/ui/alert-dialog"
 import { motion } from 'framer-motion';
 import { EmptyState } from './empty-state';
+import { useAuth } from '@/context/auth-context';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export function SkillsTab() {
-  const [skills, setSkills] = useLocalStorage<Skill[]>(
-    "skills",
-    initialSkills
-  );
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
   const [focusMode, setFocusMode] = useState(false);
   const [isGeneratingFocus, setIsGeneratingFocus] = useState(false);
   const [focusSkillIds, setFocusSkillIds] = useState<string[]>([]);
   const [focusReasoning, setFocusReasoning] = useState('');
-  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!user) {
+        setIsLoading(false);
+        setSkills([]);
+        return;
+    };
+    
+    setIsLoading(true);
+    const q = query(collection(db, "skills"), where("userId", "==", user.uid));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const userSkills: Skill[] = [];
+        querySnapshot.forEach((doc) => {
+            userSkills.push({ id: doc.id, ...doc.data() } as Skill);
+        });
+        setSkills(userSkills);
+        setIsLoading(false);
+    }, (error) => {
+        console.error("Error fetching skills: ", error);
+        toast({ title: "Error", description: "Could not fetch your skills.", variant: "destructive"});
+        setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user, toast]);
 
   const handleFocusModeChange = async (checked: boolean) => {
     setFocusMode(checked);
     if (checked) {
+        if (skills.length < 3) {
+            toast({ title: "Not Enough Skills", description: "AI Focus mode requires at least 3 skills to provide suggestions."});
+            setFocusMode(false);
+            return;
+        }
         setIsGeneratingFocus(true);
         setFocusReasoning('');
         try {
@@ -60,7 +94,6 @@ export function SkillsTab() {
                 description: 'Could not generate AI focus suggestions. Showing top 3 skills.',
                 variant: 'destructive',
             });
-            // Fallback to showing first 3 skills
             setFocusSkillIds(skills.slice(0, 3).map(s => s.id));
         } finally {
             setIsGeneratingFocus(false);
@@ -73,26 +106,52 @@ export function SkillsTab() {
 
   const displayedSkills = focusMode ? skills.filter(s => focusSkillIds.includes(s.id)) : skills;
 
-  const addSkill = (newSkill: Omit<Skill, 'id'>) => {
-    setSkills(prev => [...prev, { ...newSkill, id: `${Date.now()}` }]);
+  const addSkill = async (newSkill: Omit<Skill, 'id'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'skills'), { ...newSkill, userId: user.uid });
+      toast({ title: "Skill Added", description: `"${newSkill.area}" has been added.`});
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Error", description: "Could not add skill.", variant: "destructive"});
+    }
   }
 
-  const updateSkill = (updatedSkill: Skill) => {
-    setSkills(prev => prev.map(s => s.id === updatedSkill.id ? updatedSkill : s));
+  const updateSkill = async (updatedSkill: Skill) => {
+    if (!user) return;
+    const { id, ...skillData } = updatedSkill;
+    try {
+      await updateDoc(doc(db, 'skills', id), skillData);
+      toast({ title: "Skill Updated", description: `"${skillData.area}" has been updated.`});
+    } catch(e) {
+      console.error(e);
+      toast({ title: "Error", description: "Could not update skill.", variant: "destructive"});
+    }
   };
   
-  const deleteSkill = (skillId: string) => {
-    setSkills(prev => prev.filter(s => s.id !== skillId));
+  const deleteSkill = async (skillId: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, 'skills', skillId));
+      toast({ title: "Skill Deleted", description: "The skill has been removed."});
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Error", description: "Could not delete skill.", variant: "destructive"});
+    }
   }
 
-  const updateProgress = (skillId: string, amount: number) => {
-    setSkills(prev => prev.map(skill => {
-        if (skill.id === skillId) {
-            const newProgress = Math.max(0, Math.min(skill.progress + amount, skill.maxProgress));
-            return { ...skill, progress: newProgress };
-        }
-        return skill;
-    }));
+  const updateProgress = async (skillId: string, amount: number) => {
+    if (!user) return;
+    const skillToUpdate = skills.find(s => s.id === skillId);
+    if (!skillToUpdate) return;
+    
+    const newProgress = Math.max(0, Math.min(skillToUpdate.progress + amount, skillToUpdate.maxProgress));
+    try {
+      await updateDoc(doc(db, 'skills', skillId), { progress: newProgress });
+    } catch(e) {
+       console.error(e);
+      toast({ title: "Error", description: "Could not update progress.", variant: "destructive"});
+    }
   };
 
   return (
@@ -111,6 +170,7 @@ export function SkillsTab() {
                 id="focus-mode" 
                 checked={focusMode}
                 onCheckedChange={handleFocusModeChange}
+                disabled={skills.length < 3}
               />
               <Label htmlFor="focus-mode" className="flex items-center gap-1">
                 <Wand2 className="h-4 w-4" />
@@ -134,7 +194,11 @@ export function SkillsTab() {
             </div>
         )}
         
-        {skills.length === 0 ? (
+        {isLoading ? (
+            <div className="flex justify-center items-center h-48">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        ) : skills.length === 0 ? (
             <EmptyState 
                 title="No Skills Added"
                 subtitle="Start your growth journey by adding a new skill to track."
