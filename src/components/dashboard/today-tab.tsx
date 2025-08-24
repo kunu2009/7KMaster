@@ -201,17 +201,17 @@ export function TodayTab() {
         <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <CardTitle>Today's Command Center</CardTitle>
                       <CardDescription>
                         Your aggregated tasks for today from all sources.
                       </CardDescription>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                       <ManageTimeBlocksDialog timeBlocks={timeBlocks} setTimeBlocks={setTimeBlocks} />
                       {tasks.length === 0 && (
-                          <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan}>
+                          <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan} className="flex-grow sm:flex-grow-0">
                               {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                               AI Generate Daily Plan
                           </Button>
