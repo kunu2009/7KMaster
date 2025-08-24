@@ -2,9 +2,10 @@
 
 
 
+
 export type TimeBlock = { id: string; name: string };
 
-export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean };
+export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean; userId?: string; };
 
 export type AggregatedTodo = {
     id: string;
@@ -37,9 +38,9 @@ export type Project = {
     userId?: string;
 };
 
-export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number };
+export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number; userId?: string; };
 
-export type SelfSpaceItem = { id: string; area: string; status: string; goal: string; imageUrl?: string };
+export type SelfSpaceItem = { id: string; area: string; status: string; goal: string; imageUrl?: string; userId?: string; };
 
 export type ResearchType = 'Tool' | 'Website' | 'Article' | 'Video' | 'Course';
 
@@ -51,6 +52,7 @@ export type ResearchItem = {
     description: string;
     attachment?: string;
     todos: Todo[];
+    userId?: string;
 };
 
 export type NoteBlock = {
@@ -66,6 +68,7 @@ export type Note = {
   content: NoteBlock[];
   createdAt: string;
   modifiedAt: string;
+  userId?: string;
 };
 
 export type Habit = {
@@ -74,9 +77,15 @@ export type Habit = {
     icon: string;
     frequency: 'daily';
     goal: number; // e.g., 7 times a week for a daily habit
+    userId?: string;
 };
 
-export type HabitLog = Record<string, string[]>; // habitId: ['2024-07-28', '2024-07-29']
+// HabitLog will have a document per habit, containing the log data.
+export type HabitLog = {
+    habitId: string;
+    userId: string;
+    dates: string[]; // ['2024-07-28', '2024-07-29']
+};
 
 export type LawNote = {
   topic: string;

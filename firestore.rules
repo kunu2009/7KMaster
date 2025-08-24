@@ -1,57 +1,60 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check ownership
+  
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
-
-    // Projects: Allow users to read and write their own projects
+  
+    // Projects: Users can only read/write their own projects.
     match /projects/{projectId} {
       allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Skills: Allow users to read and write their own skills
-    // Added backwards compatibility for skills that might not have a userId yet.
+    // Skills: Users can only read/write their own skills.
     match /skills/{skillId} {
-      allow read: if request.auth != null && 
-                    (resource.data.userId == request.auth.uid || !('userId' in resource.data));
-      allow write: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, write: if isOwner(resource.data.userId) || (request.method == 'read' && resource.data.userId == null);
+    }
+    
+    // Habits: Users can only read/write their own habits.
+    match /habits/{habitId} {
+        allow read, write: if isOwner(resource.data.userId);
     }
 
-    // Notes: Allow users to read and write their own notes
+    // HabitLogs: Users can only read/write their own habit logs.
+    match /habitLogs/{logId} {
+        allow read, write: if isOwner(resource.data.userId);
+    }
+    
+    // TodayTasks: Users can only read/write their own tasks.
+    match /todayTasks/{taskId} {
+        allow read, write: if isOwner(resource.data.userId);
+    }
+    
+    // TimeBlocks: Users can only read/write their own time blocks.
+    match /timeBlocks/{blockId} {
+        allow read, write: if isOwner(resource.data.userId);
+    }
+    
+    // Notes: Users can only read/write their own notes.
     match /notes/{noteId} {
-       allow read, write: if isOwner(resource.data.userId);
-    }
-
-    // Today's Tasks: Allow users to manage their own daily tasks
-     match /todayTasks/{taskId} {
-       allow read, write: if isOwner(resource.data.userId);
+        allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Time Blocks: Allow users to manage their own time blocks
-     match /timeBlocks/{blockId} {
-       allow read, write: if isOwner(resource.data.userId);
-    }
-
-    // Habits & Logs: Allow users to manage their own habits
-     match /habits/{habitId} {
-       allow read, write: if isOwner(resource.data.userId);
-    }
-     match /habitLogs/{logId} {
-       allow read, write: if isOwner(resource.data.userId);
+    // SelfSpace (Journal): Users can only read/write their own entries.
+    match /selfSpace/{itemId} {
+        allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Research Items: Allow users to manage their own research items
-     match /researchItems/{itemId} {
-       allow read, write: if isOwner(resource.data.userId);
+    // ResearchItems: Users can only read/write their own items.
+    match /researchItems/{itemId} {
+        allow read, write: if isOwner(resource.data.userId);
     }
     
-    // Self & Space (Journal): Allow users to manage their own journal entries
-     match /selfSpace/{itemId} {
-       allow read, write: if isOwner(resource.data.userId);
+    // UserMetrics (for streak, etc.): Users can only access their own document.
+    match /userMetrics/{userId} {
+        allow read, write: if isOwner(userId);
     }
   }
 }

@@ -1,6 +1,7 @@
 
 "use client"
 
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -20,11 +21,11 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Download, Rocket, Trophy, Archive, TrendingUp } from "lucide-react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import {
-  initialTodayTasks,
-} from "@/lib/data";
-import type { TodayTask } from "@/lib/types";
+import { useAuth } from '@/context/auth-context';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import type { TodayTask } from '@/lib/types';
+
 
 const weeklyBurnupData = [
   { date: 'Week 1', completed: 5, added: 8 },
@@ -45,31 +46,58 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ProgressTab() {
-  const [tasks] = useLocalStorage<TodayTask[]>(
-    "todayTasks",
-    initialTodayTasks
-  );
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<TodayTask[]>([]);
+  const [streak, setStreak] = useState(0);
 
-  // This is a simplified calculation. A real implementation would need to track streak over days.
-  const [streak] = useLocalStorage<number>("dailyStreak", 5);
+  useEffect(() => {
+    if (!user) return;
+    
+    // Listen to tasks
+    const tasksQuery = require('firebase/firestore').query(
+        require('firebase/firestore').collection(db, 'todayTasks'), 
+        where('userId', '==', user.uid)
+    );
+    const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
+        setTasks(snapshot.docs.map(doc => doc.data() as TodayTask));
+    });
+
+    // Listen to user metrics for streak
+    const metricsDocRef = doc(db, 'userMetrics', user.uid);
+    const unsubMetrics = onSnapshot(metricsDocRef, (doc) => {
+      if (doc.exists()) {
+        setStreak(doc.data().dailyStreak || 0);
+      }
+    });
+
+    return () => {
+      unsubTasks();
+      unsubMetrics();
+    };
+
+  }, [user]);
+
   const completedTasks = tasks.filter((task) => task.done);
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    if(!user) return;
     try {
-      const data = {
-        todayTasks: JSON.parse(localStorage.getItem('todayTasks') || '[]'),
-        projects: JSON.parse(localStorage.getItem('projects') || '[]'),
-        skills: JSON.parse(localStorage.getItem('skills') || '[]'),
-        selfSpace: JSON.parse(localStorage.getItem('selfSpace') || '[]'),
-        notes: JSON.parse(localStorage.getItem('notes') || '[]'),
-      };
-      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-        JSON.stringify(data, null, 2)
-      )}`;
-      const link = document.createElement("a");
-      link.href = jsonString;
-      link.download = `7k-life-backup-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
+        const collectionsToExport = ['projects', 'skills', 'notes', 'todayTasks', 'timeBlocks', 'habits', 'habitLogs', 'selfSpace', 'researchItems'];
+        const data: Record<string, any[]> = {};
+        
+        for (const collectionName of collectionsToExport) {
+            const q = require('firebase/firestore').query(collection(db, collectionName), where('userId', '==', user.uid));
+            const querySnapshot = await require('firebase/firestore').getDocs(q);
+            data[collectionName] = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+        }
+      
+        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+            JSON.stringify(data, null, 2)
+        )}`;
+        const link = document.createElement("a");
+        link.href = jsonString;
+        link.download = `7k-life-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
     } catch (error) {
       console.error("Failed to export data", error);
     }
@@ -80,7 +108,7 @@ export function ProgressTab() {
        <div className="lg:col-span-2 grid gap-6 md:grid-cols-3">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Daily Routine Streak</CardTitle>
+                <CardTitle className="text-sm font-medium">Daily Task Streak</CardTitle>
                 <Rocket className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -90,11 +118,11 @@ export function ProgressTab() {
         </Card>
          <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Completed Tasks</CardTitle>
+                <CardTitle className="text-sm font-medium">Completed Tasks Today</CardTitle>
                 <Trophy className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{completedTasks.length} This Cycle</div>
+                <div className="text-2xl font-bold">{completedTasks.length}</div>
                 <p className="text-xs text-muted-foreground">Total from current daily plan</p>
             </CardContent>
         </Card>
@@ -146,7 +174,7 @@ export function ProgressTab() {
                     <h3 className="font-medium">Export Progress</h3>
                     <p className="text-sm text-muted-foreground">Download all your data as a JSON file.</p>
                 </div>
-                <Button onClick={handleExport} size="sm">
+                <Button onClick={handleExport} size="sm" disabled={!user}>
                     <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
             </div>

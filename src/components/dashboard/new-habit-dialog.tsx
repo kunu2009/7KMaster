@@ -28,7 +28,7 @@ import * as Icons from 'lucide-react';
 import { ScrollArea } from "../ui/scroll-area";
 
 interface NewHabitDialogProps {
-  onAddHabit: (habit: Omit<Habit, 'id'>) => void;
+  onAddHabit: (habit: Omit<Habit, 'id' | 'userId'>) => void;
 }
 
 // A curated list of icons to avoid dynamic import issues.

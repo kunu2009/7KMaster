@@ -18,7 +18,7 @@ import { PlusCircle } from "lucide-react";
 import type { Note } from "@/lib/types";
 
 interface NewNoteDialogProps {
-    onAddNote: (note: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content'>) => void;
+    onAddNote: (noteData: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content' | 'userId'>) => void;
 }
 
 export function NewNoteDialog({ onAddNote }: NewNoteDialogProps) {

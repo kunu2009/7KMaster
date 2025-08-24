@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { generateJournalImage } from "@/ai/flows/generate-journal-image-flow";
 
 interface NewSelfSpaceDialogProps {
-    onAddItem: (item: Omit<SelfSpaceItem, 'id'>) => void;
+    onAddItem: (item: Omit<SelfSpaceItem, 'id' | 'userId'>) => void;
 }
 
 export function NewSelfSpaceDialog({ onAddItem }: NewSelfSpaceDialogProps) {
