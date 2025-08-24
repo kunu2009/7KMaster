@@ -39,7 +39,7 @@ export function NewResearchItemDialog({ onAddItem }: NewResearchItemDialogProps)
 
   const handleSubmit = () => {
     if (name && url && description) {
-      onAddItem({ name, type, url, description, attachment: attachment?.name });
+      onAddItem({ name, type, url, description, attachment: attachment?.name || null });
       setOpen(false);
       // Reset fields
       setName('');
