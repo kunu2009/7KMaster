@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Separator } from '../ui/separator';
 
 
 interface ProjectDetailProps {
@@ -204,7 +205,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-8">
         {isEditing ? (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                 <h3 className="font-semibold text-lg">Edit Project Details</h3>
@@ -268,8 +269,9 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             </div>
         ) : (
              <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Description</h3>
-                <p className="text-sm text-muted-foreground">{currentProject.description || "No description provided."}</p>
+                <h3 className="font-semibold text-lg">Next Action</h3>
+                <p className="text-muted-foreground">{currentProject.nextAction || "No next action defined."}</p>
+                 <Separator className="pt-4"/>
             </div>
         )}
 
@@ -282,30 +284,29 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
                     AI Generate Tasks
                 </Button>
             </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {(currentProject.todos || []).map(todo => (
-              <div key={todo.id} className="group flex items-center gap-3">
+              <div key={todo.id} className="group flex items-start gap-3 p-2 rounded-md hover:bg-muted/50">
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
                   onCheckedChange={() => handleToggleTodo(todo.id)}
+                  className="mt-1"
                 />
-                <Input 
-                  value={todo.text}
-                  onChange={(e) => handleEditTodo(todo.id, e.target.value)}
-                  className={`flex-1 h-9 border-0 shadow-none focus-visible:ring-0 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
-                />
+                <Label htmlFor={`todo-${todo.id}`} className={`flex-1 text-sm leading-snug ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+                    {todo.text}
+                </Label>
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="shrink-0 opacity-50 group-hover:opacity-100">
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Button variant="ghost" size="icon" className="shrink-0 opacity-0 group-hover:opacity-100 h-8 w-8">
+                            <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete this to-do item.
+                        This action will permanently delete this to-do item.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -324,10 +325,12 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
               placeholder="Add a new to-do item..."
               onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
             />
-            <Button onClick={handleAddTodo}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
+            <Button onClick={handleAddTodo}><PlusCircle className="mr-2 h-4 w-4" /> Add Task</Button>
           </div>
         </div>
         
+         <Separator />
+
         {/* Attachments */}
         <div className="space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-2">
@@ -338,7 +341,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             {(currentProject.attachments || []).map(attachment => (
               <div key={attachment.id} className="flex items-center gap-3 p-2 rounded-md border bg-muted/20">
                 <LinkIcon className="h-4 w-4 text-muted-foreground" />
-                <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium text-primary hover:underline">
+                <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm font-medium text-primary hover:underline truncate">
                   {attachment.name}
                 </a>
                 <a href={attachment.url} target="_blank" rel="noopener noreferrer">
@@ -356,6 +359,8 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
             )}
           </div>
         </div>
+
+        <Separator />
 
         {/* Work Log */}
         <div className="space-y-6">
@@ -387,3 +392,5 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
     </Card>
   );
 }
+
+    
