@@ -23,6 +23,9 @@ import {
 import { PlusCircle } from "lucide-react";
 import type { TodayTask, TimeBlock } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useAuth } from "@/context/auth-context";
 
 interface AddTodayTaskProps {
     onAddTask: (task: Omit<TodayTask, 'id' | 'userId'>) => void;
@@ -33,8 +36,17 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
   const [task, setTask] = useState("");
   const [timeBlock, setTimeBlock] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleAddTask = () => {
+    if (!user) {
+        toast({
+            title: "Not Authenticated",
+            description: "You must be logged in to add a task.",
+            variant: "destructive",
+        });
+        return;
+    }
     if (!task.trim() || !timeBlock) {
         toast({
             title: "Missing Information",
@@ -99,3 +111,5 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
     </Card>
   );
 }
+
+    

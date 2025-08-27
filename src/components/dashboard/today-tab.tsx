@@ -13,9 +13,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon, Settings, Trash2, Loader2 } from 'lucide-react';
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialProjects, initialSkills, initialTimeBlocks } from "@/lib/data";
-import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
 import type { TodayTask, Project, Skill, AggregatedTodo, TimeBlock } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
 import { generateBlockTasks, type GenerateBlockTasksInput } from "@/ai/flows/generate-block-tasks-flow";
@@ -48,6 +45,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { hscEnglishPoetry, hscEnglishProse } from "@/lib/hsc-data";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { initialProjects, initialSkills } from "@/lib/data";
 
 
 export function TodayTab() {
@@ -84,6 +84,15 @@ export function TodayTab() {
     const unsubBlocks = onSnapshot(blocksQuery, (snapshot) => {
         if (snapshot.empty) {
             // If user has no timeblocks, set the initial ones for them
+            const initialTimeBlocks: Omit<TimeBlock, 'id'|'userId'>[] = [
+                { name: "08:00 - 08:30 Morning Routine" },
+                { name: "09:00 - 11:00 Focus Block 1" },
+                { name: "11:30 - 12:30 Skill Practice" },
+                { name: "13:30 - 14:30 Admin & Breaks" },
+                { name: "15:00 - 17:00 Focus Block 2" },
+                { name: "17:00 - 17:30 Afternoon Wrap-up" },
+                { name: "20:00 - 21:00 Evening Review" },
+            ];
             const batch = writeBatch(db);
             initialTimeBlocks.forEach(block => {
                 const docRef = doc(collection(db, 'timeBlocks'));
@@ -109,7 +118,7 @@ export function TodayTab() {
         .map(p => ({
             id: `proj-${p.id}`,
             text: p.nextAction,
-            source: p.name,
+            source: 'Project Next Actions', // Use a consistent group name
             completed: false // Not trackable here
         }));
 
@@ -256,7 +265,7 @@ export function TodayTab() {
 
   const groupedTasks = useMemo(() => {
     return aggregatedTasks.reduce((acc, task) => {
-        const group = task.id.startsWith('proj-') ? "Project Next Actions" : task.source;
+        const group = task.source;
         if (!acc[group]) {
             acc[group] = [];
         }
@@ -267,14 +276,27 @@ export function TodayTab() {
 
   const sortedGroups = useMemo(() => {
     const projectActionsGroup = "Project Next Actions";
-    const timeBlockGroups = timeBlocks
+    // Get all time block names that have tasks
+    const timeBlockGroupNames = timeBlocks
         .map(tb => tb.name)
         .filter(name => groupedTasks[name]);
-
-    const otherGroups = Object.keys(groupedTasks)
+    
+    // Get any other group names that aren't project actions or in the time blocks list
+    const otherGroupNames = Object.keys(groupedTasks)
         .filter(g => g !== projectActionsGroup && !timeBlocks.some(tb => tb.name === g));
         
-    return [...timeBlockGroups, ...otherGroups, ...(groupedTasks[projectActionsGroup] ? [projectActionsGroup] : [])];
+    // Combine them, ensuring project actions are last
+    const allGroups = [
+        ...timeBlockGroupNames,
+        ...otherGroupNames
+    ];
+
+    if (groupedTasks[projectActionsGroup]) {
+        allGroups.push(projectActionsGroup);
+    }
+    
+    // Use Set to get unique group names while preserving order
+    return [...new Set(allGroups)];
   }, [groupedTasks, timeBlocks]);
 
 
@@ -309,8 +331,8 @@ export function TodayTab() {
                     </div>
                   ) : aggregatedTasks.length > 0 ? (
                     <div className="space-y-6">
-                      {sortedGroups.map((groupName) => (
-                        <div key={groupName}>
+                      {sortedGroups.map((groupName, index) => (
+                        <div key={`${groupName}-${index}`}>
                           <div className="flex justify-between items-center mb-2 border-b pb-1">
                               <h3 className="font-semibold text-lg text-primary">{groupName}</h3>
                                {groupName !== "Project Next Actions" && (
@@ -427,7 +449,23 @@ export function TodayTab() {
               </CardContent>
                {tasks.length > 0 && !isLoading && (
                 <CardFooter>
-                    <Button variant="destructive" size="sm" onClick={clearDailyPlan}>Clear Daily Plan</Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">Clear Daily Plan</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete all tasks from your daily plan.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={clearDailyPlan}>Delete All</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </CardFooter>
               )}
             </Card>
@@ -439,3 +477,5 @@ export function TodayTab() {
     </div>
   );
 }
+
+    
