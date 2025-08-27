@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Edit, Save, PlusCircle, Trash2, Wand2, Loader, Link as LinkIcon, ExternalLink, MoreVertical } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { generateProjectTodos } from '@/ai/flows/generate-project-todos-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Separator } from '../ui/separator';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 
 interface ProjectDetailProps {
@@ -42,6 +43,8 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
   const [editedProject, setEditedProject] = useState<Project>(project);
   const [newTodo, setNewTodo] = useState('');
   const [newLogEntry, setNewLogEntry] = useState('');
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  const [editingLogText, setEditingLogText] = useState('');
   const [isGeneratingTodos, setIsGeneratingTodos] = useState(false);
   const { toast } = useToast();
 
@@ -150,15 +153,6 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
       onUpdateProject(updatedProject);
   };
 
-  const handleEditTodo = (todoId: string, newText: string) => {
-    const updatedProject = {
-        ...project,
-        todos: (project.todos || []).map(t => t.id === todoId ? { ...t, text: newText } : t),
-    }
-    onUpdateProject(updatedProject);
-    setEditedProject(updatedProject);
-  };
-
   const handleAddLog = () => {
     if (newLogEntry.trim() !== '') {
       const log: WorkLogEntry = {
@@ -171,6 +165,33 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
       onUpdateProject(updatedProject);
       setNewLogEntry('');
     }
+  };
+  
+  const handleStartEditLog = (log: WorkLogEntry) => {
+      setEditingLogId(log.id);
+      setEditingLogText(log.description);
+  }
+
+  const handleCancelEditLog = () => {
+      setEditingLogId(null);
+      setEditingLogText('');
+  }
+
+  const handleUpdateLog = () => {
+    if (!editingLogId) return;
+    const updatedWorkLog = (editedProject.workLog || []).map(log => 
+        log.id === editingLogId ? { ...log, description: editingLogText } : log
+    );
+    const updatedProject = { ...editedProject, workLog: updatedWorkLog };
+    onUpdateProject(updatedProject);
+    setEditingLogId(null);
+    setEditingLogText('');
+  }
+  
+  const handleDeleteLog = (logId: string) => {
+      const updatedWorkLog = (editedProject.workLog || []).filter(log => log.id !== logId);
+      const updatedProject = { ...editedProject, workLog: updatedWorkLog };
+      onUpdateProject(updatedProject);
   };
   
   const currentProject = isEditing ? editedProject : project;
@@ -293,7 +314,7 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
                   onCheckedChange={() => handleToggleTodo(todo.id)}
                   className="mt-1"
                 />
-                <Label htmlFor={`todo-${todo.id}`} className={`flex-1 text-sm leading-snug ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+                <Label htmlFor={`todo-${todo.id}`} className={`flex-1 text-sm font-normal leading-snug ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
                     {todo.text}
                 </Label>
                 <AlertDialog>
@@ -378,9 +399,60 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
           )}
           <div className="space-y-4">
             {(currentProject.workLog || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(log => (
-              <div key={log.id} className="p-3 border-l-2 pl-4 rounded-r-md bg-muted/20">
-                <p className="font-semibold text-sm">{log.date}</p>
-                <p className="text-muted-foreground text-sm">{log.description}</p>
+              <div key={log.id} className="group relative p-3 border-l-2 pl-4 rounded-r-md bg-muted/20">
+                {editingLogId === log.id ? (
+                  <div className="space-y-2">
+                    <Textarea 
+                      value={editingLogText}
+                      onChange={(e) => setEditingLogText(e.target.value)}
+                      className="bg-background"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button size="sm" variant="ghost" onClick={handleCancelEditLog}>Cancel</Button>
+                      <Button size="sm" onClick={handleUpdateLog}>Save</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="font-semibold text-sm">{log.date}</p>
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{log.description}</p>
+                    {isEditing && (
+                      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                               <Button variant="ghost" size="icon" className="h-7 w-7">
+                                  <MoreVertical className="h-4 w-4" />
+                               </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                               <DropdownMenuItem onClick={() => handleStartEditLog(log)}>
+                                  <Edit className="mr-2 h-4 w-4"/> Edit
+                               </DropdownMenuItem>
+                               <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+                                          <Trash2 className="mr-2 h-4 w-4"/> Delete
+                                      </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                          This will permanently delete this log entry. This action cannot be undone.
+                                      </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDeleteLog(log.id)}>Delete</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                  </AlertDialogContent>
+                               </AlertDialog>
+                            </DropdownMenuContent>
+                         </DropdownMenu>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
              {(currentProject.workLog || []).length === 0 && !isEditing && (
@@ -392,5 +464,3 @@ export function ProjectDetail({ project, onUpdateProject, onDeleteProject, onBac
     </Card>
   );
 }
-
-    
