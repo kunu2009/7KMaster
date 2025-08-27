@@ -23,17 +23,15 @@ import {
 import { PlusCircle } from "lucide-react";
 import type { TodayTask, TimeBlock } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialTimeBlocks } from "@/lib/data";
 
 interface AddTodayTaskProps {
-    onAddTask: (task: TodayTask) => void;
+    onAddTask: (task: Omit<TodayTask, 'id' | 'userId'>) => void;
+    timeBlocks: TimeBlock[];
 }
 
-export function AddTodayTask({ onAddTask }: AddTodayTaskProps) {
+export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
   const [task, setTask] = useState("");
   const [timeBlock, setTimeBlock] = useState("");
-  const [timeBlocks] = useLocalStorage<TimeBlock[]>("timeBlocks", initialTimeBlocks);
   const { toast } = useToast();
 
   const handleAddTask = () => {
@@ -46,8 +44,7 @@ export function AddTodayTask({ onAddTask }: AddTodayTaskProps) {
       return;
     }
 
-    const newTask: TodayTask = {
-      id: `${Date.now()}`,
+    const newTask: Omit<TodayTask, 'id' | 'userId'> = {
       task: task.trim(),
       timeBlock,
       done: false,

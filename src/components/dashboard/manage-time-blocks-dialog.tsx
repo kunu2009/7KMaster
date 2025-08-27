@@ -18,35 +18,56 @@ import { Settings, Plus, Trash2 } from "lucide-react";
 import type { TimeBlock } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "../ui/scroll-area";
+import { useAuth } from "@/context/auth-context";
+import { db } from "@/lib/firebase";
+import { collection, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+
 
 interface ManageTimeBlocksDialogProps {
     timeBlocks: TimeBlock[];
-    setTimeBlocks: (blocks: TimeBlock[]) => void;
 }
 
-export function ManageTimeBlocksDialog({ timeBlocks, setTimeBlocks }: ManageTimeBlocksDialogProps) {
+export function ManageTimeBlocksDialog({ timeBlocks }: ManageTimeBlocksDialogProps) {
   const [open, setOpen] = useState(false);
   const [newBlockName, setNewBlockName] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handleAddBlock = () => {
-    if (newBlockName.trim() === "") {
+  const handleAddBlock = async () => {
+    if (!user || !newBlockName.trim()) {
         toast({ title: 'Block name cannot be empty', variant: 'destructive'});
         return;
     }
-    const newBlock: TimeBlock = { id: `tb-${Date.now()}`, name: newBlockName.trim() };
-    setTimeBlocks([...timeBlocks, newBlock]);
-    setNewBlockName("");
-    toast({ title: 'Time Block Added!' });
+    const newBlock = { name: newBlockName.trim(), userId: user.uid };
+    try {
+        await addDoc(collection(db, 'timeBlocks'), newBlock);
+        setNewBlockName("");
+        toast({ title: 'Time Block Added!' });
+    } catch(e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not add time block.', variant: 'destructive'});
+    }
   };
 
-  const handleUpdateBlock = (id: string, newName: string) => {
-    setTimeBlocks(timeBlocks.map(block => block.id === id ? { ...block, name: newName } : block));
+  const handleUpdateBlock = async (id: string, newName: string) => {
+    if (!user) return;
+    try {
+        await updateDoc(doc(db, 'timeBlocks', id), { name: newName });
+    } catch(e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not update time block.', variant: 'destructive'});
+    }
   };
 
-  const handleDeleteBlock = (id: string) => {
-    setTimeBlocks(timeBlocks.filter(block => block.id !== id));
-    toast({ title: 'Time Block Removed' });
+  const handleDeleteBlock = async (id: string) => {
+    if (!user) return;
+    try {
+        await deleteDoc(doc(db, 'timeBlocks', id));
+        toast({ title: 'Time Block Removed' });
+    } catch(e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not remove time block.', variant: 'destructive'});
+    }
   };
 
 

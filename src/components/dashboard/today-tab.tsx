@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -12,14 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon, Settings, Trash2 } from 'lucide-react';
+import { Loader, Wand2, PlusCircle, BrainCircuit, GanttChartSquare, Scale, ScrollText, BookCopy, Languages, TrendingUp, Vote, BookText as EnglishIcon, Settings, Trash2, Loader2 } from 'lucide-react';
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import {
-  initialTodayTasks,
-  initialProjects,
-  initialSkills,
-  initialTimeBlocks,
-} from "@/lib/data";
+import { initialProjects, initialSkills, initialTimeBlocks } from "@/lib/data";
 import { hscEnglishProse, hscEnglishPoetry } from "@/lib/hsc-data";
 import type { TodayTask, Project, Skill, AggregatedTodo, TimeBlock } from "@/lib/types";
 import { generateDailyPlan } from "@/ai/flows/generate-daily-plan-flow";
@@ -29,6 +24,9 @@ import { PomodoroTimer } from "./pomodoro-timer";
 import { AddTodayTask } from "./add-today-task";
 import { ScrollArea } from "../ui/scroll-area";
 import { ManageTimeBlocksDialog } from "./manage-time-blocks-dialog";
+import { useAuth } from "@/context/auth-context";
+import { db } from "@/lib/firebase";
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,15 +51,57 @@ import {
 
 
 export function TodayTab() {
-  const [tasks, setTasks] = useLocalStorage<TodayTask[]>("todayTasks", initialTodayTasks);
+  const [tasks, setTasks] = useState<TodayTask[]>([]);
   const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
   const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
-  const [timeBlocks, setTimeBlocks] = useLocalStorage<TimeBlock[]>("timeBlocks", initialTimeBlocks);
+  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
   const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+        setIsLoading(false);
+        setTasks([]);
+        setTimeBlocks([]);
+        return;
+    };
+
+    setIsLoading(true);
+
+    const tasksQuery = query(collection(db, 'todayTasks'), where('userId', '==', user.uid));
+    const blocksQuery = query(collection(db, 'timeBlocks'), where('userId', '==', user.uid));
+
+    const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
+        setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TodayTask)));
+        setIsLoading(false);
+    });
+
+    const unsubBlocks = onSnapshot(blocksQuery, (snapshot) => {
+        if (snapshot.empty) {
+            // If user has no timeblocks, set the initial ones for them
+            const batch = writeBatch(db);
+            initialTimeBlocks.forEach(block => {
+                const docRef = doc(collection(db, 'timeBlocks'));
+                batch.set(docRef, { ...block, userId: user.uid });
+            });
+            batch.commit().then(() => {
+                // The listener will pick up the new blocks.
+            });
+        } else {
+             setTimeBlocks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TimeBlock)).sort((a,b) => a.name.localeCompare(b.name)));
+        }
+    });
+
+    return () => {
+        unsubTasks();
+        unsubBlocks();
+    };
+  }, [user]);
 
   const aggregatedTasks = useMemo<AggregatedTodo[]>(() => {
     const projectNextActions: AggregatedTodo[] = projects
@@ -83,27 +123,44 @@ export function TodayTab() {
     return [...dailyPlanTasks, ...projectNextActions];
   }, [tasks, projects]);
   
-  const handleToggleTask = (id: string) => {
-    // Only daily plan tasks can be toggled
-    if (id.startsWith('proj-')) return;
+  const handleToggleTask = async (id: string) => {
+    if (id.startsWith('proj-') || !user) return;
     
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
-      )
-    );
+    const taskToUpdate = tasks.find(t => t.id === id);
+    if (taskToUpdate) {
+        const taskRef = doc(db, 'todayTasks', id);
+        try {
+            await updateDoc(taskRef, { done: !taskToUpdate.done });
+        } catch(e) {
+            console.error(e);
+            toast({ title: 'Error', description: 'Could not update task status.', variant: 'destructive'});
+        }
+    }
   };
   
-  const handleDeleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
-    toast({ title: 'Task Removed', description: 'The task has been deleted from your daily plan.' });
+  const handleDeleteTask = async (id: string) => {
+    if (!user) return;
+    try {
+        await deleteDoc(doc(db, 'todayTasks', id));
+        toast({ title: 'Task Removed', description: 'The task has been deleted from your daily plan.' });
+    } catch(e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not delete task.', variant: 'destructive'});
+    }
   }
 
-  const handleAddTask = (newTask: TodayTask) => {
-    setTasks(prev => [...prev, newTask]);
+  const handleAddTask = async (task: Omit<TodayTask, 'id' | 'userId'>) => {
+    if (!user) return;
+    try {
+        await addDoc(collection(db, 'todayTasks'), { ...task, userId: user.uid });
+    } catch(e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not add new task.', variant: 'destructive'});
+    }
   };
   
   const handleGeneratePlan = async () => {
+    if (!user) return;
     setIsGeneratingPlan(true);
     try {
       const result = await generateDailyPlan({ 
@@ -111,8 +168,18 @@ export function TodayTab() {
         skills: skills.map(({ area, weeklyGoal }) => ({ area, weeklyGoal })),
         timeBlocks: timeBlocks,
       });
-      if (result.tasks) {
-        setTasks(result.tasks);
+      if (result.tasks && result.tasks.length > 0) {
+        // Clear existing tasks and add new ones
+        const batch = writeBatch(db);
+        tasks.forEach(task => {
+            batch.delete(doc(db, 'todayTasks', task.id));
+        });
+        result.tasks.forEach(task => {
+            const docRef = doc(collection(db, 'todayTasks'));
+            batch.set(docRef, { ...task, userId: user.uid });
+        });
+        await batch.commit();
+
         toast({ title: 'Plan Generated!', description: 'Your daily plan has been created.' });
       }
     } catch (error) {
@@ -124,6 +191,7 @@ export function TodayTab() {
   };
 
   const handleGenerateBlockTasks = async (taskType: GenerateBlockTasksInput['taskType'], blockTitle: string) => {
+    if (!user) return;
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
@@ -139,18 +207,22 @@ export function TodayTab() {
         if (taskType === 'HSC English') {
             input.hscEnglish = [...hscEnglishProse.map(p => p.title), ...hscEnglishPoetry.map(p => p.title)];
         }
-        // TODO: Add context for other HSC subjects when data is available
         
         const result = await generateBlockTasks(input);
 
         if (result.tasks && result.tasks.length > 0) {
-            const newTasks: TodayTask[] = result.tasks.map(taskText => ({
-                id: `${Date.now()}-${Math.random()}`,
-                timeBlock: blockTitle,
-                task: taskText,
-                done: false
-            }));
-            setTasks(prev => [...prev, ...newTasks]);
+            const batch = writeBatch(db);
+            result.tasks.forEach(taskText => {
+                const docRef = doc(collection(db, 'todayTasks'));
+                const newTask: Omit<TodayTask, 'id'> = {
+                    timeBlock: blockTitle,
+                    task: taskText,
+                    done: false,
+                    userId: user.uid
+                };
+                batch.set(docRef, newTask);
+            });
+            await batch.commit();
             toast({ title: 'Tasks Added!', description: `${result.tasks.length} new tasks suggested for ${blockTitle}`});
         } else {
             toast({ title: 'No new tasks', description: 'The AI couldn\'t think of any new tasks for this block.'});
@@ -171,6 +243,16 @@ export function TodayTab() {
         toast({title: "Pomodoro Complete!", description: `Task "${task.text}" marked as done.`})
      }
   }
+
+  const clearDailyPlan = async () => {
+    if (!user || tasks.length === 0) return;
+    const batch = writeBatch(db);
+    tasks.forEach(task => {
+        batch.delete(doc(db, 'todayTasks', task.id));
+    });
+    await batch.commit();
+    toast({title: 'Plan Cleared', description: 'Your daily tasks have been removed.'})
+  };
 
   const groupedTasks = useMemo(() => {
     return aggregatedTasks.reduce((acc, task) => {
@@ -209,7 +291,7 @@ export function TodayTab() {
                       </CardDescription>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-                      <ManageTimeBlocksDialog timeBlocks={timeBlocks} setTimeBlocks={setTimeBlocks} />
+                      <ManageTimeBlocksDialog timeBlocks={timeBlocks} />
                       {tasks.length === 0 && (
                           <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan} className="flex-grow sm:flex-grow-0">
                               {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
@@ -221,7 +303,11 @@ export function TodayTab() {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[calc(100vh-22rem)] pr-4">
-                  {aggregatedTasks.length > 0 ? (
+                  {isLoading ? (
+                    <div className="flex justify-center items-center h-48">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : aggregatedTasks.length > 0 ? (
                     <div className="space-y-6">
                       {sortedGroups.map((groupName) => (
                         <div key={groupName}>
@@ -339,15 +425,15 @@ export function TodayTab() {
                   )}
                 </ScrollArea>
               </CardContent>
-               {tasks.length > 0 && (
+               {tasks.length > 0 && !isLoading && (
                 <CardFooter>
-                    <Button variant="destructive" size="sm" onClick={() => setTasks([])}>Clear Daily Plan</Button>
+                    <Button variant="destructive" size="sm" onClick={clearDailyPlan}>Clear Daily Plan</Button>
                 </CardFooter>
               )}
             </Card>
         </div>
         <div className="lg:col-span-1 space-y-6">
-            <AddTodayTask onAddTask={handleAddTask} />
+            <AddTodayTask onAddTask={handleAddTask} timeBlocks={timeBlocks} />
             <PomodoroTimer focusedTask={focusedTask} onPomodoroComplete={handlePomodoroComplete} />
         </div>
     </div>

@@ -3,7 +3,8 @@
 
 
 
-export type TimeBlock = { id: string; name: string };
+
+export type TimeBlock = { id: string; name: string; userId?: string; };
 
 export type TodayTask = { id: string; timeBlock: string; task: string; done: boolean; userId?: string; };
 
@@ -40,7 +41,7 @@ export type Project = {
 
 export type Skill = { id: string; area: string; level: string; weeklyGoal: string; progress: number; maxProgress: number; userId?: string; };
 
-export type SelfSpaceItem = { id: string; area: string; status: string; goal: string; imageUrl?: string; userId?: string; };
+export type SelfSpaceItem = { id: string; area: string; status: string; goal: string; imageUrl?: string | null; userId?: string; };
 
 export type ResearchType = 'Tool' | 'Website' | 'Article' | 'Video' | 'Course';
 
@@ -50,7 +51,7 @@ export type ResearchItem = {
     type: ResearchType;
     url: string;
     description: string;
-    attachment?: string;
+    attachment: string | null;
     todos: Todo[];
     userId?: string;
 };
