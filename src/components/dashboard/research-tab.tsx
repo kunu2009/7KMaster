@@ -36,6 +36,7 @@ export function ResearchTab() {
   const [selectedItem, setSelectedItem] = useState<ResearchItem | null>(null);
 
   const items = user ? firestoreItems : localItems;
+  const setItems = user ? setFirestoreItems : setLocalItems;
   
   useEffect(() => {
     if (!user) {
@@ -59,8 +60,8 @@ export function ResearchTab() {
   const addItem = async (newItem: Omit<ResearchItem, 'id' | 'todos' | 'userId'>) => {
     const itemWithTodos = { ...newItem, todos: [] };
     if (!user) {
-        setLocalItems(prev => [...prev, {...itemWithTodos, id: `${Date.now()}`}]);
-        toast({ title: 'Item Added!', description: `"${newItem.name}" has been saved.` });
+        setItems(prev => [...prev, {...itemWithTodos, id: `${Date.now()}`}]);
+        toast({ title: 'Item Added (Guest Mode)', description: `"${newItem.name}" has been saved.` });
         return;
     }
     try {
@@ -74,7 +75,7 @@ export function ResearchTab() {
   
   const updateItem = async (updatedItem: ResearchItem) => {
     if (!user) {
-        setLocalItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+        setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
         if (selectedItem?.id === updatedItem.id) {
             setSelectedItem(updatedItem);
         }
@@ -94,11 +95,11 @@ export function ResearchTab() {
   
   const deleteItem = async (itemId: string) => {
      if (!user) {
-        setLocalItems(prev => prev.filter(item => item.id !== itemId));
+        setItems(prev => prev.filter(item => item.id !== itemId));
         if (selectedItem?.id === itemId) {
             setSelectedItem(null);
         }
-        toast({ title: 'Item Deleted' });
+        toast({ title: 'Item Deleted (Guest Mode)' });
         return;
     }
     try {

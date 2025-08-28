@@ -85,9 +85,10 @@ export function HabitTrackerTab() {
   }, [user]);
 
   const addHabit = async (newHabit: Omit<Habit, 'id' | 'userId'>) => {
-    const habitWithId = { ...newHabit, id: `${Date.now()}` };
     if (!user) {
+      const habitWithId = { ...newHabit, id: `${Date.now()}` };
       setLocalHabits(prev => [...prev, habitWithId]);
+      toast({ title: "Habit Added (Guest Mode)"});
       return;
     }
     try {
@@ -103,7 +104,8 @@ export function HabitTrackerTab() {
   
   const updateHabit = async (updatedHabit: Habit) => {
     if (!user) {
-      setLocalHabits(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+      setHabits(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+      toast({ title: "Habit Updated (Guest Mode)"});
       return;
     }
     const { id, ...habitData } = updatedHabit;
@@ -118,12 +120,13 @@ export function HabitTrackerTab() {
   
   const deleteHabit = async (habitId: string) => {
     if (!user) {
-       setLocalHabits(prev => prev.filter(h => h.id !== habitId));
-       setLocalHabitLogs(prev => {
+       setHabits(prev => prev.filter(h => h.id !== habitId));
+       setHabitLogs(prev => {
            const newLogs = {...prev};
            delete newLogs[habitId];
            return newLogs;
        });
+       toast({ title: "Habit Deleted (Guest Mode)"});
        return;
     }
     try {
@@ -151,7 +154,7 @@ export function HabitTrackerTab() {
       : [...logs, dateString];
 
     if (!user) {
-        setLocalHabitLogs(prev => ({...prev, [habitId]: newLogs }));
+        setHabitLogs(prev => ({...prev, [habitId]: newLogs }));
         return;
     }
     

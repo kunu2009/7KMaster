@@ -47,27 +47,35 @@ import {
 } from "@/components/ui/alert-dialog"
 import { hscEnglishPoetry, hscEnglishProse } from "@/lib/hsc-data";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialProjects, initialSkills } from "@/lib/data";
+import { initialProjects, initialSkills, initialTimeBlocks, initialTodayTasks } from "@/lib/data";
 
 
 export function TodayTab() {
-  const [tasks, setTasks] = useState<TodayTask[]>([]);
-  const [projects] = useLocalStorage<Project[]>("projects", initialProjects);
-  const [skills] = useLocalStorage<Skill[]>("skills", initialSkills);
-  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
+  const [localTasks, setLocalTasks] = useLocalStorage<TodayTask[]>('todayTasks_guest', initialTodayTasks);
+  const [firestoreTasks, setFirestoreTasks] = useState<TodayTask[]>([]);
+  
+  const [localTimeBlocks, setLocalTimeBlocks] = useLocalStorage<TimeBlock[]>('timeBlocks_guest', initialTimeBlocks);
+  const [firestoreTimeBlocks, setFirestoreTimeBlocks] = useState<TimeBlock[]>([]);
+  
+  const [projects] = useLocalStorage<Project[]>("projects_guest", initialProjects);
+  const [skills] = useLocalStorage<Skill[]>("skills_guest", initialSkills);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [generatingBlock, setGeneratingBlock] = useState<string | null>(null);
   const [focusedTask, setFocusedTask] = useState<AggregatedTodo | null>(null);
-  const { toast } = useToast();
-  const { user } = useAuth();
+
+  const tasks = user ? firestoreTasks : localTasks;
+  const setTasks = user ? setFirestoreTasks : setLocalTasks;
+  const timeBlocks = user ? firestoreTimeBlocks : localTimeBlocks;
+  const setTimeBlocks = user ? setFirestoreTimeBlocks : setLocalTimeBlocks;
 
   useEffect(() => {
     if (!user) {
         setIsLoading(false);
-        setTasks([]);
-        setTimeBlocks([]);
         return;
     };
 
@@ -77,32 +85,21 @@ export function TodayTab() {
     const blocksQuery = query(collection(db, 'timeBlocks'), where('userId', '==', user.uid));
 
     const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
-        setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TodayTask)));
-        setIsLoading(false);
-    });
+        setFirestoreTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TodayTask)));
+        if (isLoading) setIsLoading(false);
+    }, () => setIsLoading(false));
 
     const unsubBlocks = onSnapshot(blocksQuery, (snapshot) => {
         if (snapshot.empty) {
-            // If user has no timeblocks, set the initial ones for them
-            const initialTimeBlocks: Omit<TimeBlock, 'id'|'userId'>[] = [
-                { name: "08:00 - 08:30 Morning Routine" },
-                { name: "09:00 - 11:00 Focus Block 1" },
-                { name: "11:30 - 12:30 Skill Practice" },
-                { name: "13:30 - 14:30 Admin & Breaks" },
-                { name: "15:00 - 17:00 Focus Block 2" },
-                { name: "17:00 - 17:30 Afternoon Wrap-up" },
-                { name: "20:00 - 21:00 Evening Review" },
-            ];
             const batch = writeBatch(db);
             initialTimeBlocks.forEach(block => {
                 const docRef = doc(collection(db, 'timeBlocks'));
-                batch.set(docRef, { ...block, userId: user.uid });
+                const { id, ...rest } = block;
+                batch.set(docRef, { ...rest, userId: user.uid });
             });
-            batch.commit().then(() => {
-                // The listener will pick up the new blocks.
-            });
+            batch.commit();
         } else {
-             setTimeBlocks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TimeBlock)).sort((a,b) => a.name.localeCompare(b.name)));
+             setFirestoreTimeBlocks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TimeBlock)).sort((a,b) => a.name.localeCompare(b.name)));
         }
     });
 
@@ -133,7 +130,12 @@ export function TodayTab() {
   }, [tasks, projects]);
   
   const handleToggleTask = async (id: string) => {
-    if (id.startsWith('proj-') || !user) return;
+    if (id.startsWith('proj-')) return;
+    
+    if (!user) {
+        setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+        return;
+    }
     
     const taskToUpdate = tasks.find(t => t.id === id);
     if (taskToUpdate) {
@@ -148,7 +150,11 @@ export function TodayTab() {
   };
   
   const handleDeleteTask = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+        setTasks(prev => prev.filter(t => t.id !== id));
+        toast({ title: 'Task Removed (Guest Mode)' });
+        return;
+    }
     try {
         await deleteDoc(doc(db, 'todayTasks', id));
         toast({ title: 'Task Removed', description: 'The task has been deleted from your daily plan.' });
@@ -159,7 +165,11 @@ export function TodayTab() {
   }
 
   const handleAddTask = async (task: Omit<TodayTask, 'id' | 'userId'>) => {
-    if (!user) return;
+    if (!user) {
+        const newTask = { ...task, id: `${Date.now()}` };
+        setTasks(prev => [...prev, newTask]);
+        return;
+    }
     try {
         await addDoc(collection(db, 'todayTasks'), { ...task, userId: user.uid });
     } catch(e) {
@@ -169,26 +179,30 @@ export function TodayTab() {
   };
   
   const handleGeneratePlan = async () => {
-    if (!user) return;
+    const planProjects = user ? projects : initialProjects.map(p => ({name: p.name, nextAction: p.nextAction}));
+    const planSkills = user ? skills : initialSkills.map(s => ({area: s.area, weeklyGoal: s.weeklyGoal}));
+
     setIsGeneratingPlan(true);
     try {
       const result = await generateDailyPlan({ 
-        projects: projects.map(({ name, nextAction }) => ({ name, nextAction })),
-        skills: skills.map(({ area, weeklyGoal }) => ({ area, weeklyGoal })),
+        projects: planProjects,
+        skills: planSkills,
         timeBlocks: timeBlocks,
       });
       if (result.tasks && result.tasks.length > 0) {
-        // Clear existing tasks and add new ones
-        const batch = writeBatch(db);
-        tasks.forEach(task => {
-            batch.delete(doc(db, 'todayTasks', task.id));
-        });
-        result.tasks.forEach(task => {
-            const docRef = doc(collection(db, 'todayTasks'));
-            batch.set(docRef, { ...task, userId: user.uid });
-        });
-        await batch.commit();
-
+        if(!user) {
+            setTasks(result.tasks.map(t => ({...t, id: `${Date.now()}-${t.id}`})));
+        } else {
+            const batch = writeBatch(db);
+            tasks.forEach(task => {
+                batch.delete(doc(db, 'todayTasks', task.id));
+            });
+            result.tasks.forEach(task => {
+                const docRef = doc(collection(db, 'todayTasks'));
+                batch.set(docRef, { ...task, userId: user.uid });
+            });
+            await batch.commit();
+        }
         toast({ title: 'Plan Generated!', description: 'Your daily plan has been created.' });
       }
     } catch (error) {
@@ -200,7 +214,6 @@ export function TodayTab() {
   };
 
   const handleGenerateBlockTasks = async (taskType: GenerateBlockTasksInput['taskType'], blockTitle: string) => {
-    if (!user) return;
     setGeneratingBlock(blockTitle);
     try {
         const existingTasks = tasks.filter(t => t.timeBlock === blockTitle).map(t => t.task);
@@ -220,18 +233,23 @@ export function TodayTab() {
         const result = await generateBlockTasks(input);
 
         if (result.tasks && result.tasks.length > 0) {
-            const batch = writeBatch(db);
-            result.tasks.forEach(taskText => {
-                const docRef = doc(collection(db, 'todayTasks'));
-                const newTask: Omit<TodayTask, 'id'> = {
-                    timeBlock: blockTitle,
-                    task: taskText,
-                    done: false,
-                    userId: user.uid
-                };
-                batch.set(docRef, newTask);
-            });
-            await batch.commit();
+            if(!user) {
+                const newTasks: TodayTask[] = result.tasks.map(t => ({ id: `${Date.now()}-${t}`, task: t, timeBlock: blockTitle, done: false }));
+                setTasks(prev => [...prev, ...newTasks]);
+            } else {
+                const batch = writeBatch(db);
+                result.tasks.forEach(taskText => {
+                    const docRef = doc(collection(db, 'todayTasks'));
+                    const newTask: Omit<TodayTask, 'id'> = {
+                        timeBlock: blockTitle,
+                        task: taskText,
+                        done: false,
+                        userId: user.uid
+                    };
+                    batch.set(docRef, newTask);
+                });
+                await batch.commit();
+            }
             toast({ title: 'Tasks Added!', description: `${result.tasks.length} new tasks suggested for ${blockTitle}`});
         } else {
             toast({ title: 'No new tasks', description: 'The AI couldn\'t think of any new tasks for this block.'});
@@ -254,7 +272,12 @@ export function TodayTab() {
   }
 
   const clearDailyPlan = async () => {
-    if (!user || tasks.length === 0) return;
+    if (!user) {
+        setTasks([]);
+        toast({title: 'Plan Cleared', description: 'Your daily tasks have been removed.'});
+        return;
+    }
+    if (tasks.length === 0) return;
     const batch = writeBatch(db);
     tasks.forEach(task => {
         batch.delete(doc(db, 'todayTasks', task.id));
@@ -276,16 +299,13 @@ export function TodayTab() {
 
   const sortedGroups = useMemo(() => {
     const projectActionsGroup = "Project Next Actions";
-    // Get all time block names that have tasks
     const timeBlockGroupNames = timeBlocks
         .map(tb => tb.name)
         .filter(name => groupedTasks[name]);
     
-    // Get any other group names that aren't project actions or in the time blocks list
     const otherGroupNames = Object.keys(groupedTasks)
         .filter(g => g !== projectActionsGroup && !timeBlocks.some(tb => tb.name === g));
         
-    // Combine them, ensuring project actions are last
     const allGroups = [
         ...timeBlockGroupNames,
         ...otherGroupNames
@@ -295,7 +315,6 @@ export function TodayTab() {
         allGroups.push(projectActionsGroup);
     }
     
-    // Use Set to get unique group names while preserving order
     return [...new Set(allGroups)];
   }, [groupedTasks, timeBlocks]);
 
@@ -313,7 +332,7 @@ export function TodayTab() {
                       </CardDescription>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-                      <ManageTimeBlocksDialog timeBlocks={timeBlocks} />
+                      <ManageTimeBlocksDialog timeBlocks={timeBlocks} setTimeBlocks={setTimeBlocks} />
                       {tasks.length === 0 && (
                           <Button onClick={handleGeneratePlan} disabled={isGeneratingPlan} className="flex-grow sm:flex-grow-0">
                               {isGeneratingPlan ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
@@ -325,7 +344,7 @@ export function TodayTab() {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[calc(100vh-22rem)] pr-4">
-                  {isLoading ? (
+                  {isLoading && user ? (
                     <div className="flex justify-center items-center h-48">
                         <Loader2 className="h-8 w-8 animate-spin" />
                     </div>
@@ -447,7 +466,7 @@ export function TodayTab() {
                   )}
                 </ScrollArea>
               </CardContent>
-               {tasks.length > 0 && !isLoading && (
+               {tasks.length > 0 && (!isLoading || !user) && (
                 <CardFooter>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -477,5 +496,3 @@ export function TodayTab() {
     </div>
   );
 }
-
-    

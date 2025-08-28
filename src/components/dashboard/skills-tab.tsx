@@ -43,6 +43,7 @@ export function SkillsTab() {
   const [isLoading, setIsLoading] = useState(true);
 
   const skills = user ? firestoreSkills : localSkills;
+  const setSkills = user ? setFirestoreSkills : setLocalSkills;
 
   const [focusMode, setFocusMode] = useState(false);
   const [isGeneratingFocus, setIsGeneratingFocus] = useState(false);
@@ -127,14 +128,12 @@ export function SkillsTab() {
 
   const updateSkill = async (updatedSkill: Skill) => {
      if (!user) {
-        setLocalSkills(prev => prev.map(s => s.id === updatedSkill.id ? updatedSkill : s));
-        toast({ title: "Skill Updated (Guest Mode)"});
+        setSkills(prev => prev.map(s => s.id === updatedSkill.id ? updatedSkill : s));
         return;
     }
     const { id, ...skillData } = updatedSkill;
     try {
       await updateDoc(doc(db, 'skills', id), skillData);
-      toast({ title: "Skill Updated", description: `"${skillData.area}" has been updated.`});
     } catch(e) {
       console.error(e);
       toast({ title: "Error", description: "Could not update skill.", variant: "destructive"});
@@ -143,7 +142,7 @@ export function SkillsTab() {
   
   const deleteSkill = async (skillId: string) => {
     if (!user) {
-        setLocalSkills(prev => prev.filter(s => s.id !== skillId));
+        setSkills(prev => prev.filter(s => s.id !== skillId));
         toast({ title: "Skill Deleted (Guest Mode)"});
         return;
     }

@@ -25,19 +25,29 @@ import { collection, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestor
 
 interface ManageTimeBlocksDialogProps {
     timeBlocks: TimeBlock[];
+    setTimeBlocks: (value: TimeBlock[] | ((val: TimeBlock[]) => TimeBlock[])) => void;
 }
 
-export function ManageTimeBlocksDialog({ timeBlocks }: ManageTimeBlocksDialogProps) {
+export function ManageTimeBlocksDialog({ timeBlocks, setTimeBlocks }: ManageTimeBlocksDialogProps) {
   const [open, setOpen] = useState(false);
   const [newBlockName, setNewBlockName] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
 
   const handleAddBlock = async () => {
-    if (!user || !newBlockName.trim()) {
+    if (!newBlockName.trim()) {
         toast({ title: 'Block name cannot be empty', variant: 'destructive'});
         return;
     }
+
+    if(!user) {
+        const newBlock = { id: `${Date.now()}`, name: newBlockName.trim() };
+        setTimeBlocks(prev => [...prev, newBlock].sort((a,b) => a.name.localeCompare(b.name)));
+        setNewBlockName("");
+        toast({ title: 'Time Block Added! (Guest Mode)' });
+        return;
+    }
+
     const newBlock = { name: newBlockName.trim(), userId: user.uid };
     try {
         await addDoc(collection(db, 'timeBlocks'), newBlock);
@@ -50,7 +60,10 @@ export function ManageTimeBlocksDialog({ timeBlocks }: ManageTimeBlocksDialogPro
   };
 
   const handleUpdateBlock = async (id: string, newName: string) => {
-    if (!user) return;
+    if(!user) {
+        setTimeBlocks(prev => prev.map(b => b.id === id ? {...b, name: newName} : b));
+        return;
+    }
     try {
         await updateDoc(doc(db, 'timeBlocks', id), { name: newName });
     } catch(e) {
@@ -60,7 +73,11 @@ export function ManageTimeBlocksDialog({ timeBlocks }: ManageTimeBlocksDialogPro
   };
 
   const handleDeleteBlock = async (id: string) => {
-    if (!user) return;
+     if(!user) {
+        setTimeBlocks(prev => prev.filter(b => b.id !== id));
+        toast({ title: 'Time Block Removed (Guest Mode)' });
+        return;
+    }
     try {
         await deleteDoc(doc(db, 'timeBlocks', id));
         toast({ title: 'Time Block Removed' });
@@ -105,7 +122,7 @@ export function ManageTimeBlocksDialog({ timeBlocks }: ManageTimeBlocksDialogPro
             </ScrollArea>
              <div className="flex items-center gap-2 border-t pt-4">
               <Input
-                placeholder="Add new block (e.g., 18:00 - 19:00 Dinner)"
+                placeholder="Add new block (e.g., 18:00 Dinner)"
                 value={newBlockName}
                 onChange={(e) => setNewBlockName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddBlock()}
