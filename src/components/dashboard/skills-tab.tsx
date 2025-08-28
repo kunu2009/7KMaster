@@ -2,8 +2,6 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialSkills } from "@/lib/data";
 import type { Skill } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -33,12 +31,18 @@ import { EmptyState } from './empty-state';
 import { useAuth } from '@/context/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { initialSkills } from '@/lib/data';
 
 export function SkillsTab() {
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const [localSkills, setLocalSkills] = useLocalStorage<Skill[]>('skills_guest', initialSkills);
+  const [firestoreSkills, setFirestoreSkills] = useState<Skill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const skills = user ? firestoreSkills : localSkills;
 
   const [focusMode, setFocusMode] = useState(false);
   const [isGeneratingFocus, setIsGeneratingFocus] = useState(false);
@@ -48,7 +52,6 @@ export function SkillsTab() {
   useEffect(() => {
     if (!user) {
         setIsLoading(false);
-        setSkills([]);
         return;
     };
     
@@ -60,7 +63,7 @@ export function SkillsTab() {
         querySnapshot.forEach((doc) => {
             userSkills.push({ id: doc.id, ...doc.data() } as Skill);
         });
-        setSkills(userSkills);
+        setFirestoreSkills(userSkills);
         setIsLoading(false);
     }, (error) => {
         console.error("Error fetching skills: ", error);
@@ -106,11 +109,16 @@ export function SkillsTab() {
 
   const displayedSkills = focusMode ? skills.filter(s => focusSkillIds.includes(s.id)) : skills;
 
-  const addSkill = async (newSkill: Omit<Skill, 'id'>) => {
-    if (!user) return;
+  const addSkill = async (newSkillData: Omit<Skill, 'id' | 'userId'>) => {
+    if (!user) {
+        const skillWithId = { ...newSkillData, id: `${Date.now()}`};
+        setLocalSkills(prev => [...prev, skillWithId]);
+        toast({ title: "Skill Added (Guest Mode)"});
+        return;
+    }
     try {
-      await addDoc(collection(db, 'skills'), { ...newSkill, userId: user.uid });
-      toast({ title: "Skill Added", description: `"${newSkill.area}" has been added.`});
+      await addDoc(collection(db, 'skills'), { ...newSkillData, userId: user.uid });
+      toast({ title: "Skill Added", description: `"${newSkillData.area}" has been added.`});
     } catch (e) {
       console.error(e);
       toast({ title: "Error", description: "Could not add skill.", variant: "destructive"});
@@ -118,7 +126,11 @@ export function SkillsTab() {
   }
 
   const updateSkill = async (updatedSkill: Skill) => {
-    if (!user) return;
+     if (!user) {
+        setLocalSkills(prev => prev.map(s => s.id === updatedSkill.id ? updatedSkill : s));
+        toast({ title: "Skill Updated (Guest Mode)"});
+        return;
+    }
     const { id, ...skillData } = updatedSkill;
     try {
       await updateDoc(doc(db, 'skills', id), skillData);
@@ -130,7 +142,11 @@ export function SkillsTab() {
   };
   
   const deleteSkill = async (skillId: string) => {
-    if (!user) return;
+    if (!user) {
+        setLocalSkills(prev => prev.filter(s => s.id !== skillId));
+        toast({ title: "Skill Deleted (Guest Mode)"});
+        return;
+    }
     try {
       await deleteDoc(doc(db, 'skills', skillId));
       toast({ title: "Skill Deleted", description: "The skill has been removed."});
@@ -140,18 +156,14 @@ export function SkillsTab() {
     }
   }
 
-  const updateProgress = async (skillId: string, amount: number) => {
-    if (!user) return;
+  const updateProgress = (skillId: string, amount: number) => {
     const skillToUpdate = skills.find(s => s.id === skillId);
     if (!skillToUpdate) return;
     
     const newProgress = Math.max(0, Math.min(skillToUpdate.progress + amount, skillToUpdate.maxProgress));
-    try {
-      await updateDoc(doc(db, 'skills', skillId), { progress: newProgress });
-    } catch(e) {
-       console.error(e);
-      toast({ title: "Error", description: "Could not update progress.", variant: "destructive"});
-    }
+    const updatedSkill = { ...skillToUpdate, progress: newProgress };
+    
+    updateSkill(updatedSkill);
   };
 
   return (
@@ -194,7 +206,7 @@ export function SkillsTab() {
             </div>
         )}
         
-        {isLoading ? (
+        {isLoading && user ? (
             <div className="flex justify-center items-center h-48">
                 <Loader2 className="h-8 w-8 animate-spin" />
             </div>

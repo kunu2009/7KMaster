@@ -2,8 +2,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { initialProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +9,15 @@ import { NewProjectDialog } from "./new-project-dialog";
 import { ProjectDetail } from "./project-detail";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ArrowUpDown, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { EmptyState } from "./empty-state";
 import { useAuth } from "@/context/auth-context";
 import { collection, addDoc, onSnapshot, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { initialProjects } from "@/lib/data";
 
 
 const statusColors: Record<ProjectStatus, string> = {
@@ -35,16 +35,22 @@ interface ProjectsTabProps {
 }
 
 export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabProps) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [localProjects, setLocalProjects] = useLocalStorage<Project[]>('projects_guest', initialProjects);
+  const [firestoreProjects, setFirestoreProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [sortBy, setSortBy] = useLocalStorage<SortOption>('projectSortOrder', 'lastWorked');
+  
+  const projects = user ? firestoreProjects : localProjects;
+  const setProjects = user ? setFirestoreProjects : setLocalProjects;
+
 
   useEffect(() => {
     if (!user) {
         setIsLoading(false);
-        setProjects([]); // Clear projects if user logs out
         return;
     };
     
@@ -56,7 +62,7 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
         querySnapshot.forEach((doc) => {
             userProjects.push({ id: doc.id, ...doc.data() } as Project);
         });
-        setProjects(userProjects);
+        setFirestoreProjects(userProjects);
         setIsLoading(false);
     }, (error) => {
         console.error("Error fetching projects: ", error);
@@ -67,22 +73,26 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
     return () => unsubscribe(); // Cleanup listener on component unmount
   }, [user, toast]);
 
-  const addProject = async (newProject: Omit<Project, 'id' | 'lastWorked' | 'attachments'>) => {
-    if (!user) {
-        toast({ title: "Not Authenticated", description: "You must be logged in to add a project.", variant: "destructive" });
-        return;
-    }
-    const fullProject = {
+  const addProject = async (newProject: Omit<Project, 'id' | 'lastWorked' | 'attachments' | 'userId'>) => {
+    const fullProject: Omit<Project, 'id' | 'userId'> = {
       ...newProject,
-      userId: user.uid,
       lastWorked: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
       todos: [],
       workLog: [],
       attachments: [],
     };
+
+    if (!user) {
+        const projectWithId = { ...fullProject, id: `${Date.now()}` };
+        setLocalProjects(prev => [...prev, projectWithId]);
+        onSelectProject(projectWithId);
+        toast({ title: "Project Added (Guest Mode)", description: `"${fullProject.name}" has been created.`});
+        return;
+    }
+
     try {
-        const docRef = await addDoc(collection(db, "projects"), fullProject);
-        const newProjectWithId = { ...fullProject, id: docRef.id };
+        const docRef = await addDoc(collection(db, "projects"), { ...fullProject, userId: user.uid });
+        const newProjectWithId = { ...fullProject, id: docRef.id, userId: user.uid };
         onSelectProject(newProjectWithId);
         toast({ title: "Project Added", description: `"${fullProject.name}" has been created.`});
     } catch(e) {
@@ -92,6 +102,11 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
   }
 
   const handleUpdateProject = async (updatedProject: Project) => {
+    if (!user) {
+        setLocalProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
+        onSelectProject(updatedProject);
+        return;
+    }
     const { id, ...projectData } = updatedProject;
      try {
         await updateDoc(doc(db, "projects", id), projectData);
@@ -103,6 +118,12 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
   };
   
   const handleDeleteProject = async (projectId: string) => {
+     if (!user) {
+        setLocalProjects(prev => prev.filter(p => p.id !== projectId));
+        onSelectProject(null);
+        toast({ title: "Project Deleted (Guest Mode)" });
+        return;
+     }
      try {
         await deleteDoc(doc(db, "projects", projectId));
         onSelectProject(null);
@@ -191,7 +212,7 @@ export function ProjectsTab({ selectedProject, onSelectProject }: ProjectsTabPro
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading && user ? (
             <div className="flex justify-center items-center h-48">
                 <Loader2 className="h-8 w-8 animate-spin" />
             </div>
