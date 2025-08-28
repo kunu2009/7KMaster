@@ -39,14 +39,6 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
   const { user } = useAuth();
 
   const handleAddTask = () => {
-    if (!user) {
-        toast({
-            title: "Not Authenticated",
-            description: "You must be logged in to add a task.",
-            variant: "destructive",
-        });
-        return;
-    }
     if (!task.trim() || !timeBlock) {
         toast({
             title: "Missing Information",
@@ -64,7 +56,7 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
 
     onAddTask(newTask);
     setTask("");
-    setTimeBlock("");
+    // Do not reset timeBlock, user might want to add multiple tasks to the same block
     toast({
         title: "Task Added!",
         description: `"${newTask.task}" has been added to your plan.`,
@@ -86,7 +78,8 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
                 id="task-description"
                 placeholder="e.g., Finish the presentation slides"
                 value={task}
-                onChange={(e) => setTask(e.target.value)} 
+                onChange={(e) => setTask(e.target.value)}
+                onKeyDown={(e) => { if(e.key === 'Enter') handleAddTask() }}
             />
         </div>
         <div className="space-y-2">
@@ -111,5 +104,3 @@ export function AddTodayTask({ onAddTask, timeBlocks }: AddTodayTaskProps) {
     </Card>
   );
 }
-
-    

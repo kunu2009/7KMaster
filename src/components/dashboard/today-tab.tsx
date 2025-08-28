@@ -60,8 +60,11 @@ export function TodayTab() {
   const [localTimeBlocks, setLocalTimeBlocks] = useLocalStorage<TimeBlock[]>('timeBlocks_guest', initialTimeBlocks);
   const [firestoreTimeBlocks, setFirestoreTimeBlocks] = useState<TimeBlock[]>([]);
   
-  const [projects] = useLocalStorage<Project[]>("projects_guest", initialProjects);
-  const [skills] = useLocalStorage<Skill[]>("skills_guest", initialSkills);
+  const [localProjects] = useLocalStorage<Project[]>("projects_guest", initialProjects);
+  const [localSkills] = useLocalStorage<Skill[]>("skills_guest", initialSkills);
+  
+  const [firestoreProjects, setFirestoreProjects] = useState<Project[]>([]);
+  const [firestoreSkills, setFirestoreSkills] = useState<Skill[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
@@ -72,6 +75,9 @@ export function TodayTab() {
   const setTasks = user ? setFirestoreTasks : setLocalTasks;
   const timeBlocks = user ? firestoreTimeBlocks : localTimeBlocks;
   const setTimeBlocks = user ? setFirestoreTimeBlocks : setLocalTimeBlocks;
+  const projects = user ? firestoreProjects : localProjects;
+  const skills = user ? firestoreSkills : localSkills;
+
 
   useEffect(() => {
     if (!user) {
@@ -80,15 +86,31 @@ export function TodayTab() {
     };
 
     setIsLoading(true);
+    const unsubs: (() => void)[] = [];
+    const collectionsToSync = [
+        { name: 'todayTasks', setter: setFirestoreTasks },
+        { name: 'timeBlocks', setter: setFirestoreTimeBlocks },
+        { name: 'projects', setter: setFirestoreProjects },
+        { name: 'skills', setter: setFirestoreSkills },
+    ];
 
-    const tasksQuery = query(collection(db, 'todayTasks'), where('userId', '==', user.uid));
+    collectionsToSync.forEach(({ name, setter }) => {
+        const q = query(collection(db, name), where('userId', '==', user.uid));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (name === 'timeBlocks') {
+                setter(items.sort((a:any, b:any) => a.name.localeCompare(b.name)) as any);
+            } else {
+                setter(items as any);
+            }
+        }, (error) => {
+            console.error(`Error fetching ${name}:`, error);
+        });
+        unsubs.push(unsubscribe);
+    });
+
+    // Seed initial time blocks if they don't exist for the user
     const blocksQuery = query(collection(db, 'timeBlocks'), where('userId', '==', user.uid));
-
-    const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
-        setFirestoreTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TodayTask)));
-        if (isLoading) setIsLoading(false);
-    }, () => setIsLoading(false));
-
     const unsubBlocks = onSnapshot(blocksQuery, (snapshot) => {
         if (snapshot.empty) {
             const batch = writeBatch(db);
@@ -98,14 +120,14 @@ export function TodayTab() {
                 batch.set(docRef, { ...rest, userId: user.uid });
             });
             batch.commit();
-        } else {
-             setFirestoreTimeBlocks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TimeBlock)).sort((a,b) => a.name.localeCompare(b.name)));
         }
     });
+    unsubs.push(unsubBlocks);
+
+    setIsLoading(false);
 
     return () => {
-        unsubTasks();
-        unsubBlocks();
+        unsubs.forEach(unsub => unsub());
     };
   }, [user]);
 
@@ -179,8 +201,8 @@ export function TodayTab() {
   };
   
   const handleGeneratePlan = async () => {
-    const planProjects = user ? projects : initialProjects.map(p => ({name: p.name, nextAction: p.nextAction}));
-    const planSkills = user ? skills : initialSkills.map(s => ({area: s.area, weeklyGoal: s.weeklyGoal}));
+    const planProjects = projects.map(p => ({name: p.name, nextAction: p.nextAction}));
+    const planSkills = skills.map(s => ({area: s.area, weeklyGoal: s.weeklyGoal}));
 
     setIsGeneratingPlan(true);
     try {

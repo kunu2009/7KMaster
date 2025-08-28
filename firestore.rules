@@ -9,66 +9,64 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
-    // Projects
+    // Projects Collection
     match /projects/{projectId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
     
-    // Skills
+    // Skills Collection
     match /skills/{skillId} {
-      allow read: if isOwner(resource.data.userId) || resource.data.userId == null; // For backward compatibility
-      allow update, delete: if isOwner(resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
-    
-    // Notes
+
+    // Notes Collection
     match /notes/{noteId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
-    
-    // Today's Tasks
+
+    // Today's Tasks Collection
     match /todayTasks/{taskId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
     
-    // Time Blocks
+    // Time Blocks Collection
     match /timeBlocks/{blockId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
-    
-    // Habits
+
+    // Habits Collection
     match /habits/{habitId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
 
-    // Habit Logs
+    // Habit Logs Collection
     match /habitLogs/{logId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
 
-    // Journal / Self & Space
+    // Self & Space (Journal) Collection
     match /selfSpace/{itemId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
 
-    // Research Items
+    // Research Items Collection
     match /researchItems/{itemId} {
       allow read, update, delete: if isOwner(resource.data.userId);
       allow create: if isOwner(request.resource.data.userId);
     }
     
-    // User Metrics (for streak, etc.)
+    // User Metrics Collection (for streaks, etc.)
     match /userMetrics/{userId} {
       allow read, write: if isOwner(userId);
     }
+
   }
 }
-
-    
