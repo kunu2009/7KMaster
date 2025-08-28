@@ -26,24 +26,31 @@ import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { initialSelfSpace } from '@/lib/data';
 
 export function JournalTab() {
-  const [items, setItems] = useState<SelfSpaceItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const [localItems, setLocalItems] = useLocalStorage<SelfSpaceItem[]>('selfSpace_guest', initialSelfSpace);
+  const [firestoreItems, setFirestoreItems] = useState<SelfSpaceItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const items = user ? firestoreItems : localItems;
+  const setItems = user ? setFirestoreItems : setLocalItems;
+
 
   useEffect(() => {
     if (!user) {
       setIsLoading(false);
-      setItems([]);
       return;
     }
     setIsLoading(true);
     const q = query(collection(db, 'selfSpace'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SelfSpaceItem));
-      setItems(userItems);
+      setFirestoreItems(userItems);
       setIsLoading(false);
     }, (error) => {
       console.error(error);
@@ -54,7 +61,11 @@ export function JournalTab() {
   }, [user, toast]);
 
   const addItem = async (newItem: Omit<SelfSpaceItem, 'id' | 'userId'>) => {
-    if (!user) return;
+    if (!user) {
+      setLocalItems(prev => [...prev, { ...newItem, id: `${Date.now()}` }]);
+      toast({ title: 'Area Added!', description: `"${newItem.area}" has been added.` });
+      return;
+    }
     try {
       await addDoc(collection(db, 'selfSpace'), { ...newItem, userId: user.uid });
       toast({ title: 'Area Added!', description: `"${newItem.area}" has been added.` });
@@ -65,7 +76,11 @@ export function JournalTab() {
   };
 
   const updateItem = async (updatedItem: SelfSpaceItem) => {
-    if (!user) return;
+     if (!user) {
+      setLocalItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+      toast({ title: 'Area Updated!', description: `"${updatedItem.area}" has been updated.` });
+      return;
+    }
     const { id, ...itemData } = updatedItem;
     try {
       await updateDoc(doc(db, 'selfSpace', id), itemData);
@@ -77,7 +92,11 @@ export function JournalTab() {
   };
 
   const deleteItem = async (itemId: string) => {
-    if (!user) return;
+    if (!user) {
+      setLocalItems(prev => prev.filter(item => item.id !== itemId));
+      toast({ title: 'Area Deleted', description: 'The journal entry has been removed.' });
+      return;
+    }
     try {
       await deleteDoc(doc(db, 'selfSpace', itemId));
       toast({ title: 'Area Deleted', description: 'The journal entry has been removed.' });
@@ -103,7 +122,7 @@ export function JournalTab() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading && user ? (
             <div className="flex justify-center items-center h-48">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>

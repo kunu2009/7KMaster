@@ -26,23 +26,36 @@ import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { initialHabits, initialHabitLogs } from '@/lib/data';
 
 
 export function HabitTrackerTab() {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [habitLogs, setHabitLogs] = useState<Record<string, string[]>>({});
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Local state for guests
+  const [localHabits, setLocalHabits] = useLocalStorage<Habit[]>(`habits_guest`, initialHabits);
+  const [localHabitLogs, setLocalHabitLogs] = useLocalStorage<Record<string, string[]>>(`habitLogs_guest`, initialHabitLogs);
+
+  // Firestore state for logged-in users
+  const [firestoreHabits, setFirestoreHabits] = useState<Habit[]>([]);
+  const [firestoreHabitLogs, setFirestoreHabitLogs] = useState<Record<string, string[]>>({});
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const habits = user ? firestoreHabits : localHabits;
+  const habitLogs = user ? firestoreHabitLogs : localHabitLogs;
+  const setHabits = user ? setFirestoreHabits : setLocalHabits;
+  const setHabitLogs = user ? setFirestoreHabitLogs : setLocalHabitLogs;
+
 
   const weekDays = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) }), [currentDate]);
 
   useEffect(() => {
     if (!user) {
         setIsLoading(false);
-        setHabits([]);
-        setHabitLogs({});
         return;
     }
     
@@ -52,9 +65,9 @@ export function HabitTrackerTab() {
 
     const unsubHabits = onSnapshot(habitsQuery, (snapshot) => {
         const userHabits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Habit));
-        setHabits(userHabits);
+        setFirestoreHabits(userHabits);
         if(isLoading) setIsLoading(false);
-    });
+    }, () => setIsLoading(false));
 
     const unsubLogs = onSnapshot(logsQuery, (snapshot) => {
         const userLogs: Record<string, string[]> = {};
@@ -62,7 +75,7 @@ export function HabitTrackerTab() {
             const data = doc.data() as HabitLog;
             userLogs[data.habitId] = data.dates;
         });
-        setHabitLogs(userLogs);
+        setFirestoreHabitLogs(userLogs);
     });
 
     return () => {
@@ -72,7 +85,11 @@ export function HabitTrackerTab() {
   }, [user]);
 
   const addHabit = async (newHabit: Omit<Habit, 'id' | 'userId'>) => {
-    if (!user) return;
+    const habitWithId = { ...newHabit, id: `${Date.now()}` };
+    if (!user) {
+      setLocalHabits(prev => [...prev, habitWithId]);
+      return;
+    }
     try {
         const habitDoc = await addDoc(collection(db, 'habits'), { ...newHabit, userId: user.uid });
         // Create an empty log document for the new habit
@@ -85,7 +102,10 @@ export function HabitTrackerTab() {
   };
   
   const updateHabit = async (updatedHabit: Habit) => {
-    if (!user) return;
+    if (!user) {
+      setLocalHabits(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+      return;
+    }
     const { id, ...habitData } = updatedHabit;
     try {
         await updateDoc(doc(db, 'habits', id), habitData);
@@ -97,7 +117,15 @@ export function HabitTrackerTab() {
   };
   
   const deleteHabit = async (habitId: string) => {
-    if (!user) return;
+    if (!user) {
+       setLocalHabits(prev => prev.filter(h => h.id !== habitId));
+       setLocalHabitLogs(prev => {
+           const newLogs = {...prev};
+           delete newLogs[habitId];
+           return newLogs;
+       });
+       return;
+    }
     try {
         const batch = writeBatch(db);
         batch.delete(doc(db, 'habits', habitId));
@@ -116,16 +144,15 @@ export function HabitTrackerTab() {
   };
 
   const toggleHabit = async (habitId: string, date: Date) => {
-    if (!user) return;
     const dateString = format(date, 'yyyy-MM-dd');
     const logs = habitLogs[habitId] || [];
-    const logIndex = logs.findIndex(d => d === dateString);
-    let newLogs: string[];
+    const newLogs = logs.includes(dateString)
+      ? logs.filter(d => d !== dateString)
+      : [...logs, dateString];
 
-    if (logIndex > -1) {
-      newLogs = logs.filter(d => d !== dateString);
-    } else {
-      newLogs = [...logs, dateString];
+    if (!user) {
+        setLocalHabitLogs(prev => ({...prev, [habitId]: newLogs }));
+        return;
     }
     
     try {
@@ -233,7 +260,7 @@ export function HabitTrackerTab() {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading && user ? (
             <div className="flex justify-center items-center h-48">
                 <Loader2 className="h-8 w-8 animate-spin" />
             </div>
@@ -315,7 +342,7 @@ export function HabitTrackerTab() {
                 </table>
             </div>
         )}
-        {habits.length === 0 && !isLoading && (
+        {habits.length === 0 && (!isLoading || !user) && (
             <div className="text-center py-12 text-muted-foreground">
                 <p>No habits added yet. Click "New Habit" to start tracking.</p>
             </div>

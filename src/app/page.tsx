@@ -2,12 +2,11 @@
 "use client";
 
 import { useAuth } from "@/context/auth-context";
-import LoginPage from "@/app/login/page";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { Loader2 } from "lucide-react";
 
 export default function Home() {
-    const { user, loading } = useAuth();
+    const { loading } = useAuth();
 
     if (loading) {
         return (
@@ -17,11 +16,5 @@ export default function Home() {
         );
     }
 
-    if (user) {
-        return <DashboardView />;
-    }
-
-    return <LoginPage />;
+    return <DashboardView />;
 }
-
-    

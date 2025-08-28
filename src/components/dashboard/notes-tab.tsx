@@ -12,6 +12,8 @@ import { useAuth } from '@/context/auth-context';
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { initialNotes } from '@/lib/data';
 
 interface NotesTabProps {
   selectedNote: Note | null;
@@ -19,23 +21,26 @@ interface NotesTabProps {
 }
 
 export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const [localNotes, setLocalNotes] = useLocalStorage<Note[]>('notes_guest', initialNotes);
+  const [firestoreNotes, setFirestoreNotes] = useState<Note[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const notes = user ? firestoreNotes : localNotes;
+  const setNotes = user ? setFirestoreNotes : setLocalNotes;
 
   useEffect(() => {
     if (!user) {
       setIsLoading(false);
-      setNotes([]);
       return;
     }
     setIsLoading(true);
-    // Remove orderBy from the query to avoid needing a composite index
     const q = query(collection(db, "notes"), where("userId", "==", user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Note));
-      setNotes(userNotes);
+      setFirestoreNotes(userNotes);
       setIsLoading(false);
     }, (error) => {
         console.error(error);
@@ -50,18 +55,22 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
   }, [notes]);
 
   const addNote = async (newNoteData: Omit<Note, 'id' | 'createdAt' | 'modifiedAt' | 'content' | 'userId'>) => {
-    if (!user) return;
     const now = new Date();
-    const fullNote: Omit<Note, 'id'> = {
+    const fullNote: Omit<Note, 'id' | 'userId'> = {
       ...newNoteData,
-      userId: user.uid,
       content: [{ id: `${now.getTime()}-initial`, type: 'paragraph', content: '' }],
       createdAt: now.toISOString(),
       modifiedAt: now.toISOString(),
     };
+    if (!user) {
+        const noteWithId = {...fullNote, id: `${Date.now()}`};
+        setLocalNotes(prev => [noteWithId, ...prev]);
+        onSelectNote(noteWithId);
+        return;
+    }
     try {
-      const docRef = await addDoc(collection(db, 'notes'), fullNote);
-      onSelectNote({ ...fullNote, id: docRef.id });
+      const docRef = await addDoc(collection(db, 'notes'), {...fullNote, userId: user.uid });
+      onSelectNote({ ...fullNote, id: docRef.id, userId: user.uid });
     } catch (e) {
       console.error(e);
       toast({ title: 'Error', description: 'Could not create new note.', variant: 'destructive' });
@@ -69,12 +78,16 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
   }
 
   const handleUpdateNote = async (updatedNote: Note) => {
-    if (!user) return;
-    const { id, ...noteData } = updatedNote;
-    const noteToUpdate = { ...noteData, modifiedAt: new Date().toISOString() };
+    const noteToUpdate = { ...updatedNote, modifiedAt: new Date().toISOString() };
+    if (!user) {
+        setLocalNotes(prev => prev.map(n => n.id === noteToUpdate.id ? noteToUpdate : n));
+        onSelectNote(noteToUpdate);
+        return;
+    }
+    const { id, ...noteData } = noteToUpdate;
     try {
-      await updateDoc(doc(db, 'notes', id), noteToUpdate);
-      onSelectNote({ ...noteToUpdate, id });
+      await updateDoc(doc(db, 'notes', id), noteData);
+      onSelectNote(noteToUpdate);
     } catch(e) {
       console.error(e);
       toast({ title: 'Error', description: 'Could not save note.', variant: 'destructive' });
@@ -82,7 +95,12 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
   };
   
   const handleDeleteNote = async (noteId: string) => {
-    if (!user) return;
+     if (!user) {
+        setLocalNotes(prev => prev.filter(n => n.id !== noteId));
+        onSelectNote(null);
+        toast({ title: "Note Deleted" });
+        return;
+    }
     try {
       await deleteDoc(doc(db, 'notes', noteId));
       onSelectNote(null);
@@ -139,7 +157,7 @@ export function NotesTab({ selectedNote, onSelectNote }: NotesTabProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading && user ? (
           <div className="flex justify-center items-center h-48">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>

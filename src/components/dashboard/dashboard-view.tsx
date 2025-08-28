@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from 'next/link';
 import { TodayTab } from "@/components/dashboard/today-tab";
 import { ProjectsTab } from "@/components/dashboard/projects-tab";
 import { SkillsTab } from "@/components/dashboard/skills-tab";
@@ -32,7 +33,7 @@ import {
   BrainCircuit,
   Bot,
   AppWindow,
-  Link,
+  Link as LinkIcon,
   PenSquare,
   Home as HomeIcon,
   Bookmark,
@@ -44,6 +45,7 @@ import {
   ScrollText,
   BookCopy,
   LogOut,
+  LogIn,
   ArrowLeft,
   ChevronsLeft,
   ChevronsRight
@@ -69,7 +71,7 @@ const navItems = [
   { id: 'progress', label: 'Progress', icon: LineChart },
   { id: 'notes', label: 'Notepad', icon: NotepadText },
   { id: 'apps', label: 'Apps', icon: AppWindow },
-  { id: 'web-links', label: 'Links', icon: Link },
+  { id: 'web-links', label: 'Links', icon: LinkIcon },
 ];
 
 export function DashboardView() {
@@ -79,7 +81,7 @@ export function DashboardView() {
   const [activeHscPage, setActiveHscPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   
   // Lifted state
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -168,24 +170,46 @@ export function DashboardView() {
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
         <ThemeToggle />
-         <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-lg"
-                        aria-label="Logout"
-                        onClick={logout}
-                    >
-                        <LogOut className="size-5" />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={5}>
-                    Logout
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+         {user ? (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-lg"
+                            aria-label="Logout"
+                            onClick={logout}
+                        >
+                            <LogOut className="size-5" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" sideOffset={5}>
+                        Logout
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+         ) : (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Link href="/login">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-lg"
+                                aria-label="Login"
+                            >
+                                <LogIn className="size-5" />
+                            </Button>
+                        </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" sideOffset={5}>
+                        Sign In
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+         )}
       </nav>
     </aside>
   );
@@ -212,6 +236,11 @@ export function DashboardView() {
                     <h1 className="font-semibold text-lg">{activeTab === 'study' ? 'LawPrep Sprint' : activeTab === 'itihas' ? '7K Itihas' : activeTab === 'hsc' ? '7K HSC Board' : '7K Life'}</h1>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4">
+                    {!user && (
+                         <Link href="/login">
+                           <Button size="sm">Sign In</Button>
+                         </Link>
+                    )}
                     <div className="flex items-center space-x-2">
                         <Switch 
                             id="focus-mode" 
@@ -233,5 +262,3 @@ export function DashboardView() {
     </div>
   );
 }
-
-    

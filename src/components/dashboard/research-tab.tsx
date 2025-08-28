@@ -13,6 +13,8 @@ import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from "@/lib/firebase";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { initialResearchItems } from "@/lib/data";
 
 const typeColors: Record<ResearchType, string> = {
   Tool: "bg-blue-500/20 text-blue-500 border-blue-500/30",
@@ -23,24 +25,28 @@ const typeColors: Record<ResearchType, string> = {
 };
 
 export function ResearchTab() {
-  const [items, setItems] = useState<ResearchItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [localItems, setLocalItems] = useLocalStorage<ResearchItem[]>('researchItems_guest', initialResearchItems);
+  const [firestoreItems, setFirestoreItems] = useState<ResearchItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [filter, setFilter] = useState<ResearchType | 'All'>('All');
   const [selectedItem, setSelectedItem] = useState<ResearchItem | null>(null);
+
+  const items = user ? firestoreItems : localItems;
   
   useEffect(() => {
     if (!user) {
       setIsLoading(false);
-      setItems([]);
       return;
     }
     setIsLoading(true);
     const q = query(collection(db, 'researchItems'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const userItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ResearchItem));
-        setItems(userItems);
+        setFirestoreItems(userItems);
         setIsLoading(false);
     }, (error) => {
         console.error(error);
@@ -51,9 +57,14 @@ export function ResearchTab() {
   }, [user, toast]);
 
   const addItem = async (newItem: Omit<ResearchItem, 'id' | 'todos' | 'userId'>) => {
-    if (!user) return;
+    const itemWithTodos = { ...newItem, todos: [] };
+    if (!user) {
+        setLocalItems(prev => [...prev, {...itemWithTodos, id: `${Date.now()}`}]);
+        toast({ title: 'Item Added!', description: `"${newItem.name}" has been saved.` });
+        return;
+    }
     try {
-        await addDoc(collection(db, 'researchItems'), { ...newItem, userId: user.uid, todos: [] });
+        await addDoc(collection(db, 'researchItems'), { ...itemWithTodos, userId: user.uid });
         toast({ title: 'Item Added!', description: `"${newItem.name}" has been saved.` });
     } catch(e) {
         console.error(e);
@@ -62,7 +73,13 @@ export function ResearchTab() {
   };
   
   const updateItem = async (updatedItem: ResearchItem) => {
-    if (!user) return;
+    if (!user) {
+        setLocalItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+        if (selectedItem?.id === updatedItem.id) {
+            setSelectedItem(updatedItem);
+        }
+        return;
+    }
     const { id, ...itemData } = updatedItem;
     try {
         await updateDoc(doc(db, 'researchItems', id), itemData);
@@ -76,7 +93,14 @@ export function ResearchTab() {
   };
   
   const deleteItem = async (itemId: string) => {
-    if (!user) return;
+     if (!user) {
+        setLocalItems(prev => prev.filter(item => item.id !== itemId));
+        if (selectedItem?.id === itemId) {
+            setSelectedItem(null);
+        }
+        toast({ title: 'Item Deleted' });
+        return;
+    }
     try {
         await deleteDoc(doc(db, 'researchItems', itemId));
         if (selectedItem && selectedItem.id === itemId) {
@@ -140,7 +164,7 @@ export function ResearchTab() {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading && user ? (
              <div className="flex justify-center items-center h-48">
                 <Loader2 className="h-8 w-8 animate-spin" />
             </div>
