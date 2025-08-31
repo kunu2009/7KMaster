@@ -2,6 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   getAuth,
   onAuthStateChanged,
@@ -31,15 +32,22 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+      if (user) {
+        // If user is logged in, redirect them from login page if they are there
+        if (window.location.pathname === '/login') {
+            router.push('/');
+        }
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const login = (email: string, pass: string) => {
     return signInWithEmailAndPassword(auth, email, pass);
